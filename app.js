@@ -20,7 +20,10 @@ define(function(require) {
 	}));
 
 	var app = {
-		name: 'voip',
+        name: 'voip',
+        
+        // Hack to fix an unset accountId property bug that I haven't tracked down yet
+        isMasqueradable: true,
 
 		css: [ 'app' ],
 
