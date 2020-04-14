@@ -45,14 +45,14 @@ define(function(require) {
 				 * @type {Array}
 				 */
 				addableDeviceTypes: [
-					'sip_device',
 					'cellphone',
-					'smartphone',
-					'softphone',
-					'landline',
-					'fax',
-					'ata',
-					'sip_uri'
+					// 'sip_device',
+					// 'smartphone',
+					// 'softphone',
+					// 'landline',
+					// 'fax',
+					// 'ata',
+					// 'sip_uri'
 				],
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
