@@ -509,7 +509,7 @@ define(function(require) {
 						required: true
 					},
 					'mac_address': {
-						required: true,
+						required: false,
 						mac: true
 					},
 					'mobile.mdn': {

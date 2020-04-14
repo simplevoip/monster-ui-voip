@@ -1808,7 +1808,7 @@ define(function(require) {
 							'user.device.name': 'required',
 							'user.device.model': 'required',
 							'user.device.mac_address': {
-								required: true,
+								required: false,
 								mac: true
 							}
 						},
