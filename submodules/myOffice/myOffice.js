@@ -253,7 +253,6 @@ define(function(require) {
 
 		myOfficeLoadData: function(callback) {
 			var self = this;
-
 			monster.parallel({
 				account: function(parallelCallback) {
 					self.callApi({

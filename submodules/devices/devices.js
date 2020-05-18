@@ -2,7 +2,6 @@ define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
 		monster = require('monster');
-
 	var app = {
 
 		requests: {
@@ -28,16 +27,16 @@ define(function(require) {
 		appFlags: {
 			devices: {
 				iconClassesByDeviceTypes: {
-					application: 'icon-telicon-apps',
-					ata: 'icon-telicon-ata',
-					cellphone: 'fa fa-phone',
-					fax: 'icon-telicon-fax',
-					landline: 'icon-telicon-home',
-					mobile: 'icon-telicon-sprint-phone',
-					sip_device: 'icon-telicon-voip-phone',
-					sip_uri: 'icon-telicon-voip-phone',
-					smartphone: 'icon-telicon-mobile-phone',
-					softphone: 'icon-telicon-soft-phone'
+					// application: 'icon-telicon-apps',
+					// ata: 'icon-telicon-ata',
+					cellphone: 'fa fa-phone'
+					// fax: 'icon-telicon-fax',
+					// landline: 'icon-telicon-home',
+					// mobile: 'icon-telicon-sprint-phone',
+					// sip_device: 'icon-telicon-voip-phone',
+					// sip_uri: 'icon-telicon-voip-phone',
+					// smartphone: 'icon-telicon-mobile-phone',
+					// softphone: 'icon-telicon-soft-phone'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
@@ -45,8 +44,8 @@ define(function(require) {
 				 * @type {Array}
 				 */
 				addableDeviceTypes: [
-					'cellphone',
 					// 'sip_device',
+					'cellphone'
 					// 'smartphone',
 					// 'softphone',
 					// 'landline',
@@ -59,15 +58,15 @@ define(function(require) {
 				 * @type {Array}
 				 */
 				editableDeviceTypes: [
-					'ata',
-					'cellphone',
-					'fax',
-					'landline',
-					'mobile',
-					'sip_device',
-					'sip_uri',
-					'smartphone',
-					'softphone'
+					// 'ata',
+					'cellphone'
+					// 'fax',
+					// 'landline',
+					// 'mobile',
+					// 'sip_device',
+					// 'sip_uri',
+					// 'smartphone',
+					// 'softphone'
 				]
 			}
 		},
