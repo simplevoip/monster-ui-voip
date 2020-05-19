@@ -45,7 +45,7 @@ define(function(require) {
 				 */
 				addableDeviceTypes: [
 					'sip_device',
-					'cellphone'
+					'cellphone',
 					'smartphone',
 					'softphone',
 					'landline',
@@ -59,7 +59,7 @@ define(function(require) {
 				 */
 				editableDeviceTypes: [
 					'ata',
-					'cellphone'
+					'cellphone',
 					'fax',
 					'landline',
 					'mobile',
