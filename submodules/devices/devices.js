@@ -27,16 +27,16 @@ define(function(require) {
 		appFlags: {
 			devices: {
 				iconClassesByDeviceTypes: {
-					// application: 'icon-telicon-apps',
-					// ata: 'icon-telicon-ata',
+					application: 'icon-telicon-apps',
+					ata: 'icon-telicon-ata',
 					cellphone: 'fa fa-phone'
-					// fax: 'icon-telicon-fax',
-					// landline: 'icon-telicon-home',
-					// mobile: 'icon-telicon-sprint-phone',
-					// sip_device: 'icon-telicon-voip-phone',
-					// sip_uri: 'icon-telicon-voip-phone',
-					// smartphone: 'icon-telicon-mobile-phone',
-					// softphone: 'icon-telicon-soft-phone'
+					fax: 'icon-telicon-fax',
+					landline: 'icon-telicon-home',
+					mobile: 'icon-telicon-sprint-phone',
+					sip_device: 'icon-telicon-voip-phone',
+					sip_uri: 'icon-telicon-voip-phone',
+					smartphone: 'icon-telicon-mobile-phone',
+					softphone: 'icon-telicon-soft-phone'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
@@ -44,29 +44,29 @@ define(function(require) {
 				 * @type {Array}
 				 */
 				addableDeviceTypes: [
-					// 'sip_device',
+					'sip_device',
 					'cellphone'
-					// 'smartphone',
-					// 'softphone',
-					// 'landline',
-					// 'fax',
-					// 'ata',
-					// 'sip_uri'
+					'smartphone',
+					'softphone',
+					'landline',
+					'fax',
+					'ata',
+					'sip_uri'
 				],
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
 				 * @type {Array}
 				 */
 				editableDeviceTypes: [
-					// 'ata',
+					'ata',
 					'cellphone'
-					// 'fax',
-					// 'landline',
-					// 'mobile',
-					// 'sip_device',
-					// 'sip_uri',
-					// 'smartphone',
-					// 'softphone'
+					'fax',
+					'landline',
+					'mobile',
+					'sip_device',
+					'sip_uri',
+					'smartphone',
+					'softphone'
 				]
 			}
 		},
