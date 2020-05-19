@@ -29,7 +29,7 @@ define(function(require) {
 				iconClassesByDeviceTypes: {
 					application: 'icon-telicon-apps',
 					ata: 'icon-telicon-ata',
-					cellphone: 'fa fa-phone'
+					cellphone: 'fa fa-phone',
 					fax: 'icon-telicon-fax',
 					landline: 'icon-telicon-home',
 					mobile: 'icon-telicon-sprint-phone',
