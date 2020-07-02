@@ -478,14 +478,13 @@ define(function(require) {
 									return _.includes(staticNonNumbers, number);
 								})
 								.map(function(number) {
-									return _
-										.chain(data.numbers)
+									return _.merge({
+										number: number
+									}, _.chain(data.numbers)
 										.get(number, {})
 										.pick('features')
-										.merge({
-											number: number
-										})
-										.value();
+										.value()
+									);
 								})
 								.value();
 						});
@@ -897,14 +896,21 @@ define(function(require) {
 					submodule: 'myOffice'
 				})),
 				popup = monster.ui.dialog(popupTemplate, {
+					autoScroll: false,
 					title: self.i18n.active().myOffice.callerId.title,
 					position: ['center', 20]
 				});
 
 			if (monster.util.isNumberFeatureEnabled('e911')) {
-				var e911Form = popupTemplate.find('.emergency-form > form');
+				var e911Form = popupTemplate.find('#emergency_form');
 
 				monster.ui.validate(e911Form, {
+					rules: {
+						notification_contact_emails: {
+							normalizer: _.trim,
+							regex: /^(?:([\w+-.%]+@[\w-.]+\.[A-Za-z]{2,4})(?: ?))*$/
+						}
+					},
 					messages: {
 						'postal_code': {
 							required: '*'
@@ -917,6 +923,9 @@ define(function(require) {
 						},
 						'region': {
 							required: '*'
+						},
+						notification_contact_emails: {
+							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
 						}
 					}
 				});
@@ -945,58 +954,80 @@ define(function(require) {
 				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
+				emergencyEmailInput = popupTemplate.find('.caller-id-emergency-email'),
+				editableFeatures = [ 'e911', 'cnam' ],
 				loadNumberDetails = function(number, popupTemplate) {
-					var allowedFeatures = [],
-						callback = function(features) {
-							popupTemplate.find('.number-feature').hide();
-							_.each(features, function(featureName) {
-								popupTemplate.find('.number-feature[data-feature="' + featureName + '"]').slideDown();
+					monster.waterfall([
+						function getNumberData(waterfallCallback) {
+							if (!number) {
+								return waterfallCallback(null, null);
+							}
+
+							self.myOfficeGetNumber(number, function(numberData) {
+								waterfallCallback(null, numberData);
 							});
-						};
+						},
+						function getAllowedFeatures(numberData, waterfallCallback) {
+							if (_.isNil(numberData)) {
+								return waterfallCallback(null, numberData, []);
+							}
 
-					if (number) {
-						self.myOfficeGetNumber(number, function(numberData) {
-							var availableFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features_available') ? numberData._read_only.features_available : [],
-								activatedFeatures = numberData.hasOwnProperty('_read_only') && numberData._read_only.hasOwnProperty('features') ? numberData._read_only.features : [],
-								allFeatures = availableFeatures.concat(activatedFeatures),
-								hasE911 = allFeatures.indexOf('e911') >= 0,
-								hasCNAM = allFeatures.indexOf('cnam') >= 0;
+							var availableFeatures = monster.util.getNumberFeatures(numberData),
+								allowedFeatures = _.intersection(availableFeatures, editableFeatures);
 
-							if (hasE911) {
-								if (monster.util.isNumberFeatureEnabled('e911')) {
-									allowedFeatures.push('e911');
+							waterfallCallback(null, numberData, allowedFeatures);
+						},
+						function fillFormFields(numberData, allowedFeatures, waterfallCallback) {
+							if (_.isEmpty(allowedFeatures)) {
+								return waterfallCallback(null, allowedFeatures);
+							}
 
-									if ('e911' in numberData) {
-										emergencyZipcodeInput.val(numberData.e911.postal_code);
-										emergencyAddress1Input.val(numberData.e911.street_address);
-										emergencyAddress2Input.val(numberData.e911.extended_address);
-										emergencyCityInput.val(numberData.e911.locality);
-										emergencyStateInput.val(numberData.e911.region);
-									} else {
-										emergencyZipcodeInput.val('');
-										emergencyAddress1Input.val('');
-										emergencyAddress2Input.val('');
-										emergencyCityInput.val('');
-										emergencyStateInput.val('');
-									}
+							var hasE911 = _.includes(allowedFeatures, 'e911'),
+								hasCNAM = _.includes(allowedFeatures, 'cnam'),
+								isE911Enabled = monster.util.isNumberFeatureEnabled('e911');
+
+							if (hasE911 && isE911Enabled) {
+								if (_.has(numberData, 'e911')) {
+									emergencyZipcodeInput.val(numberData.e911.postal_code);
+									emergencyAddress1Input.val(numberData.e911.street_address);
+									emergencyAddress2Input.val(numberData.e911.extended_address);
+									emergencyCityInput.val(numberData.e911.locality);
+									emergencyStateInput.val(numberData.e911.region);
+									emergencyEmailInput.val(_
+										.chain(numberData.e911)
+										.get('notification_contact_emails', [])
+										.join(' ')
+										.value()
+									);
+								} else {
+									emergencyZipcodeInput.val('');
+									emergencyAddress1Input.val('');
+									emergencyAddress2Input.val('');
+									emergencyCityInput.val('');
+									emergencyStateInput.val('');
+									emergencyEmailInput.val('');
 								}
 							}
 
 							if (hasCNAM) {
-								allowedFeatures.push('cnam');
-
-								if ('cnam' in numberData) {
+								if (_.has(numberData, 'cnam')) {
 									callerIdNameInput.val(numberData.cnam.display_name);
 								} else {
 									callerIdNameInput.val('');
 								}
 							}
 
-							callback && callback(allowedFeatures);
+							waterfallCallback(null, allowedFeatures);
+						}
+					], function hideOrShowFeatureSections(err, allowedFeatures) {
+						_.each(editableFeatures, function(featureName) {
+							var $featureSection = popupTemplate.find('.number-feature[data-feature="' + featureName + '"]'),
+								isFeatureAllowed = _.includes(allowedFeatures, featureName),
+								action = isFeatureAllowed ? 'slideDown' : 'slideUp';
+
+							$featureSection[action]();
 						});
-					} else {
-						callback && callback(allowedFeatures);
-					}
+					});
 				};
 
 			popupTemplate.find('.cancel-link').on('click', function() {
@@ -1066,8 +1097,18 @@ define(function(require) {
 							}
 
 							if (setE911) {
-								$.extend(true, numberData, {
-									e911: e911Data
+								_.assign(numberData, {
+									e911: _.assign({}, e911Data, {
+										notification_contact_emails: _
+											.chain(e911Data)
+											.get('notification_contact_emails', '')
+											.trim()
+											.toLower()
+											.split(' ')
+											.reject(_.isEmpty)
+											.uniq()
+											.value()
+									})
 								});
 							} else {
 								delete numberData.e911;
@@ -1081,7 +1122,7 @@ define(function(require) {
 					e911Form;
 
 				if (monster.util.isNumberFeatureEnabled('e911')) {
-					e911Form = popupTemplate.find('.emergency-form > form');
+					e911Form = popupTemplate.find('#emergency_form');
 				}
 
 				if (callerIdNumber) {

@@ -1,15 +1,5 @@
 @import '../../../../css/partials/base';
 
-#users_container_overlay {
-	position: fixed;
-	top: 0;
-	right: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #000;
-	opacity: .3;
-}
-
 #users_container .users-header {
 	font-size: 18px;
 	line-height: 30px;
@@ -683,10 +673,6 @@
 	&[for="password"] {
 		margin-top: 25px;
 	}
-
-	&[for="licensed_role"] {
-		margin-top: 55px;
-	}
 }
 
 #creation_user_dialog .control-group.hack-left .control-label{
@@ -854,12 +840,32 @@
 		form {
 			margin-bottom: 0;
 
+			.control-group {
+				&.main{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					padding-bottom: 15px;
+
+					label.title {
+						font-size: 1em;
+						padding-right: 1em;
+						margin-bottom: 0px;
+						width: 230px;
+						text-align: right;
+					}
+				}
+
+				&.extra {
+					margin-bottom: 40px;
+				}
+			}
+
 			.list-numbers {
 				display: inline-block;
 				font-weight: 600;
 				height: 65px;
 				line-height: 15px;
-				margin-left: 25px;
 				overflow: auto;
 				vertical-align: middle;
 				width: 180px;
@@ -1009,7 +1015,6 @@
 			&.main{
 				display: flex;
 				flex-direction: row;
-				justify-content: center;
 				align-items: center;
 				padding-bottom: 15px;
 
@@ -1017,6 +1022,8 @@
 					font-size: 1em;
 					padding-right: 1em;
 					margin-bottom: 0px;
+					width: 200px;
+					text-align: right;
 				}
 			}
 

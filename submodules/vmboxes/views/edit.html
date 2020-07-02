@@ -139,10 +139,21 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-input checkbox">
+					<label class="control-input checkbox{{#if announcement_only}} disabled{{/if}}">
 						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.skipInstructions.help }}">
 							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.skipInstructions.label}}
-								<input type="checkbox" name="skip_instructions" id="skip_instructions" {{#if skip_instructions }}checked{{/if}} />
+								<input type="checkbox" name="skip_instructions" id="skip_instructions" {{#if skip_instructions }}checked{{/if}} {{#if announcement_only}}checked disabled{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+					<input id="skip_instructions_input" type="hidden" value="{{skip_instructions}}">
+				</div>
+
+				<div class="control-group">
+					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.announceOnly.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.announceOnly.label}}
+								<input type="checkbox" name="announcement_only" id="announcement_only" {{#if announcement_only }}checked{{/if}} />
 							{{/monsterCheckbox}}
 						</div>
 					</label>
@@ -157,6 +168,28 @@
 						</div>
 					</label>
 				</div>
+
+				<div class="control-group">
+					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.emailAsAttachment.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.emailAsAttachment.label}}
+								<input type="checkbox" name="include_message_on_notify" id="include_message_on_notify" {{#if include_message_on_notify }}checked{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+				</div>
+
+				{{#if hasTranscribe}}
+				<div class="control-group">
+					<label class="control-input checkbox">
+						<div data-toggle="tooltip" data-placement="right" data-original-title="{{ i18n.vmboxes.popupSettings.options.transcription.help }}">
+							{{#monsterCheckbox i18n.vmboxes.popupSettings.options.transcription.label}}
+								<input type="checkbox" name="transcribe" id="transcription" {{#if transcribe }}checked{{/if}} />
+							{{/monsterCheckbox}}
+						</div>
+					</label>
+				</div>
+				{{/if}}
 
 				<div class="control-group">
 					<label class="control-input checkbox">
