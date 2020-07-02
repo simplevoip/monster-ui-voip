@@ -2765,16 +2765,18 @@ define(function(require) {
 								dropdownCallEntities = self.strategyGetCallEntitiesDropdownData(popupCallEntities);
 
 							_.each(strategyData.callflows[name].flow.children, function(val, key) {
-								menuLineContainer
-									.append($(self.getTemplate({
-										name: 'menuLine',
-										data: {
-											number: key,
-											callEntities: dropdownCallEntities,
-											selectedId: val.data.id || val.data.endpoints[0].id
-										},
-										submodule: 'strategy'
-									})));
+								if ( val.data.id || ( val.data.endpoints && val.data.endpoints.length ) ) { // NOTE: temporary fix; why do all "val.data"s not have either an "id" or "endpoints" property
+									menuLineContainer
+										.append($(self.getTemplate({
+											name: 'menuLine',
+											data: {
+												number: key,
+												callEntities: dropdownCallEntities,
+												selectedId: val.data.id || val.data.endpoints[0].id
+											},
+											submodule: 'strategy'
+										})));
+								}
 							});
 
 							$.each(menuLineContainer.find('.target-input'), function() {
