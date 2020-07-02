@@ -112,6 +112,7 @@
 			"mainMenu": "Main Menu (Open hours)",
 			"voicemails": "Voicemail Boxes",
 			"users": "Users",
+			"groups": "Groups",
 			"__comment": "UI-2664: Adding devices as next action",
 			"__version": "4.1",
 			"devices": "Devices"
@@ -168,6 +169,7 @@
 			"basicSectionTitle": "Basic Settings",
 			"dragAndDrop": "To select a codec, drag and drop from the available codecs box to selected codecs box",
 			"noOwner": "- No Owner -",
+			"saveAndApply": "Save and Apply",
 			"options": {
 				"menuTitle": "Options"
 			},
@@ -295,14 +297,17 @@
 			"keys": {
 				"alert": {
 					"message": "By default, this key will be used as a Line Key. It is strongly recommended that you not change it.",
-					"title": "Key 1 Default"
+					"title": "Key {{variable}} Default"
 				},
 				"featureKeys": {
-					"title": "Feature Keys",
+					"menuTitle": "Feature Keys",
+					"sectionTitle": "Feature Keys",
 					"label": "Feature key"
 				},
 				"comboKeys": {
-					"title": "Combo Keys",
+					"menuTitle": "Combo Keys",
+					"sectionTitle": "Combo Keys {{range}}",
+					"range": "{{min}} - {{max}}",
 					"label": "Combo key"
 				},
 				"labels": {
@@ -658,7 +663,8 @@
 			"pinLabel": "Personal Conference Room number",
 			"number": "Conferencing Phone Number(s)",
 			"help": "You can create a conference call by providing a conferencing phone number and your personal room number to the participants",
-			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges"
+			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges",
+			"enableVideoConferencing": "Enable Video Conferencing"
 		},
 		"do_not_disturb": {
 			"headline": "User DND Settings",
@@ -714,7 +720,7 @@
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
 			"announceOnly": "Announce Only",
 			"transcribe": "Transcribe",
-			"attach_voicemail": "Attach voicemail message to email."
+			"attachVoicemail": "Attach voicemail message to email."
 		},
 		"find_me_follow_me": {
 			"title": "Find me, Follow me",
@@ -1140,13 +1146,15 @@
 			"numberHelp": "This number will appear as your Caller ID when you make outbound calls. Needs to be shorter than 15 characters (including spaces).",
 			"nameLabel": "Company Caller ID name",
 			"nameHelp": "This name will appear as your Caller ID when you make outbound calls.",
-			"emergencyLabel": "Company Emergency (E911) Address",
+			"emergencyLabel": "Company Emergency (E911) Information",
 			"emergencyZipcode": "Zip Code",
 			"emergencyAddress1": "Address Line 1",
 			"emergencyAddress2": "Address Line 2",
 			"emergencyCity": "City",
 			"emergencyState": "State",
-			"emergencyHelp1": "This address will appear as your Caller ID address when you make outbound emergency call to a government agency (e.g. 911 in the US).",
+			"emergencyEmail": "Email Address(es)",
+			"emergencyEmailError": "Invalid space separated address(es)",
+			"emergencyHelp1": "This information will appear as your Caller ID information when you make outbound emergency call to a government agency (e.g. 911 in the US).",
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number."
 		},

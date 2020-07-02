@@ -36,7 +36,8 @@ define(function(require) {
 			'sip_device': 'icon-telicon-voip-phone',
 			'sip_uri': 'icon-telicon-voip-phone',
 			'fax': 'icon-telicon-fax',
-			'ata': 'icon-telicon-ata'
+			'ata': 'icon-telicon-ata',
+			'application': 'icon-telicon-apps'
 		},
 
 		/* Users */
@@ -50,7 +51,7 @@ define(function(require) {
 				_sortBy = args.sortBy,
 				callback = args.callback;
 
-			self.usersRemoveOverlay();
+			self.overlayRemove();
 
 			self.usersGetData(function(data) {
 				var dataTemplate = self.usersFormatListData(data, _sortBy),
@@ -461,7 +462,7 @@ define(function(require) {
 				var userId = device.owner_id;
 
 				if (userId in mapUsers) {
-					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
+					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata', 'application'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
 					var isEnabled = device.enabled;
 
 					if (mapUsers[userId].extra.devices.length >= 2) {
@@ -591,7 +592,7 @@ define(function(require) {
 					template.find('.grid-cell').removeClass('active');
 					template.find('.grid-row').removeClass('active');
 
-					self.usersRemoveOverlay();
+					self.overlayRemove();
 					cell.css({
 						'position': 'initial',
 						'z-index': '0'
@@ -660,7 +661,7 @@ define(function(require) {
 							$('body').animate({ scrollTop: row.offset().top - (window.innerHeight - row.height() - 10) });
 						});
 
-						$('body').append($('<div id="users_container_overlay"></div>'));
+						self.overlayInsert();
 					});
 				}
 			});
@@ -698,7 +699,7 @@ define(function(require) {
 					});
 					template.find('.grid-row.active').removeClass('active');
 
-					self.usersRemoveOverlay();
+					self.overlayRemove();
 
 					template.find('.grid-cell.active').removeClass('active');
 				});
@@ -1638,26 +1639,7 @@ define(function(require) {
 				}
 			});
 
-			$('body').on('click', '#users_container_overlay', function() {
-				template.find('.edit-user').slideUp('400', function() {
-					$(this).empty();
-				});
-
-				self.usersRemoveOverlay();
-
-				template.find('.grid-cell.active').css({
-					'position': 'inline-block',
-					'z-index': '0'
-				});
-
-				template.find('.grid-row.active').parent().siblings('.edit-user').css({
-					'position': 'block',
-					'z-index': '0'
-				});
-
-				template.find('.grid-cell.active').removeClass('active');
-				template.find('.grid-row.active').removeClass('active');
-			});
+			self.overlayBindOnClick(template, 'user');
 		},
 
 		usersBindAddUserEvents: function(args) {
@@ -1985,92 +1967,98 @@ define(function(require) {
 			}
 		},
 
+		/**
+		 * @param  {Object} data
+		 * @param  {Array} data.callflows
+		 * @param  {Array} data.provisioners
+		 * @param  {Array} data.vmboxes
+		 * @return {Object}
+		 */
 		usersFormatAddUser: function(data) {
 			var self = this,
-				formattedData = {
-					hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
-					sendToSameEmail: true,
-					nextExtension: '',
-					listExtensions: {},
-					createVmbox: true,
-					listVMBoxes: {}
-				},
-				arrayExtensions = [],
-				arrayVMBoxes = [],
-				allNumbers = [];
+				servicePlansRole = self.appFlags.global.servicePlansRole,
+				listExtensions = _.flatMap(data.callflows, function(callflow) {
+					return _
+						.chain(callflow.numbers)
+						.filter(function(number) {
+							return _.size(number) < 7;
+						})
+						.map(function(number) {
+							return {
+								callflow: callflow,
+								extension: number
+							};
+						})
+						.value();
+				}),
+				mapVMBoxes = _.keyBy(data.vmboxes, 'mailbox'),
+				// We concat both arrays because we want to create users with the same number for the extension # and the vmbox,
+				// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
+				allNumbers = _
+					.chain([
+						_.map(listExtensions, 'extension'),
+						_.keys(mapVMBoxes, 'mailbox')
+					])
+					.flatten()
+					.uniq()
+					.value();
 
-			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
-				formattedData.licensedUserRoles = self.appFlags.global.servicePlansRole;
-			}
-
-			_.each(data.callflows, function(callflow) {
-				_.each(callflow.numbers, function(number) {
-					if (number.length < 7) {
-						formattedData.listExtensions[number] = callflow;
-						arrayExtensions.push(number);
-					}
-				});
+			return _.merge({
+				createVmbox: true,
+				hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
+				listExtensions: _
+					.chain(listExtensions)
+					.keyBy('extension')
+					.mapValues('callflow')
+					.value(),
+				listProvisioners: _
+					.chain(data.provisioners)
+					.map(function(brand) {
+						return _.merge({
+							models: _.flatMap(brand.families, function(family) {
+								return _.map(family.models, function(model) {
+									return _.merge({
+										family: family.name
+									}, model);
+								});
+							})
+						}, _.pick(brand, [
+							'id',
+							'name'
+						]));
+					})
+					.sortBy('name')
+					.value(),
+				listVMBoxes: mapVMBoxes,
+				nextExtension: parseInt(monster.util.getNextExtension(allNumbers)) + '',
+				sendToSameEmail: true
+			}, !_.isEmpty(servicePlansRole) && {
+				licensedUserRoles: servicePlansRole
 			});
-
-			_.each(data.vmboxes, function(vmbox) {
-				formattedData.listVMBoxes[vmbox.mailbox] = vmbox;
-				arrayVMBoxes.push(vmbox.mailbox);
-			});
-
-			// We concat both arrays because we want to create users with the same number for the extension # and the vmbox,
-			// If for some reason a vmbox number exist without an extension, we still don't want to let them set their extension number to that number.
-			allNumbers = arrayExtensions.concat(arrayVMBoxes);
-			formattedData.nextExtension = parseInt(monster.util.getNextExtension(allNumbers)) + '';
-			formattedData.listProvisioners = _.map(data.provisioners, function(brand) {
-				var models = _.flatMap(brand.families, function(family) {
-					return _.map(family.models, function(model) {
-						model.family = family.name;
-						return model;
-					});
-				});
-
-				return {
-					id: brand.id,
-					name: brand.name,
-					models: models
-				};
-			});
-
-			return formattedData;
 		},
 
 		usersFormatFaxingData: function(data) {
-			var tempList = [],
-				listNumbers = {};
-
-			_.each(data.numbers, function(val, key) {
-				tempList.push(key);
-			});
-
-			tempList.sort(function(a, b) {
-				return a < b ? -1 : 1;
-			});
-
-			if (data.callflows) {
-				if (data.callflows.numbers.length > 0) {
-					listNumbers[data.callflows.numbers[0]] = data.callflows.numbers[0];
+			return _.merge({}, data, {
+				extra: {
+					listNumbers: _
+						.chain([
+							_.keys(data.numbers),
+							_
+								.chain(data.callflows)
+								.get('numbers', [])
+								.slice(0, 1)
+								.value()
+						])
+						.flatten()
+						.uniq()
+						.keyBy()
+						.value()
 				}
-			}
-
-			_.each(tempList, function(val, key) {
-				listNumbers[val] = val;
 			});
-
-			data.extra = $.extend(true, {}, data.extra, {
-				listNumbers: listNumbers
-			});
-
-			return data;
 		},
 
 		usersRenderConferencing: function(data) {
 			var self = this,
-				data = self.usersFormatConferencingData(data),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-conferencing',
 					data: data,
@@ -2101,6 +2089,20 @@ define(function(require) {
 				if (monster.ui.valid(featureForm)) {
 					data.conference = monster.ui.getFormData('conferencing_form');
 
+					if (data.conference.video) {
+						data.conference = _.merge(data.conference, {
+							video: true,
+							profile_name: 'video',
+							caller_controls: 'video-participant',
+							moderator_controls: 'video-moderator'
+						});
+					} else {
+						delete data.conference.video;
+						delete data.conference.profile_name;
+						delete data.conference.caller_controls;
+						delete data.conference.moderator_controls;
+					}
+
 					if (switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
 							args.userId = data.user.id;
@@ -2121,10 +2123,6 @@ define(function(require) {
 				title: data.user.extra.mapFeatures.conferencing.title,
 				position: ['center', 20]
 			});
-		},
-
-		usersFormatConferencingData: function(data) {
-			return data;
 		},
 
 		usersRenderFaxboxes: function(data) {
@@ -2282,6 +2280,7 @@ define(function(require) {
 							transcribe: announcement_only ? false : transcribe,
 							announcement_only: announcement_only,
 							hasTranscribe: _.get(transcription, 'isEnabled', false),
+							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
 						})
 					}),
 					submodule: 'users'
@@ -2435,7 +2434,7 @@ define(function(require) {
 		usersRenderCallerId: function(currentUser, numberChoices) {
 			var self = this,
 				allowAnyOwnedNumberAsCallerID = monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID ? true : false,
-				templateUser = $.extend(true, {allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID}, currentUser),
+				templateUser = $.extend(true, { allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID }, currentUser),
 				featureTemplate,
 				switchFeature;
 
@@ -2499,28 +2498,25 @@ define(function(require) {
 
 		usersFormatCallForwardData: function(user) {
 			var self = this,
-				cfMode = 'off';
-
-			user.extra = user.extra || {};
+				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
+				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
+				isFailoverEnabled = _.get(user, 'call_forward.failover', false);
 
 			//cfmode is on if call_forward.enabled = true
 			//cfmode is failover if call_forward.enabled = false & call_forward.failover = true
 			//cfmode is off if call_forward.enabled = false & call_forward.failover = false
-			if (user.hasOwnProperty('call_forward') && user.call_forward.hasOwnProperty('enabled')) {
-				if (user.call_forward.enabled === true) {
-					cfMode = 'on';
-				} else if (user.call_forward.enabled === false) {
-					cfMode = user.call_forward.hasOwnProperty('failover') && user.call_forward.failover === true ? 'failover' : 'off';
+			return _.merge({}, user, _.merge({
+				extra: {
+					callForwardMode: !isCallForwardConfigured ? 'off'
+					: isCallForwardEnabled ? 'on'
+					: isFailoverEnabled ? 'failover'
+					: 'off'
 				}
-
-				if (_.has(user.call_forward, 'number')) {
-					user.call_forward.number = monster.util.unformatPhoneNumber(user.call_forward.number);
-				}
-			}
-
-			user.extra.callForwardMode = cfMode;
-
-			return user;
+			}, isCallForwardConfigured && {
+				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
+					number: monster.util.unformatPhoneNumber(user.call_forward.number)
+				})
+			}));
 		},
 
 		usersRenderCallForward: function(currentUser) {
@@ -2599,7 +2595,6 @@ define(function(require) {
 					if (timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
 					}
-
 
 					self.usersUpdateUser(userToSave, function(data) {
 						args.userId = data.data.id;
@@ -3493,7 +3488,7 @@ define(function(require) {
 					}
 				});
 
-				timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone || 'inherit', {inherit: self.i18n.active().defaultTimezone});
+				timezone.populateDropdown(template.find('#user_timezone'), dataTemplate.timezone || 'inherit', { inherit: self.i18n.active().defaultTimezone });
 
 				monster.ui.tooltips(template, {
 					options: {
@@ -3690,45 +3685,37 @@ define(function(require) {
 				callback && callback(template, user);
 			});
 		},
+
 		usersFormatLicensedRolesData: function(user) {
 			var self = this,
-				formattedData = {
-					selectedRole: undefined,
-					availableRoles: self.appFlags.global.servicePlansRole
-				};
+				userPlanIds = _
+					.chain(user)
+					.get('service.plans', {})
+					.keys()
+					.value();
 
-			if (user.hasOwnProperty('service') && user.service.hasOwnProperty('plans') && _.size(user.service.plans) > 0) {
-				for (var key in user.service.plans) {
-					if (user.service.plans.hasOwnProperty(key)) {
-						formattedData.selectedRole = key;
-						break;
-					}
-				}
-			}
-
-			return formattedData;
-		},
-		usersFormatDevicesData: function(userId, data) {
-			var self = this,
-				formattedData = {
-					countSpare: 0,
-					assignedDevices: {},
-					unassignedDevices: {}
-				};
-
-			_.each(data, function(device) {
-				if (device.owner_id === userId) {
-					formattedData.assignedDevices[device.id] = device;
-				} else if (device.owner_id === '' || !('owner_id' in device)) {
-					formattedData.countSpare++;
-					formattedData.unassignedDevices[device.id] = device;
-				}
+			return _.merge({
+				availableRoles: self.appFlags.global.servicePlansRole
+			}, !_.isEmpty(userPlanIds) && {
+				selectedRole: _.head(userPlanIds)
 			});
+		},
 
-			formattedData.emptyAssigned = _.isEmpty(formattedData.assignedDevices);
-			formattedData.emptySpare = _.isEmpty(formattedData.unassignedDevices);
+		usersFormatDevicesData: function(userId, devices) {
+			var self = this,
+				assigned = _.filter(devices, { owner_id: userId }),
+				unassigned = _.flatten([
+					_.filter(devices, { owner_id: '' }),
+					_.reject(devices, _.partial(_.has, _, 'owner_id'))
+				]);
 
-			return formattedData;
+			return {
+				countSpare: _.size(unassigned),
+				emptyAssigned: _.isEmpty(assigned),
+				emptySpare: _.isEmpty(unassigned),
+				assignedDevices: _.keyBy(assigned, 'id'),
+				unassignedDevices: _.keyBy(unassigned, 'id')
+			};
 		},
 
 		/**
@@ -5418,10 +5405,6 @@ define(function(require) {
 			}
 
 			return result;
-		},
-
-		usersRemoveOverlay: function() {
-			$('body').find('#users_container_overlay').remove();
 		},
 
 		usersResetPassword: function(data, callback) {

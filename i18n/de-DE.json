@@ -164,6 +164,7 @@
 			"basicTitle": "Allgemeine Einstellungen",
 			"basicSectionTitle": "Allgemeine Einstellungen",
 			"dragAndDrop": "Um einen Codec auszuwählen, ziehen Sie diesen aus dem Feld „Verfügbare Codecs“ in das Feld „Ausgewählte Codecs“.",
+			"saveAndApply": "Speichern und anwenden",
 			"options": {
 				"menuTitle": "Optionen"
 			},
@@ -290,19 +291,25 @@
 			"__version": "v3.20_s4",
 			"keys": {
 				"alert": {
-					"message": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern."
+					"message": "In der Standardeinstellung wird diese Taste als Leitungstaste verwendet. Wir empfehlen, dies nicht zu ändern.",
+					"title": "Taste 1 im Standart"
 				},
 				"featureKeys": {
-					"title": "Funktionstasten",
+					"menuTitle": "Funktionstasten",
+					"sectionTitle": "Funktionstasten",
 					"label": "Funktionstaste"
 				},
 				"comboKeys": {
-					"title": "Kombitasten",
-					"label": "Kombitaste"
+					"menuTitle": "Funktionstaste",
+					"sectionTitle": "Funktionstaste {{range}}",
+					"range": "{{min}} - {{max}}",
+					"label": "Funktionstaste"
 				},
 				"labels": {
+					"deviceLabel": "Beschriftung",
+					"function": "Aktion",
 					"parkingSpot": "Halteposition",
-					"user": "Benutzer",
+					"user": "Aktionsdaten",
 					"value": "Wert"
 				},
 				"info": {
@@ -320,7 +327,7 @@
 					"typeTitle": "{{variable}}: "
 				},
 				"types": {
-					"line": "Zeile",
+					"line": "Leitung",
 					"none": "Keine",
 					"presence": "Anwesenheit",
 					"parking": "Parken",
@@ -711,7 +718,8 @@
 			"text": "Für diesen Benutzer steht ein Anrufbeantworter zur Verfügung.",
 			"label": "Voicemail-zu-Email",
 			"title": "Anrufbeantworter",
-			"vmToEmailHelp": "Für jede neue Sprachnachricht wird eine E-Mail an {{variable}} gesendet. Wenn Sie den Empfänger dieser E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie bitte die E-Mail-Adresse des Benutzers im Abschnitt Benutzerverwaltung."
+			"vmToEmailHelp": "Für jede neue Sprachnachricht wird eine E-Mail an {{variable}} gesendet. Wenn Sie den Empfänger dieser E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie bitte die E-Mail-Adresse des Benutzers im Abschnitt Benutzerverwaltung.",
+			"attachVoicemail": "Nachricht der E-Mail beifügen."
 		},
 		"find_me_follow_me": {
 			"title": "Find Me/Follow Me",
@@ -1193,6 +1201,10 @@
 		"noFeatureCodeMessage": "Für Ihren Account sind noch keine Funktionscodes aktiviert. Funktionscodes werden automatisch erstellt, wenn Sie die Seite „Hauptrufnummer“ laden.",
 		"mainNumberLink": "Gehe zu „Hauptrufnummer“",
 		"labels": {
+			"directed_ext_pickup": {
+				"label": "gezielte Anrufübernahme",
+				"tooltip": "Übernahme des an der Nebenstelle eingehenden Anrufs. Wählen Sie *87 und die gewünschte Nebenstellennummer des klingelnden Endgerätes"
+			},
 			"qubicle login": {
 				"label": "Agentenanmeldung",
 				"tooltip": ""
@@ -1409,6 +1421,14 @@
 				"configurable": {
 					"label": "Über Menü konfigurierbar?",
 					"help": " Wenn deaktiviert, kann der Benutzer den Anrufbeantworter nicht über das Menü konfigurieren"
+				},
+				"announceOnly": {
+					"label": "Ansage ohne Aufnahme",
+					"help": "Der Anrufer wird nicht die Möglichkeit haben eine Nachricht zu hinterlassen."
+				},
+				"emailAsAttachment": {
+					"label": "Nachricht der E-Mail beifügen",
+					"help": "Die E-Mail enthält nicht die Voicemail-Nachricht als Anhang."
 				},
 				"__comment": "UI-2634: Unterstützung für WAV, MP4 und MP3 für die Anrufbeantworter-Medienerweiterungen hinzugefügt",
 				"__version": "4.1",
