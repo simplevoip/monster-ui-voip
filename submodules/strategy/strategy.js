@@ -2776,6 +2776,28 @@ define(function(require) {
 											},
 											submodule: 'strategy'
 										})));
+									} else {
+										var $disabled_template = $(self.getTemplate({ // NOTE: temporary fix; creates a disabled menu line item and hides the delete button
+												name: 'menuLine',
+												data: {
+													number: key,
+													callEntities: [{
+														groupName: "unknown",
+														groupType: "directory",
+														groupIcon: "fa fa-book",
+														entities: [{
+															id: "-1",
+															name: val.module.toUpperCase(),
+															module: "directory"
+														}]
+													}]
+												},
+												submodule: 'strategy'
+											}));
+											$disabled_template.find('select').prop('disabled', true);
+											$disabled_template.find('.remove-btn').addClass('hidden');
+										menuLineContainer
+											.append($disabled_template);
 								}
 							});
 
