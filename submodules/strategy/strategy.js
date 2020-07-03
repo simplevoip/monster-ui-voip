@@ -2765,16 +2765,40 @@ define(function(require) {
 								dropdownCallEntities = self.strategyGetCallEntitiesDropdownData(popupCallEntities);
 
 							_.each(strategyData.callflows[name].flow.children, function(val, key) {
-								menuLineContainer
-									.append($(self.getTemplate({
-										name: 'menuLine',
-										data: {
-											number: key,
-											callEntities: dropdownCallEntities,
-											selectedId: val.data.id || val.data.endpoints[0].id
-										},
-										submodule: 'strategy'
-									})));
+								if ( val.data.id || ( val.data.endpoints && val.data.endpoints.length ) ) { // NOTE: temporary fix; why do all "val.data"s not have either an "id" or "endpoints" property
+									menuLineContainer
+										.append($(self.getTemplate({
+											name: 'menuLine',
+											data: {
+												number: key,
+												callEntities: dropdownCallEntities,
+												selectedId: val.data.id || val.data.endpoints[0].id
+											},
+											submodule: 'strategy'
+										})));
+									} else {
+										var $disabled_template = $(self.getTemplate({ // NOTE: temporary fix; creates a disabled menu line item and hides the delete button
+												name: 'menuLine',
+												data: {
+													number: key,
+													callEntities: [{
+														groupName: "unknown",
+														groupType: "directory",
+														groupIcon: "fa fa-book",
+														entities: [{
+															id: "-1",
+															name: val.module.toUpperCase(),
+															module: "directory"
+														}]
+													}]
+												},
+												submodule: 'strategy'
+											}));
+											$disabled_template.find('select').prop('disabled', true);
+											$disabled_template.find('.remove-btn').addClass('hidden');
+										menuLineContainer
+											.append($disabled_template);
+								}
 							});
 
 							$.each(menuLineContainer.find('.target-input'), function() {
