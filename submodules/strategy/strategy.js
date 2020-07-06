@@ -2788,7 +2788,7 @@ define(function(require) {
 														entities: [{
 															id: "-1",
 															name: val.module.toUpperCase(),
-															module: "directory"
+															module: val.module
 														}]
 													}]
 												},
@@ -2796,6 +2796,9 @@ define(function(require) {
 											}));
 											$disabled_template.find('select').prop('disabled', true);
 											$disabled_template.find('.remove-btn').addClass('hidden');
+											
+											$('<div class="text-error">This call flow cannot be modified within SmartPBX, and must be edited within the Callflows app.</div>').insertBefore('#strategy_menu_popup .action-block .save-button');
+											$('#strategy_menu_popup .save-button').prop('disabled', true);
 										menuLineContainer
 											.append($disabled_template);
 								}
