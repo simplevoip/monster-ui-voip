@@ -38,6 +38,8 @@ define(function(require) {
 			'#6F7C7D' // Grey
 		],
 
+		staticNonNumbers: ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
+
 		/* My Office */
 		myOfficeRender: function(args) {
 			var self = this,
@@ -355,6 +357,37 @@ define(function(require) {
 						}
 					});
 				},
+				mainNumber: function(parallelCallback) {
+					monster.request({
+						resource: 'sv.callflow.searchByNameAndType',
+						data: {
+							accountId: self.accountId,
+							name: 'MainCallflow',
+							type: 'main'
+						},
+						success: function(data) {
+							var callflow = {};
+							if (data.data.length) {
+								var mainNumber = _
+									.chain(data.data[0].numbers)
+									.reject(function(number) {
+										return _.includes(self.staticNonNumbers, number);
+									})
+									.value();
+							
+								if (mainNumber.length) {
+									self.myOfficeGetNumber(mainNumber[0], function(numberData) {
+										parallelCallback && parallelCallback(null, numberData);
+									});
+								} else {
+									parallelCallback && parallelCallback(null, callflow);
+								}
+							} else {
+								parallelCallback && parallelCallback(null, callflow);
+							}
+						}
+					});
+				},
 				classifiers: function(parallelCallback) {
 					self.callApi({
 						resource: 'numbers.listClassifiers',
@@ -429,7 +462,7 @@ define(function(require) {
 				}),
 				staticNumberStatuses = ['assigned', 'spare'],
 				showUserTypes = self.appFlags.global.showUserTypes,
-				staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
+				// staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
 				specialNumberMatchers = {
 					mainNumbers: { type: 'main', name: 'MainCallflow' },
 					confNumbers: { type: 'conference', name: 'MainConference' },
@@ -475,7 +508,7 @@ define(function(require) {
 							return _
 								.chain(callflow.numbers)
 								.reject(function(number) {
-									return _.includes(staticNonNumbers, number);
+									return _.includes(self.staticNonNumbers, number);
 								})
 								.map(function(number) {
 									return _.merge({
@@ -490,7 +523,7 @@ define(function(require) {
 						});
 					})
 					.value(),
-				topMessage = (function(mainNumbers, account, numbers) {
+				topMessage = (function(mainNumbers, account, numbers, mainNumber) {
 					var shouldBypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
 						callerIdExternalNumber = _.get(account, 'caller_id.external.number'),
 						isExternalNumberSet = _.has(numbers, callerIdExternalNumber),
@@ -502,7 +535,8 @@ define(function(require) {
 							.get([callerIdEmergencyNumber, 'features'])
 							.includes('e911')
 							.value(),
-						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet,
+						erlId = _.get(mainNumber, 'e911.erlid'),
+						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet || erlId,
 						messageKey;
 
 					if (!hasValidCallerId && !hasValidE911) {
@@ -520,7 +554,7 @@ define(function(require) {
 							subcategory: 'callerIdDialog'
 						}
 						: undefined;
-				}(specialNumbers.mainNumbers, data.account, data.numbers)),
+				}(specialNumbers.mainNumbers, data.account, data.numbers, data.mainNumber)),
 				registeredDevices = _.map(data.devicesStatus, 'device_id');
 
 			return _.merge({
@@ -1215,8 +1249,8 @@ define(function(require) {
 		myOfficeGetNumber: function(number, success, error) {
 			var self = this;
 
-			self.callApi({
-				resource: 'numbers.get',
+			monster.request({
+				resource: 'sv.numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(number)
@@ -1233,8 +1267,8 @@ define(function(require) {
 		myOfficeUpdateNumber: function(numberData, success, error) {
 			var self = this;
 
-			self.callApi({
-				resource: 'numbers.update',
+			monster.request({
+				resource: 'sv.numbers.create',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(numberData.id),
