@@ -374,7 +374,7 @@ define(function(require) {
 										return _.includes(self.staticNonNumbers, number);
 									})
 									.value();
-							
+
 								if (mainNumber.length) {
 									self.myOfficeGetNumber(mainNumber[0], function(numberData) {
 										parallelCallback && parallelCallback(null, numberData);
@@ -989,6 +989,7 @@ define(function(require) {
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
 				emergencyEmailInput = popupTemplate.find('.caller-id-emergency-email'),
+				emergencyERLIDInput = popupTemplate.find('[name="erlid"]'),
 				editableFeatures = [ 'e911', 'cnam' ],
 				loadNumberDetails = function(number, popupTemplate) {
 					monster.waterfall([
@@ -1033,6 +1034,7 @@ define(function(require) {
 										.join(' ')
 										.value()
 									);
+									emergencyERLIDInput.val(numberData.e911.erlid);
 								} else {
 									emergencyZipcodeInput.val('');
 									emergencyAddress1Input.val('');
@@ -1040,6 +1042,7 @@ define(function(require) {
 									emergencyCityInput.val('');
 									emergencyStateInput.val('');
 									emergencyEmailInput.val('');
+									emergencyERLIDInput.val('');
 								}
 							}
 
@@ -1072,24 +1075,24 @@ define(function(require) {
 				loadNumberDetails($(this).val(), popupTemplate);
 			});
 
-			emergencyZipcodeInput.on('blur', function() {
-				var zipCode = $(this).val();
-
-				if (zipCode) {
-					self.myOfficeGetAddessFromZipCode({
-						data: {
-							zipCode: zipCode
-						},
-						success: function(results) {
-							if (!_.isEmpty(results)) {
-								var length = results[0].address_components.length;
-								emergencyCityInput.val(results[0].address_components[1].long_name);
-								emergencyStateInput.val(results[0].address_components[length - 2].short_name);
-							}
-						}
-					});
-				}
-			});
+			// emergencyZipcodeInput.on('blur', function() {
+			// 	var zipCode = $(this).val();
+			//
+			// 	if (zipCode) {
+			// 		self.myOfficeGetAddessFromZipCode({
+			// 			data: {
+			// 				zipCode: zipCode
+			// 			},
+			// 			success: function(results) {
+			// 				if (!_.isEmpty(results)) {
+			// 					var length = results[0].address_components.length;
+			// 					emergencyCityInput.val(results[0].address_components[1].long_name);
+			// 					emergencyStateInput.val(results[0].address_components[length - 2].short_name);
+			// 				}
+			// 			}
+			// 		});
+			// 	}
+			// });
 
 			popupTemplate.find('.save').on('click', function() {
 				var callerIdNumber = callerIdNumberSelect.val(),
@@ -1267,8 +1270,17 @@ define(function(require) {
 		myOfficeUpdateNumber: function(numberData, success, error) {
 			var self = this;
 
+			var resource = 'sv.numbers.create';
+			if (numberData.hasOwnProperty('e911')) {
+				if (numberData.e911.hasOwnProperty('erlid')) {
+					if (numberData.e911.erlid.length) {
+						resource = 'sv.numbers.update';
+					}
+				}
+			}
+
 			monster.request({
-				resource: 'sv.numbers.create',
+				resource: resource,
 				data: {
 					accountId: self.accountId,
 					phoneNumber: encodeURIComponent(numberData.id),
