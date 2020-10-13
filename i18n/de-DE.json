@@ -1141,7 +1141,8 @@
 			"emergencyState": "Bundesland/Kanton",
 			"emergencyHelp1": "Diese Adresse wird als Ihre Anrufer-ID-Adresse angezeigt, wenn Sie einen ausgehenden Notruf an eine Behörde tätigen (z. B. 911 in den USA).",
 			"emergencyHelp2": "Hinweis: Sie können diese Funktion auch für Rufnummern von Benutzern festlegen, wenn sich diese an einem anderen Standort als oben angegeben befinden.",
-			"mandatoryE911Alert": "Sie müssen für Ihre Unternehmens-Anrufer-ID-Nummer e911-Informationen angeben."
+			"mandatoryE911Alert": "Sie müssen für Ihre Unternehmens-Anrufer-ID-Nummer e911-Informationen angeben.",
+			"invalidCNAMAlert": "Anrufer-ID-Name kann nur aus Buchstaben, Zahlen und Leerzeichen bestehen."
 		},
 		"missingMainNumberForCallerId": "Bevor Sie die Anrufer-ID konfigurieren können, müssen Sie eine Hauptrufnummer zu Ihrem Büro hinzufügen!",
 		"missingMainNumberMessage": "Fügen Sie Ihrem Account eine Hauptrufnummer hinzu.",

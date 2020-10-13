@@ -1163,16 +1163,26 @@ define(function(require) {
 				}
 
 				if (callerIdNumber) {
-					if (monster.util.isNumberFeatureEnabled('e911')) {
-						if (monster.ui.valid(e911Form)) {
-							var e911Data = monster.ui.getFormData(e911Form[0]);
+					var cnam = callerIdNameInput.val();
+					if (cnam.length) {
+						var regex = /[^a-zA-Z0-9\s]/,
+							matches = regex.exec(cnam);
 
-							setNumberData(e911Data);
+						if (matches !== null) {
+							monster.ui.alert(self.i18n.active().myOffice.callerId.invalidCNAMAlert);
 						} else {
-							monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
+							if (monster.util.isNumberFeatureEnabled('e911')) {
+								if (monster.ui.valid(e911Form)) {
+									var e911Data = monster.ui.getFormData(e911Form[0]);
+
+									setNumberData(e911Data);
+								} else {
+									monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
+								}
+							} else {
+								setNumberData();
+							}
 						}
-					} else {
-						setNumberData();
 					}
 				} else {
 					delete account.caller_id.external;

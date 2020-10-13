@@ -897,7 +897,8 @@
 			"emergencyState": "Estado",
 			"emergencyHelp1": "Esta dirección aparecerá como su dirección de identificador al hacer llamada de emergencia saliente a una agencia del gobierno (e.g. 911 in the US).",
 			"emergencyHelp2": "Nota: puede poner este rasgo en los números de los usuarios también si no comparten la misma ubicación que el anterior.",
-			"mandatoryE911Alert": "Se debe especificar información de e911 para su número de identificación de llamadas de empresa."
+			"mandatoryE911Alert": "Se debe especificar información de e911 para su número de identificación de llamadas de empresa.",
+            "invalidCNAMAlert": "El nombre del identificador de llamadas solo puede contener letras, números y espacios."
 		},
 		"missingMainNumberForCallerId": "Tienes que añadir un número principal a su oficina antes de configurar el identificador de llamadas!",
 		"missingE911Message": "Por favor, configure su identificador de empresa y e911 en un número de principal.",

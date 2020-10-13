@@ -861,7 +861,8 @@
 			"emergencyState": "État",
 			"emergencyHelp1": "Cette adresse apparaitra lorsque vous appelerez un numéro d'urgence (911 aux Etats-Unis).",
 			"emergencyHelp2": "Note: Vous pouvez ajouter cette fonctionnalité sur chaque utilisateur si cette adresse ne leur correspond pas.",
-			"mandatoryE911Alert": "Vous devez spécifier les infos E911 pour le Caller-ID de ce numéro d'entreprise."
+			"mandatoryE911Alert": "Vous devez spécifier les infos E911 pour le Caller-ID de ce numéro d'entreprise.",
+			"invalidCNAMAlert": "Caller-ID d'Appels ne peut être que des lettres, des chiffres et des espaces."
 		},
 		"missingMainNumberForCallerId": "Veuillez ajouter un Numéro principal à votre compte avant de configurer le Caller-ID de votre compte!",
 		"missingCnamE911Message": "Veuillez configurer le Caller-ID et l'E911 sur un de vos numéros principaux.",
