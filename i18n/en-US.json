@@ -1157,7 +1157,7 @@
 			"emergencyHelp1": "This information will appear as your Caller ID information when you make outbound emergency call to a government agency (e.g. 911 in the US).",
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number.",
-			"invalidCNAMAlert": "Caller ID Name can only be letters, numbers, and spaces."
+			"invalidCNAMAlert": "Caller ID Name must be no more than 15 characters and can only include letters, numbers, and spaces."
 		},
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",

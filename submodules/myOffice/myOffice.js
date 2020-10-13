@@ -1168,7 +1168,7 @@ define(function(require) {
 						var regex = /[^a-zA-Z0-9\s]/,
 							matches = regex.exec(cnam);
 
-						if (matches !== null) {
+						if (matches !== null || cnam.length > 15) {
 							monster.ui.alert(self.i18n.active().myOffice.callerId.invalidCNAMAlert);
 						} else {
 							if (monster.util.isNumberFeatureEnabled('e911')) {
