@@ -1165,6 +1165,9 @@
             "numberLabel": "Phone Number",
             "autoResponseLabel": "Auto-Response",
             "autoResponseHelp": "This response will be sent automatically upon receipt of an SMS from the customer.",
+            "enabledLabel": "Enable Curbside",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
             "replies": {
                 "sectionTitle": "Replies",
                 "helpLabel": "These replies will available for you to respond to the customer.",

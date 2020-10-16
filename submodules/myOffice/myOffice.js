@@ -958,7 +958,7 @@ define(function(require) {
 			self.myOfficeCurbsidePopupBindEvents({
 				popupTemplate: popupTemplate,
 				popup: popup,
-                data: curbsideData
+				data: curbsideData
 			});
 		},
 
@@ -966,8 +966,18 @@ define(function(require) {
 			var self = this,
 				popupTemplate = args.popupTemplate,
 				popup = args.popup,
-                data = args.data,
-				curbsideForm = popupTemplate.find('#form_curbside');
+				data = args.data,
+				curbsideForm = popupTemplate.find('#form_curbside'),
+				loadCurbsideSection = function() {
+					_.each(editableFeatures, function(featureName) {
+						var $curbside = popupTemplate.find('.number-feature[data-feature="curbside"]'),
+							$enabled = popupTemplate.find('[name="curbside_enabled"]'),
+							action = $enabled.is(':checked') ? 'slideDown' : 'slideUp';
+
+						$featureSection[action]();
+					});
+				};
+				loadCurbsideSection();
 
 			monster.ui.validate(curbsideForm, {
 				rules: {
@@ -980,22 +990,26 @@ define(function(require) {
 				}
 			});
 
+			popupTemplate.find('[name="curbside_enabled"]').on('click', function(evt) {
+				loadCurbsideSection();
+			});
+
 			popupTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
 
 			popupTemplate.find('.save').on('click', function() {
-                if (monster.ui.valid(curbsideForm)) {
+				if (monster.ui.valid(curbsideForm)) {
 					var dataToSave = self.myOfficeCurbsideMergeData(data, popupTemplate);
 
-                    self.myOfficeSaveCurbside(dataToSave, function(data) {
+					self.myOfficeSaveCurbside(dataToSave, function(data) {
 						popup.dialog('close').remove();
 					});
-                }
+				}
 			});
 
 
-            // Replies stuff
+			// Replies stuff
 			var addEntity = function(event) {
 				event.preventDefault();
 
@@ -1047,32 +1061,32 @@ define(function(require) {
 			});
 		},
 
-        myOfficeCurbsideMergeData: function(originalData, template) {
-            var self = this,
-                formData = monster.ui.getFormData('form_curbside'),
-                mergedData = $.extend(true, {}, originalData, formData);
+		myOfficeCurbsideMergeData: function(originalData, template) {
+			var self = this,
+				formData = monster.ui.getFormData('form_curbside'),
+				mergedData = $.extend(true, {}, originalData, formData);
 
-            // Rebuild list of replies from UI
+			// Rebuild list of replies from UI
 			mergedData.replies = [];
 			template.find('.saved-entities .entity-wrapper').each(function() {
 				mergedData.replies.push($(this).data('reply'));
 			});
 
-            delete mergedData.mainNumbers;
-            delete mergedData.extra;
+			delete mergedData.mainNumbers;
+			delete mergedData.extra;
 
-            return mergedData;
-        },
+			return mergedData;
+		},
 
-        myOfficeSaveCurbside: function(curbsideData, callback) {
-            var self = this;
+		myOfficeSaveCurbside: function(curbsideData, callback) {
+			var self = this;
 
 			if (curbsideData.id === 0) {
 				self.myOfficeUpdateCurbside(curbsideData, callback);
 			} else {
 				self.myOfficeCreateCurbside(curbsideData, callback);
 			}
-        },
+		},
 
 		myOfficeRenderCallerIdPopup: function(args) {
 			var self = this,
@@ -1436,38 +1450,38 @@ define(function(require) {
 			});
 		},
 
-        myOfficeUpdateCurbside: function(curbsideData, callbackSuccess, callbackError) {
-            var self = this;
+		myOfficeUpdateCurbside: function(curbsideData, callbackSuccess, callbackError) {
+			var self = this;
 
-            self.callApi({
-                resource: 'sv.curbside.update',
-                data: {
-                    accountId: self.accountId,
-                    data: curbsideData
-                },
-                success: function(data) {
-                    callbackSuccess && callbackSuccess(data.data);
-                },
-                error: function(data) {
-                    callbackError && callbackError(data);
-                }
-            });
-        },
+			self.callApi({
+				resource: 'sv.curbside.update',
+				data: {
+					accountId: self.accountId,
+					data: curbsideData
+				},
+				success: function(data) {
+					callbackSuccess && callbackSuccess(data.data);
+				},
+				error: function(data) {
+					callbackError && callbackError(data);
+				}
+			});
+		},
 
-        myOfficeCreateCurbside: function(curbsideData, callback) {
-            var self = this;
+		myOfficeCreateCurbside: function(curbsideData, callback) {
+			var self = this;
 
-            self.callApi({
-                resource: 'sv.curbside.create',
-                data: {
-                    accountId: self.accountId,
-                    data: curbsideData
-                },
-                success: function(data) {
-                    callback(data.data);
-                }
-            });
-        },
+			self.callApi({
+				resource: 'sv.curbside.create',
+				data: {
+					accountId: self.accountId,
+					data: curbsideData
+				},
+				success: function(data) {
+					callback(data.data);
+				}
+			});
+		},
 
 		myOfficeGetCurbside: function(dids, success, error) {
 			var self = this;
