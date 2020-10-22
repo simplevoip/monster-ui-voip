@@ -969,22 +969,20 @@ define(function(require) {
 				data = args.data,
 				curbsideForm = popupTemplate.find('#form_curbside'),
 				loadCurbsideSection = function() {
-					_.each(editableFeatures, function(featureName) {
-						var $curbside = popupTemplate.find('.number-feature[data-feature="curbside"]'),
-							$enabled = popupTemplate.find('[name="curbside_enabled"]'),
-							action = $enabled.is(':checked') ? 'slideDown' : 'slideUp';
+					var $curbside = popupTemplate.find('.number-feature[data-feature="curbside"]'),
+						$enabled = popupTemplate.find('[name="curbside_enabled"]'),
+						action = $enabled.is(':checked') ? 'slideDown' : 'slideUp';
 
-						$featureSection[action]();
-					});
+					$curbside[action]();
 				};
 				loadCurbsideSection();
 
 			monster.ui.validate(curbsideForm, {
 				rules: {
-					'tn': {
+					'did': {
 						required: true
 					},
-					'auto_response': {
+					'curbside_settings.initial_msg': {
 						required: true
 					}
 				}
@@ -1002,7 +1000,7 @@ define(function(require) {
 				if (monster.ui.valid(curbsideForm)) {
 					var dataToSave = self.myOfficeCurbsideMergeData(data, popupTemplate);
 
-					self.myOfficeSaveCurbside(dataToSave, function(data) {
+					self.myOfficeSaveCurbside(data, dataToSave, function(data) {
 						popup.dialog('close').remove();
 					});
 				}
@@ -1067,10 +1065,13 @@ define(function(require) {
 				mergedData = $.extend(true, {}, originalData, formData);
 
 			// Rebuild list of replies from UI
-			mergedData.replies = [];
+			mergedData.curbside_settings.replies = [];
 			template.find('.saved-entities .entity-wrapper').each(function() {
-				mergedData.replies.push($(this).data('reply'));
+				mergedData.curbside_settings.replies.push($(this).data('reply'));
 			});
+
+			// set Kazoo Account ID
+			mergedData.kazoo_account_id = self.accountId;
 
 			delete mergedData.mainNumbers;
 			delete mergedData.extra;
@@ -1078,13 +1079,13 @@ define(function(require) {
 			return mergedData;
 		},
 
-		myOfficeSaveCurbside: function(curbsideData, callback) {
+		myOfficeSaveCurbside: function(origData, curbsideData, callback) {
 			var self = this;
 
-			if (curbsideData.id === 0) {
-				self.myOfficeUpdateCurbside(curbsideData, callback);
-			} else {
+			if (origData.tn === '+10000000000') {
 				self.myOfficeCreateCurbside(curbsideData, callback);
+			} else {
+				self.myOfficeUpdateCurbside(curbsideData, callback);
 			}
 		},
 
@@ -1453,7 +1454,7 @@ define(function(require) {
 		myOfficeUpdateCurbside: function(curbsideData, callbackSuccess, callbackError) {
 			var self = this;
 
-			self.callApi({
+			monster.request({
 				resource: 'sv.curbside.update',
 				data: {
 					accountId: self.accountId,
@@ -1471,7 +1472,7 @@ define(function(require) {
 		myOfficeCreateCurbside: function(curbsideData, callback) {
 			var self = this;
 
-			self.callApi({
+			monster.request({
 				resource: 'sv.curbside.create',
 				data: {
 					accountId: self.accountId,
@@ -1489,6 +1490,7 @@ define(function(require) {
 			monster.request({
 				resource: 'sv.curbside.get',
 				data: {
+					accountId: self.accountId,
 					dids: dids.join(",")
 				},
 				success: function(data, status) {

@@ -1172,7 +1172,10 @@
                 "sectionTitle": "Replies",
                 "helpLabel": "These replies will available for you to respond to the customer.",
                 "createLabel": "Add new reply"
-            }
+            },
+            "urlSectionTitle": "Curbside URL",
+            "urlHelpLabel": "Use this URL to manage curbside requests and responses.",
+            "url": "https://curbside.simplevoip.us"
         },
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",

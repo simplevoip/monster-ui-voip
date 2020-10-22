@@ -3,10 +3,10 @@
         <form id="form_curbside" class="form-horizontal">
 		    <div class="content">
                 <div class="control-group">
-                    <label class="control-label">{{ i18n.myOffice.curbside.enabledLabel }}</label>
+                    <label class="control-label">{{ i18n.myOffice.curbside.title }}</label>
                     <div class="switch">
                     {{#monsterSwitch}}
-                        <input class="enable-switch" type="checkbox" name="curbside_enabled" data-on="{{i18n.myOffice.curbside.enabled}}" data-off="{{i18n.myOffice.curbside.disabled}}" {{#if enabled}} checked{{/if}}></input>
+                        <input class="enable-switch" type="checkbox" name="curbside_enabled" data-on="{{i18n.myOffice.curbside.enabled}}" data-off="{{i18n.myOffice.curbside.disabled}}" {{#if curbside_enabled}} checked{{/if}}></input>
                     {{/monsterSwitch}}
                     </div>
                 </div>
@@ -14,10 +14,10 @@
             <div class="content number-feature" data-feature="curbside">
 				<div class="control-group">
 					<label class="control-label">{{ i18n.myOffice.curbside.numberLabel }}</label>
-					<select name="tn" class="curbside-number-select">
-						<option{{#compare tn "===" ""}} selected{{/compare}} value="">None</option>
+					<select name="did" class="curbside-number-select">
+						<option{{#compare did "===" ""}} selected{{/compare}} value="">None</option>
 						{{#each mainNumbers}}
-							<option{{#compare ../tn "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
+							<option{{#compare ../did "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
 						{{/each}}
 					</select>
 				</div>
@@ -33,7 +33,7 @@
     				</div>
 
     				<div>
-    					<textarea name="init_msg" class="curbside-auto-response">{{init_msg}}</textarea>
+    					<textarea name="curbside_settings.initial_msg" class="curbside-auto-response">{{curbside_settings.initial_msg}}</textarea>
     				</div>
                 </div>
 
@@ -64,7 +64,7 @@
     					</div>
 
     					<div class="saved-entities">
-                            {{#each replies}}
+                            {{#each curbside_settings.replies}}
                                 <div class="entity-wrapper" data-reply="{{this}}">
                                     <span class="entity-title">{{this}}</span>
                                     <div class="delete-entity"><i class="fa fa-trash-o monster-red"></i></div>
@@ -74,8 +74,18 @@
     				</div>
                 </div>
 
-                <input type="hidden" name="id" value="{{id}}">
-				<input type="hidden" name="accountId" value="{{accountId}}">
+                <div class="control-group">
+                    <div class="title">
+    					{{ i18n.myOffice.curbside.urlSectionTitle }}
+    				</div>
+
+    				<div class="helper">
+    					<i class="fa fa-info-circle"></i>
+    					{{ i18n.myOffice.curbside.urlHelpLabel }}
+    				</div>
+
+                    <h4><a href="{{ i18n.myOffice.curbside.url }}" target="_blank">{{ i18n.myOffice.curbside.url }}</a></h4>
+                </div>
     		</div>
         </form>
 	</div>
