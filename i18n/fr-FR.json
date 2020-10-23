@@ -835,7 +835,8 @@
 			"callerID": "Caller ID",
 			"musicOnHold": "Musique d'attente",
 			"callRecording": "Enregistrement",
-			"hours": "Heures"
+			"hours": "Heures",
+			"curbside": "Bordure"
 		},
 		"musicOnHold": {
 			"title": "Musique d'attente",

@@ -21,7 +21,7 @@ define(function(require) {
 
 	var app = {
         name: 'voip',
-        
+
         // Hack to fix an unset accountId property bug that I haven't tracked down yet
         isMasqueradable: true,
 
@@ -64,7 +64,31 @@ define(function(require) {
                 apiRoot: monster.config.api.default,
 				url: 'accounts/{accountId}/callflows?filter_name={name}&filter_type={type}',
 				verb: 'GET'
-			}
+			},
+            'sv.curbside.get': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=curbside&accountId={accountId}&dids={dids}',
+                verb: 'GET',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.curbside.create': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=curbside&accountId={accountId}',
+                verb: 'PUT',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.curbside.update': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=curbside&accountId={accountId}',
+                verb: 'POST',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            }
 		},
 		subscribe: {},
 		appFlags: {

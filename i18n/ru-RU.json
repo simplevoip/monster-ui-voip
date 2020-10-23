@@ -884,7 +884,8 @@
 			"callerID": "АОН",
 			"musicOnHold": "Музыка ожидания",
 			"callRecording": "Запись",
-			"hours": "Часы"
+			"hours": "Часы",
+			"curbside": "Обочина"
 		},
 		"musicOnHold": {
 			"title": "Музыка ожидания",

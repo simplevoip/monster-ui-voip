@@ -1125,7 +1125,8 @@
 			"callerID": "Caller ID",
 			"musicOnHold": "Hold Music",
 			"callRecording": "Recording",
-			"hours": "Hours"
+			"hours": "Hours",
+			"curbside": "Curbside"
 		},
 		"musicOnHold": {
 			"title": "Music-On-Hold",
@@ -1159,8 +1160,26 @@
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number.",
 			"invalidCNAMAlert": "Caller ID Name must be no more than 15 characters and can only include letters, numbers, and spaces."
 		},
+        "curbside": {
+            "title": "Curbside",
+            "numberLabel": "Phone Number",
+            "autoResponseLabel": "Auto-Response",
+            "autoResponseHelp": "This response will be sent automatically upon receipt of an SMS from the customer.",
+            "enabledLabel": "Enable Curbside",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "replies": {
+                "sectionTitle": "Replies",
+                "helpLabel": "These replies will available for you to respond to the customer.",
+                "createLabel": "Add new reply"
+            },
+            "urlSectionTitle": "Curbside URL",
+            "urlHelpLabel": "Use this URL to manage curbside requests and responses.",
+            "url": "https://curbside.simplevoip.us"
+        },
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",
+        "missingMainNumberForCurbside": "You need to add a main number to your office before configuring Curbside!",
 		"missingMainNumberMessage": "Please add a Main Number to your account.",
 		"totalUsers": "Total Users",
 		"totalDevices": "Total Devices",
