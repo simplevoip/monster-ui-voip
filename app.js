@@ -67,23 +67,31 @@ define(function(require) {
 			},
             'sv.curbside.get': {
                 apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&accountId={accountId}&dids={dids}',
+                url: 'api_functions.php?m=sms&dids={dids}',
                 verb: 'GET',
                 removeHeaders: [
                     'X-Auth-Token'
                 ]
             },
-            'sv.curbside.create': {
+            'sv.sms.get': {
                 apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&accountId={accountId}',
+                url: 'api_functions.php?m=sms&did={did}',
+                verb: 'GET',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.sms.create': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=sms',
                 verb: 'PUT',
                 removeHeaders: [
                     'X-Auth-Token'
                 ]
             },
-            'sv.curbside.update': {
+            'sv.sms.update': {
                 apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&accountId={accountId}',
+                url: 'api_functions.php?m=sms',
                 verb: 'POST',
                 removeHeaders: [
                     'X-Auth-Token'

@@ -758,6 +758,24 @@
 			"headline": "User Hot-Desking Settings",
 			"help": "The Hot-Desking ID is automatically set as the user's extensions number."
 		},
+        "sms": {
+            "title": "SMS",
+            "headline": "User SMS Settings",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "email": {
+                "switch": "via Email",
+                "label": "Email Address"
+            },
+            "webhook": {
+                "switch": "via Webhook",
+                "label": "Webhook URL"
+            },
+            "app": {
+                "switch": "via Mobile App",
+                "label": "Softphone Device"
+            }
+        },
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {

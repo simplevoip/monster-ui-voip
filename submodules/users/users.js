@@ -265,7 +265,12 @@ define(function(require) {
 							icon: 'fa fa-ban',
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
-						}
+						},
+                        sms: {
+                            icon: 'fa fa-mobile',
+                            iconColor: 'monster-green',
+                            title: self.i18n.active().users.sms.title
+                        }
 					},
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
@@ -2668,6 +2673,55 @@ define(function(require) {
 				position: ['center', 20]
 			});
 		},
+
+        usersRenderSms: function(featureUser) {
+            var self = this,
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-sms',
+					data: featureUser,
+					submodule: 'users'
+				})),
+				switchFeature = featureTemplate.find('#checkbox_sms');
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+			featureTemplate.find('.save').on('click', function() {
+				var userToSave = featureUser;
+				//update data.data.sms depending on the switch status
+				if (typeof userToSave.sms === 'undefined') {
+					userToSave.sms = {};
+				}
+				if (typeof userToSave.sms.enabled === 'undefined') {
+					userToSave.sms.enabled = false;
+				}
+				userToSave.sms.enabled = switchFeature.prop('checked');
+
+				self.usersUpdateUser(userToSave, function(data) {
+					monster.request({
+						resource: 'sv.sms.update',
+						data: {
+							accountId: self.accountId,
+							data: {
+								userToSave.sms
+							}
+						},
+						error: function() {
+							console.log('Failed to update SMS settings');
+						}
+					});
+					popup.dialog('close').remove();
+					self.usersRender({
+						userId: userToSave.id,
+						openedTab: 'features'
+					});
+				});
+			});
+			var popup = monster.ui.dialog(featureTemplate, {
+				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.sms.title,
+				position: ['center', 20]
+			});
+        }
 
 		usersRenderFindMeFollowMe: function(params) {
 			var self = this;
