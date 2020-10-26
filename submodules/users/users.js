@@ -237,12 +237,12 @@ define(function(require) {
 							title: self.i18n.active().users.vmbox.title
 						},
 						faxing: {
-							icon: 'icon-telicon-fax',
+							icon: 'fa fa-fax',
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.faxing.title
 						},
 						conferencing: {
-							icon: 'fa fa-comments',
+							icon: 'fa fa-users',
 							iconColor: 'monster-grey',
 							title: self.i18n.active().users.conferencing.title
 						},
@@ -265,6 +265,11 @@ define(function(require) {
 							icon: 'fa fa-ban',
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
+						},
+						sms: {
+							icon: 'fa fa-comments',
+							iconColor: 'monster-green',
+							title: self.i18n.active().users.sms.title
 						}
 					},
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
@@ -1551,6 +1556,10 @@ define(function(require) {
 				});
 			});
 
+			template.on('click', '.feature[data-feature="sms"]', function() {
+				self.usersRenderSms(currentUser);
+			});
+
 			template.on('click', '.feature[data-feature="faxing"]', function() {
 				if (!monster.util.isTrial()) {
 					monster.parallel({
@@ -2665,6 +2674,44 @@ define(function(require) {
 			});
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.do_not_disturb.title,
+				position: ['center', 20]
+			});
+		},
+
+		usersRenderSms: function(featureUser) {
+			var self = this,
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-sms',
+					data: featureUser,
+					submodule: 'users'
+				})),
+				switchFeature = featureTemplate.find('.switch-state');
+
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			featureTemplate.find('.save').on('click', function() {
+				var formData = monster.ui.getFormData('sms_form'),
+					smsToSave = $.extend(true, {}, featureUser.sms, formData);
+
+				self.usersUpdateSms(smsToSave, function(data) {
+					if (data) {
+						popup.dialog('close').remove();
+						self.usersRender({
+							userId: featureUser.id,
+							openedTab: 'features'
+						});
+					}
+				})
+			});
+
+			var popup = monster.ui.dialog(featureTemplate, {
+				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.sms.title,
 				position: ['center', 20]
 			});
 		},
@@ -4533,8 +4580,8 @@ define(function(require) {
 		usersGetUser: function(userId, callback) {
 			var self = this;
 
-			self.callApi({
-				resource: 'user.get',
+			monster.request({
+				resource: 'sv.user.get',
 				data: {
 					accountId: self.accountId,
 					userId: userId
@@ -4796,8 +4843,8 @@ define(function(require) {
 
 			monster.parallel({
 				users: function(callback) {
-					self.callApi({
-						resource: 'user.list',
+					monster.request({
+						resource: 'sv.user.list',
 						data: {
 							accountId: self.accountId,
 							filters: {
@@ -5900,6 +5947,26 @@ define(function(require) {
 					}
 				}
 			], callback);
+		},
+
+		usersUpdateSms: function(sms, callback) {
+			var self = this,
+				enabled = sms.enabled,
+				resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
+
+			monster.request({
+				resource: resource,
+				data: {
+					accountId: self.accountId,
+					data: sms
+				},
+				success: function(data) {
+					callback && callback(data);
+				},
+				error: function() {
+					console.log('Failed to update SMS settings');
+				}
+			});
 		}
 	};
 

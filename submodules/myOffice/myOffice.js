@@ -1455,9 +1455,8 @@ define(function(require) {
 			var self = this;
 
 			monster.request({
-				resource: 'sv.curbside.update',
+				resource: 'sv.sms.update',
 				data: {
-					accountId: self.accountId,
 					data: curbsideData
 				},
 				success: function(data) {
@@ -1473,9 +1472,8 @@ define(function(require) {
 			var self = this;
 
 			monster.request({
-				resource: 'sv.curbside.create',
+				resource: 'sv.sms.create',
 				data: {
-					accountId: self.accountId,
 					data: curbsideData
 				},
 				success: function(data) {
@@ -1490,7 +1488,6 @@ define(function(require) {
 			monster.request({
 				resource: 'sv.curbside.get',
 				data: {
-					accountId: self.accountId,
 					dids: dids.join(",")
 				},
 				success: function(data, status) {

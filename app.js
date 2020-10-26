@@ -67,24 +67,56 @@ define(function(require) {
 			},
             'sv.curbside.get': {
                 apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&accountId={accountId}&dids={dids}',
+                url: 'api_functions.php?m=curbside&dids={dids}',
                 verb: 'GET',
                 removeHeaders: [
                     'X-Auth-Token'
                 ]
             },
-            'sv.curbside.create': {
+            'sv.sms.get': {
                 apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&accountId={accountId}',
+                url: 'api_functions.php?m=sms&did={did}',
+                verb: 'GET',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.sms.create': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=sms',
                 verb: 'PUT',
                 removeHeaders: [
                     'X-Auth-Token'
                 ]
             },
-            'sv.curbside.update': {
+            'sv.sms.update': {
                 apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&accountId={accountId}',
+                url: 'api_functions.php?m=sms',
                 verb: 'POST',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.sms.delete': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=sms',
+                verb: 'DELETE',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.user.list': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=users&accountId={accountId}',
+                verb: 'GET',
+                removeHeaders: [
+                    'X-Auth-Token'
+                ]
+            },
+            'sv.user.get': {
+                apiRoot: monster.config.api.simplevoip,
+                url: 'api_functions.php?m=user&accountId={accountId}&userId={userId}',
+                verb: 'GET',
                 removeHeaders: [
                     'X-Auth-Token'
                 ]
