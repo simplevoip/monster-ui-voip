@@ -761,20 +761,9 @@
         "sms": {
             "title": "SMS",
             "headline": "User SMS Settings",
-            "enabled": "Enabled",
-            "disabled": "Disabled",
-            "email": {
-                "switch": "via Email",
-                "label": "Email Address"
-            },
-            "webhook": {
-                "switch": "via Webhook",
-                "label": "Webhook URL"
-            },
-            "app": {
-                "switch": "via Mobile App",
-                "label": "Softphone Device"
-            }
+            "emailLabel": "Notify Email",
+            "webhookLabel": "Notify URL",
+            "appLabel": "Deliver to Softphone"
         },
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
