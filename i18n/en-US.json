@@ -761,8 +761,10 @@
         "sms": {
             "title": "SMS",
             "headline": "User SMS Settings",
+            "didLabel": "Add Service to Number",
             "emailLabel": "Notify Email",
             "webhookLabel": "Notify URL",
+            "webhookHelpLabel": "The URL option is for advanced users and will deliver incoming SMS messages to a webhook.",
             "appLabel": "Deliver to Softphone"
         },
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
