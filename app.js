@@ -20,10 +20,10 @@ define(function(require) {
 	}));
 
 	var app = {
-        name: 'voip',
+		name: 'voip',
 
-        // Hack to fix an unset accountId property bug that I haven't tracked down yet
-        isMasqueradable: true,
+		// Hack to fix an unset accountId property bug that I haven't tracked down yet
+		isMasqueradable: true,
 
 		css: [ 'app' ],
 
@@ -60,67 +60,62 @@ define(function(require) {
 					'X-Auth-Token'
 				]
 			},
-			'sv.callflow.searchByNameAndType': {
-                apiRoot: monster.config.api.default,
-				url: 'accounts/{accountId}/callflows?filter_name={name}&filter_type={type}',
-				verb: 'GET'
+			'sv.curbside.get': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=curbside&dids={dids}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
 			},
-            'sv.curbside.get': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=curbside&dids={dids}',
-                verb: 'GET',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            },
-            'sv.sms.get': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=sms&did={did}',
-                verb: 'GET',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            },
-            'sv.sms.create': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=sms',
-                verb: 'PUT',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            },
-            'sv.sms.update': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=sms',
-                verb: 'POST',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            },
-            'sv.sms.delete': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=sms',
-                verb: 'DELETE',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            },
-            'sv.user.list': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=users&accountId={accountId}',
-                verb: 'GET',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            },
-            'sv.user.get': {
-                apiRoot: monster.config.api.simplevoip,
-                url: 'api_functions.php?m=user&accountId={accountId}&userId={userId}',
-                verb: 'GET',
-                removeHeaders: [
-                    'X-Auth-Token'
-                ]
-            }
+			'sv.sms.get': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=sms&did={did}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.create': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=sms',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.update': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=sms',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.delete': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=sms',
+				verb: 'DELETE',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.list': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=users&accountId={accountId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.get': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			}
 		},
 		subscribe: {},
 		appFlags: {
