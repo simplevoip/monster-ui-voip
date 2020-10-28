@@ -1,7 +1,7 @@
 <div id="my_office_curbside_popup" class="monster-feature-popup-container">
-	<div class="content-wrapper">
+    <div class="content-wrapper">
         <form id="form_curbside" class="form-horizontal">
-		    <div class="content">
+            <div class="content">
                 <div class="control-group">
                     <label class="control-label">{{ i18n.myOffice.curbside.title }}</label>
                     <div class="switch">
@@ -12,88 +12,89 @@
                 </div>
             </div>
             <div class="content number-feature" data-feature="curbside">
-				<div class="control-group">
-					<label class="control-label">{{ i18n.myOffice.curbside.numberLabel }}</label>
-					<select name="did" class="curbside-number-select">
-						<option{{#compare did "===" ""}} selected{{/compare}} value="">None</option>
-						{{#each mainNumbers}}
-							<option{{#compare ../did "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
-						{{/each}}
-					</select>
-				</div>
-
                 <div class="control-group">
-                    <div class="title">
-    					{{ i18n.myOffice.curbside.autoResponseLabel }}
-    				</div>
-
-                    <div class="helper">
-    					<i class="fa fa-info-circle"></i>
-    					{{ i18n.myOffice.curbside.autoResponseHelp }}
-    				</div>
-
-    				<div>
-    					<textarea name="curbside_settings.initial_msg" class="curbside-auto-response">{{curbside_settings.initial_msg}}</textarea>
-    				</div>
+                    <label class="control-label">{{ i18n.myOffice.curbside.numberLabel }}</label>
+                    <select name="did" class="curbside-number-select">
+                        <option{{#compare did "===" ""}} selected{{/compare}} value="">None</option>
+                        {{#each mainNumbers}}
+                            <option{{#compare ../did "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
+                        {{/each}}
+                    </select>
                 </div>
 
                 <div class="control-group">
                     <div class="title">
-    					{{ i18n.myOffice.curbside.replies.sectionTitle }}
-    				</div>
+                        {{ i18n.myOffice.curbside.autoResponseLabel }}
+                    </div>
 
-    				<div class="helper">
-    					<i class="fa fa-info-circle"></i>
-    					{{ i18n.myOffice.curbside.replies.helpLabel }}
-    				</div>
+                    <div class="helper">
+                        <i class="fa fa-info-circle"></i>
+                        {{ i18n.myOffice.curbside.autoResponseHelp }}
+                    </div>
 
-    				<div class="list-entities replies-list">
-    					<div class="create-entity">
-    						<div class="entity-wrapper placeholder">
-    							<div class="create-text">
-    								<i class="fa fa-plus-circle"></i>
-    								{{ i18n.myOffice.curbside.replies.createLabel }}
-    							</div>
+                    <div>
+                        <textarea name="curbside_settings.initial_msg" class="curbside-auto-response">{{curbside_settings.initial_msg}}</textarea>
+                    </div>
+                </div>
 
-    							<div class="create-inputs">
-    								<input type="text" id="entity_name" name="extra.entityName" class="input-medium">
-    								<button id="add_entity" class="monster-button monster-button-success">{{ i18n.add }}</button>
-    								<a href="javascript:void(0);" id="cancel_entity">{{ i18n.cancel }}</a>
-    							</div>
-    						</div>
-    					</div>
+                <div class="control-group">
+                    <div class="title">
+                        {{ i18n.myOffice.curbside.replies.sectionTitle }}
+                    </div>
 
-    					<div class="saved-entities">
+                    <div class="helper">
+                        <i class="fa fa-info-circle"></i>
+                        {{ i18n.myOffice.curbside.replies.helpLabel }}
+                    </div>
+
+                    <div class="list-entities replies-list">
+                        <div class="create-entity">
+                            <div class="entity-wrapper placeholder">
+                                <div class="create-text">
+                                    <i class="fa fa-plus-circle"></i>
+                                    {{ i18n.myOffice.curbside.replies.createLabel }}
+                                </div>
+
+                                <div class="create-inputs">
+                                    <input type="text" id="entity_name" name="extra.entityName" class="input-medium">
+                                    <button id="add_entity" class="monster-button monster-button-success">{{ i18n.add }}</button>
+                                    <a href="javascript:void(0);" id="cancel_entity">{{ i18n.cancel }}</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="saved-entities">
                             {{#each curbside_settings.replies}}
                                 <div class="entity-wrapper" data-reply="{{this}}">
                                     <span class="entity-title">{{this}}</span>
                                     <div class="delete-entity"><i class="fa fa-trash-o monster-red"></i></div>
                                 </div>
                             {{/each}}
-    					</div>
-    				</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="control-group">
                     <div class="title">
-    					{{ i18n.myOffice.curbside.urlSectionTitle }}
-    				</div>
+                        {{ i18n.myOffice.curbside.urlSectionTitle }}
+                    </div>
 
-    				<div class="helper">
-    					<i class="fa fa-info-circle"></i>
-    					{{ i18n.myOffice.curbside.urlHelpLabel }}
-    				</div>
+                    <div class="helper">
+                        <i class="fa fa-info-circle"></i>
+                        {{ i18n.myOffice.curbside.urlHelpLabel }}
+                    </div>
 
                     <h4><a href="{{ i18n.myOffice.curbside.url }}" target="_blank">{{ i18n.myOffice.curbside.url }}</a></h4>
                 </div>
-    		</div>
-        </form>
-	</div>
 
-	<div class="actions clearfix">
-		<div class="pull-right">
-			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
-			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
-		</div>
-	</div>
+            </div>
+        </form>
+    </div>
+
+    <div class="actions clearfix">
+        <div class="pull-right">
+            <a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+            <button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+        </div>
+    </div>
 </div>

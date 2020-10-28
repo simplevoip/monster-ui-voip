@@ -709,7 +709,7 @@ define(function(require) {
 				});
 			});
 
-			if (monster.util.isNumberFeatureEnabled('cnam')) {
+			// if (monster.util.isNumberFeatureEnabled('cnam')) {
 				template.find('.header-link.caller-id:not(.disabled)').on('click', function(e) {
 					e.preventDefault();
 					self.myOfficeRenderCallerIdPopup({
@@ -717,7 +717,7 @@ define(function(require) {
 						myOfficeData: myOfficeData
 					});
 				});
-			}
+			// }
 
 			template.find('.header-link.caller-id.disabled').on('click', function(e) {
 				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
