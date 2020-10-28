@@ -2685,29 +2685,69 @@ define(function(require) {
 					data: featureUser,
 					submodule: 'users'
 				})),
-				switchFeature = featureTemplate.find('.switch-state');
+				// switchFeature = featureTemplate.find('.switch-state'),
+				featureForm = featureTemplate.find('#sms_form');
 
-			switchFeature.on('change', function() {
-				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			jQuery.validator.addMethod("require_from_sms_options", function (value, element, options) {
+				var numberRequired = options[0];
+				var selector = options[1];
+				var fields = $(selector, element.form);
+				var filled_fields = fields.filter(function () {
+					// it's more clear to compare with empty string
+					return $(this).val() != "";
+				});
+				var empty_fields = fields.not(filled_fields);
+				// we will mark only first empty field as invalid
+				if (filled_fields.length < numberRequired && empty_fields[0] == element) {
+					return false;
+				}
+				return true;
+				// {0} below is the 0th item in the options field
+			}, jQuery.validator.format("Please choose at least one delivery option (Softphone, Email, or URL)"));
+
+			monster.ui.validate(featureForm, {
+				// groups: {
+				// 	names: "mobile_id url email"
+				// },
+				rules: {
+					'did': {
+						required: true
+					},
+					'mobile_id': {
+						require_from_sms_options: [1, '.required-by-sms']
+					},
+					'url': {
+						require_from_sms_options: [1, '.required-by-sms']
+					},
+					'email': {
+						require_from_sms_options: [1, '.required-by-sms']
+					}
+				}
 			});
+
+			// switchFeature.on('change', function() {
+			// 	$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			// });
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
 
 			featureTemplate.find('.save').on('click', function() {
-				var formData = monster.ui.getFormData('sms_form'),
-					smsToSave = $.extend(true, {}, featureUser.sms, formData);
+				if (monster.ui.valid(featureForm)) {
+					var formData = monster.ui.getFormData('sms_form'),
+						smsToSave = $.extend(true, {}, featureUser.sms, formData);
 
-				self.usersUpdateSms(smsToSave, function(data) {
-					if (data) {
-						popup.dialog('close').remove();
-						self.usersRender({
-							userId: featureUser.id,
-							openedTab: 'features'
-						});
-					}
-				})
+					self.usersUpdateSms(smsToSave, function(data) {
+						if (data) {
+							popup.dialog('close').remove();
+							self.usersRender({
+								userId: featureUser.id,
+								openedTab: 'features'
+							});
+						}
+					});
+				}
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
@@ -5950,12 +5990,12 @@ define(function(require) {
 		},
 
 		usersUpdateSms: function(sms, callback) {
-			var self = this,
-				enabled = sms.enabled,
-				resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
+			var self = this;
+				// enabled = sms.enabled,
+				// resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
 
 			monster.request({
-				resource: resource,
+				resource: 'sv.sms.update',
 				data: {
 					accountId: self.accountId,
 					data: sms

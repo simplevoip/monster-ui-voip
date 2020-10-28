@@ -1,30 +1,39 @@
 <div class="monster-feature-popup-container" data-feature="sms">
     <form id="sms_form" class="form-horizontal">
 
-    	<div class="feature-popup-title">
-    		<div class="popup-title">
-    			<div class="feature-fa-wrapper">
-    				<i class="{{extra.mapFeatures.sms.icon}}"></i>
-    			</div>
-    			<div class="feature-title">
-    				{{ i18n.users.sms.headline }}
-    			</div>
-    		</div>
-    		<div class="switch popup-action">
-    		{{#monsterSwitch}}
-    			<input class="switch-state" type="checkbox" name="enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}"{{#if sms.enabled}} checked="checked"{{/if}}></input>
-    		{{/monsterSwitch}}
-    		</div>
-    	</div>
+        <div class="feature-popup-title">
+            <div class="popup-title">
+                <div class="feature-fa-wrapper">
+                    <i class="{{extra.mapFeatures.sms.icon}}"></i>
+                </div>
+                <div class="feature-title">
+                    {{ i18n.users.sms.headline }}
+                </div>
+            </div>
+        </div>
 
-    	<div class="content number-feature{{#unless sms.enabled}} disabled{{/unless}}" data-feature="sms">
+        <div class="content number-feature" data-feature="sms">
+            <div class="form-group">
+                <label class="title control-label col-sm-3">
+                    {{ i18n.users.sms.didLabel }}
+                </label>
+                <div class="col-sm-9">
+                    <select name="did" class="form-control">
+                        <option{{#compare sms.did "===" ""}} selected{{/compare}} value="">Please choose a number</option>
+                        {{#each extra.listNumbers}}
+                            <option{{#compare ../sms.did "===" this}} selected{{/compare}} value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label class="title control-label col-sm-3">
                     {{ i18n.users.sms.appLabel }}
                 </label>
                 <div class="col-sm-9">
-                    <select name="mobile_id" class="form-control">
-                        <option{{#compare sms.mobile_id "===" ""}} selected{{/compare}} value="">None</option>
+                    <select name="mobile_id" class="form-control required-by-sms">
+                        <option{{#compare sms.mobile_id "===" ""}} selected{{/compare}} value="">Choose a softphone</option>
                         {{#each extra.devices}}
                             {{#compare this.type "===" "softphone"}}
                                 <option{{#compare ../sms.mobile_id "===" this.id}} selected{{/compare}} value="{{this.id}}">{{this.name}}</option>
@@ -39,8 +48,13 @@
                     {{ i18n.users.sms.emailLabel }}
                 </label>
                 <div class="col-sm-9">
-                    <input type="email" name="email" value="{{sms.email}}" class="form-control">
+                    <input type="email" name="email" value="{{sms.email}}" class="form-control required-by-sms">
                 </div>
+            </div>
+
+            <div class="helper">
+                <i class="fa fa-info-circle"></i>
+                {{ i18n.users.sms.webhookHelpLabel }}
             </div>
 
             <div class="form-group">
@@ -48,18 +62,19 @@
                     {{ i18n.users.sms.webhookLabel }}
                 </label>
                 <div class="col-sm-9">
-                    <input type="text" name="url" value="{{sms.url}}" class="form-control">
+                    <input type="text" name="url" value="{{sms.url}}" class="form-control required-by-sms">
                 </div>
             </div>
-    	</div>
+
+        </div>
 
         <input type="hidden" name="kazoo_account_id" value="{{sms.kazoo_account_id}}">
     </form>
 
     <div class="actions clearfix">
-		<div class="pull-right">
-			<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
-			<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
-		</div>
-	</div>
+        <div class="pull-right">
+            <a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+            <button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+        </div>
+    </div>
 </div>
