@@ -263,7 +263,20 @@ define(function(require) {
 							accountId: self.accountId
 						},
 						success: function(dataAccount) {
-							parallelCallback && parallelCallback(null, dataAccount.data);
+
+							var callerIdEmergencyNumber = _.get(dataAccount, 'data.caller_id.emergency.number');
+							if (callerIdEmergencyNumber) {
+								self.myOfficeGetNumber(callerIdEmergencyNumber, function(numberData) {
+									var erlId = _.get(numberData, 'e911.erlid');
+									if (erlId) {
+										_.set(dataAccount, 'data.caller_id.emergency.erl_id', erlId);
+									}
+									parallelCallback && parallelCallback(null, dataAccount.data);
+								});
+							} else {
+								parallelCallback && parallelCallback(null, dataAccount.data);
+							}
+
 						}
 					});
 				},
@@ -354,37 +367,6 @@ define(function(require) {
 						},
 						success: function(data) {
 							parallelCallback && parallelCallback(null, data.data);
-						}
-					});
-				},
-				mainNumber: function(parallelCallback) {
-					monster.request({
-						resource: 'sv.callflow.searchByNameAndType',
-						data: {
-							accountId: self.accountId,
-							name: 'MainCallflow',
-							type: 'main'
-						},
-						success: function(data) {
-							var callflow = {};
-							if (data.data.length) {
-								var mainNumber = _
-									.chain(data.data[0].numbers)
-									.reject(function(number) {
-										return _.includes(self.staticNonNumbers, number);
-									})
-									.value();
-
-								if (mainNumber.length) {
-									self.myOfficeGetNumber(mainNumber[0], function(numberData) {
-										parallelCallback && parallelCallback(null, numberData);
-									});
-								} else {
-									parallelCallback && parallelCallback(null, callflow);
-								}
-							} else {
-								parallelCallback && parallelCallback(null, callflow);
-							}
 						}
 					});
 				},
@@ -523,7 +505,7 @@ define(function(require) {
 						});
 					})
 					.value(),
-				topMessage = (function(mainNumbers, account, numbers, mainNumber) {
+				topMessage = (function(mainNumbers, account, numbers) {
 					var shouldBypassCnam = !monster.util.isNumberFeatureEnabled('cnam'),
 						callerIdExternalNumber = _.get(account, 'caller_id.external.number'),
 						isExternalNumberSet = _.has(numbers, callerIdExternalNumber),
@@ -535,7 +517,7 @@ define(function(require) {
 							.get([callerIdEmergencyNumber, 'features'])
 							.includes('e911')
 							.value(),
-						erlId = _.get(mainNumber, 'e911.erlid'),
+						erlId = _.get(account, 'caller_id.emergency.erl_id'),
 						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet || erlId,
 						messageKey;
 
@@ -554,7 +536,7 @@ define(function(require) {
 							subcategory: 'callerIdDialog'
 						}
 						: undefined;
-				}(specialNumbers.mainNumbers, data.account, data.numbers, data.mainNumber)),
+				}(specialNumbers.mainNumbers, data.account, data.numbers)),
 				registeredDevices = _.map(data.devicesStatus, 'device_id');
 
 			return _.merge({
@@ -1455,9 +1437,8 @@ define(function(require) {
 			var self = this;
 
 			monster.request({
-				resource: 'sv.curbside.update',
+				resource: 'sv.sms.update',
 				data: {
-					accountId: self.accountId,
 					data: curbsideData
 				},
 				success: function(data) {
@@ -1473,9 +1454,8 @@ define(function(require) {
 			var self = this;
 
 			monster.request({
-				resource: 'sv.curbside.create',
+				resource: 'sv.sms.create',
 				data: {
-					accountId: self.accountId,
 					data: curbsideData
 				},
 				success: function(data) {
@@ -1490,7 +1470,6 @@ define(function(require) {
 			monster.request({
 				resource: 'sv.curbside.get',
 				data: {
-					accountId: self.accountId,
 					dids: dids.join(",")
 				},
 				success: function(data, status) {
