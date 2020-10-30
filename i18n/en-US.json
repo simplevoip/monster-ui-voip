@@ -1184,7 +1184,11 @@
             },
             "urlSectionTitle": "Curbside URL",
             "urlHelpLabel": "Use this URL to manage curbside requests and responses.",
-            "url": "https://curbside.simplevoip.us"
+            "url": "https://curbside.simplevoip.us",
+            "securitySectionTitle": "Security",
+            "securityHelpLabel": "Only use these fields if newly enabling curbside, or if you need to update your password. Otherwise, leave them blank.",
+            "passwordLabel": "Password",
+            "passwordConfirmLabel": "Confirm Password"
         },
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",

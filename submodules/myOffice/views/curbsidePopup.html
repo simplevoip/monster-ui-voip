@@ -11,7 +11,7 @@
                     </div>
                 </div>
             </div>
-            <div class="content number-feature" data-feature="curbside">
+            <div class="content number-feature{{#unless curbside_enabled}} disabled{{/unless}}" data-feature="curbside">
                 <div class="control-group">
                     <label class="control-label">{{ i18n.myOffice.curbside.numberLabel }}</label>
                     <select name="did" class="curbside-number-select">
@@ -24,7 +24,7 @@
 
                 <div class="control-group">
                     <div class="title">
-                        {{ i18n.myOffice.curbside.autoResponseLabel }}
+                        {{ i18n.myOffice.curbside.replies.sectionTitle }}
                     </div>
 
                     <div class="helper">
@@ -38,10 +38,6 @@
                 </div>
 
                 <div class="control-group">
-                    <div class="title">
-                        {{ i18n.myOffice.curbside.replies.sectionTitle }}
-                    </div>
-
                     <div class="helper">
                         <i class="fa fa-info-circle"></i>
                         {{ i18n.myOffice.curbside.replies.helpLabel }}
@@ -87,6 +83,26 @@
                     <h4><a href="{{ i18n.myOffice.curbside.url }}" target="_blank">{{ i18n.myOffice.curbside.url }}</a></h4>
                 </div>
 
+                <div class="control-group">
+                    <div class="title">
+                        {{ i18n.myOffice.curbside.securitySectionTitle }}
+                    </div>
+
+                    <div class="helper">
+                        <i class="fa fa-info-circle"></i>
+                        {{ i18n.myOffice.curbside.securityHelpLabel }}
+                    </div>
+
+                    <div>
+        				<label class="control-label">{{ i18n.myOffice.curbside.passwordLabel }}</label>
+        				<input id="password" type="password" name="curbside_settings.curbside_password">
+        			</div>
+
+                    <div>
+        				<label class="control-label">{{ i18n.myOffice.curbside.passwordConfirmLabel }}</label>
+        				<input type="password" name="curbside_settings.confirm_password">
+        			</div>
+                </div>
             </div>
         </form>
     </div>
