@@ -709,7 +709,7 @@ define(function(require) {
 				});
 			});
 
-			if (monster.util.isNumberFeatureEnabled('cnam')) {
+			// if (monster.util.isNumberFeatureEnabled('cnam')) {
 				template.find('.header-link.caller-id:not(.disabled)').on('click', function(e) {
 					e.preventDefault();
 					self.myOfficeRenderCallerIdPopup({
@@ -717,7 +717,7 @@ define(function(require) {
 						myOfficeData: myOfficeData
 					});
 				});
-			}
+			// }
 
 			template.find('.header-link.caller-id.disabled').on('click', function(e) {
 				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
@@ -957,18 +957,29 @@ define(function(require) {
 
 					$curbside[action]();
 				};
-				loadCurbsideSection();
+				// loadCurbsideSection();
 
 			monster.ui.validate(curbsideForm, {
 				rules: {
 					'did': {
 						required: true
 					},
-					'curbside_settings.initial_msg': {
+					'curbside_settings.curbside_password': {
+						maxlength: 70,
+						required: true
+					},
+					'curbside_settings.confirm_password': {
+						maxlength: 70,
+						equalTo: '#password',
 						required: true
 					}
 				}
 			});
+
+			if (data.curbside_enabled) {
+				$('[name="curbside_settings.curbside_password"]').rules('remove', 'required');
+				$('[name="curbside_settings.confirm_password"]').rules('remove', 'required');
+			}
 
 			popupTemplate.find('[name="curbside_enabled"]').on('click', function(evt) {
 				loadCurbsideSection();
@@ -982,9 +993,17 @@ define(function(require) {
 				if (monster.ui.valid(curbsideForm)) {
 					var dataToSave = self.myOfficeCurbsideMergeData(data, popupTemplate);
 
+					if (dataToSave.curbside_settings.curbside_password.length === 0) {
+						delete dataToSave.curbside_settings.curbside_password;
+					}
+					delete dataToSave.curbside_settings.confirm_password;
+
 					self.myOfficeSaveCurbside(data, dataToSave, function(data) {
 						popup.dialog('close').remove();
 					});
+
+					$('[name="curbside_settings.curbside_password"]').rules('remove', 'required');
+					$('[name="curbside_settings.confirm_password"]').rules('remove', 'required');
 				}
 			});
 
@@ -1064,7 +1083,7 @@ define(function(require) {
 		myOfficeSaveCurbside: function(origData, curbsideData, callback) {
 			var self = this;
 
-			if (origData.tn === '+10000000000') {
+			if (!origData.curbside_enabled) {
 				self.myOfficeCreateCurbside(curbsideData, callback);
 			} else {
 				self.myOfficeUpdateCurbside(curbsideData, callback);
