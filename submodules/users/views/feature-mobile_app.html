@@ -1,0 +1,56 @@
+<div class="monster-feature-popup-container" data-feature="mobile_app">
+    <div class="content-wrapper">
+        <div class="feature-popup-title">
+            <div class="popup-title">
+                <div class="feature-fa-wrapper">
+                    <i class="{{extra.mapFeatures.mobile_app.icon}}"></i>
+                </div>
+                <div class="feature-title">
+                    {{ i18n.users.mobile_app.headline }}
+                </div>
+            </div>
+        </div>
+
+        <div class="content number-feature" data-feature="mobile_app">
+
+            <div class="control-group">
+                <div class="title">
+                    {{ i18n.users.mobile_app.mobileLabel }}
+                </div>
+
+                <div class="text-center">
+                    <img style="max-width: 200px;" src="{{mobile_app.credentials.qr_code}}">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="title">
+                    {{ i18n.users.mobile_app.desktopLabel }}
+                </div>
+
+                <div>
+                    {{ i18n.users.mobile_app.usernameLabel }}
+                    <pre class="well">{{mobile_app.credentials.username}}</pre>
+                </div>
+
+                <div>
+                    {{ i18n.users.mobile_app.passwordLabel}}
+                    <pre class="well">{{mobile_app.credentials.password}}</pre>
+                </div>
+            </div>
+
+            <div class="control-group">
+                {{ i18n.users.mobile_app.sendEmailHelpLabel }} {{email}}
+                <br>
+                <button type="button" class="monster-button monster-button-success send-email">{{ i18n.users.mobile_app.sendEmailLabel }}</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="actions clearfix">
+        <div class="pull-right">
+            <button type="button" class="monster-button monster-button-danger close">{{ i18n.close }}</button>
+        </div>
+    </div>
+</div>

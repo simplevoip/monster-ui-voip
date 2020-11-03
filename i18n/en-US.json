@@ -767,6 +767,22 @@
             "webhookHelpLabel": "The URL option is for advanced users and will deliver incoming SMS messages to a webhook.",
             "appLabel": "Deliver to Softphone"
         },
+        "mobile_app": {
+            "title": "SV Mobile App",
+            "headline": "SimpleVoIP App Credentials",
+            "mobileLabel": "iOS or Android App",
+            "desktopLabel": "Desktop/Web App",
+            "usernameLabel": "Username",
+            "passwordLabel": "Password",
+            "sendEmailLabel": "Send Email",
+            "sendEmailHelpLabel": "Send credential reminder email to",
+            "provisionHelpLabel": "In order to use the SimpleVoIP apps, you must have a softphone device.",
+            "provisionLabel": "Add Softphone Device",
+            "provisionHeadline": "Setup Softphone for",
+            "createADevice": "We didn't find any Softphone associated with your user, would you like to create one now?",
+            "deviceName": "Mobile App",
+            "createDeviceError": "Unable to create softphone device."
+        },
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {

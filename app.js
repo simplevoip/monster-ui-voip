@@ -115,6 +115,22 @@ define(function(require) {
 				removeHeaders: [
 					'X-Auth-Token'
 				]
+			},
+			'sv.device.create': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=device&accountId={accountId}',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.credentials.send': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=credentials&userId={userId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
 			}
 		},
 		subscribe: {},
