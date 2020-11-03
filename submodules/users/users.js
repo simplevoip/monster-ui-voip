@@ -270,7 +270,12 @@ define(function(require) {
 							icon: 'fa fa-comments',
 							iconColor: 'monster-green',
 							title: self.i18n.active().users.sms.title
-						}
+						},
+                        mobile_app: {
+                            icon: 'fa fa-mobile',
+                            iconColor: 'monster-orange',
+                            title: self.i18n.active().users.mobile_app.title
+                        }
 					},
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
@@ -1560,6 +1565,22 @@ define(function(require) {
 				self.usersRenderSms(currentUser);
 			});
 
+			template.on('click', '.feature[data-feature="mobile_app"]', function() {
+				if (currentUser.mobile_app.is_provisioned) {
+					self.usersRenderMobileApp(currentUser);
+				} else {
+					self.usersPromptUserCreateDevice(currentUser, function(device) {
+						self.usersRender({
+							userId: currentUser.id,
+							openedTab: 'features'//,
+							// callback: self.usersRenderMobileApp(currentUser)
+						});
+					}, function() {
+						monster.ui.alert('error', self.i18n.active().users.mobile_app.createDeviceError);
+					});
+				}
+			});
+
 			template.on('click', '.feature[data-feature="faxing"]', function() {
 				if (!monster.util.isTrial()) {
 					monster.parallel({
@@ -2706,9 +2727,6 @@ define(function(require) {
 			}, jQuery.validator.format("Please choose at least one delivery option (Softphone, Email, or URL)"));
 
 			monster.ui.validate(featureForm, {
-				// groups: {
-				// 	names: "mobile_id url email"
-				// },
 				rules: {
 					'did': {
 						required: true
@@ -2752,6 +2770,68 @@ define(function(require) {
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.sms.title,
+				position: ['center', 20]
+			});
+		},
+
+		usersPromptUserCreateDevice: function(featureUser, success, error) {
+			var self = this;
+
+			monster.ui.confirm(self.i18n.active().users.mobile_app.createADevice,
+				function() {
+					self.usersCreateUserDevice(featureUser, function(device) {
+						self.usersSendMobileAppCredentials(featureUser.id, function() {
+							success(device);
+						});
+					}, error);
+				},
+				function() {}
+			);
+		},
+
+		usersCreateUserDevice: function(featureUser, callback) {
+			var self = this,
+				accountId = self.accountId,
+				deviceData = {
+					device_name: `${featureUser.first_name} ${featureUser.last_name} - Mobile App`,
+					device_type: 'softphone',
+					user_name: `${featureUser.presence_id}_softphone`,
+					user_id: `${featureUser.id}`
+				};
+
+			monster.request({
+				resource: 'sv.device.create',
+				data: {
+					accountId: accountId,
+					data: deviceData
+				},
+				success: function(device) {
+					callback && callback(device.data);
+				}
+			});
+		},
+
+		usersRenderMobileApp: function(featureUser) {
+			var self = this,
+				featureTemplate = $(self.getTemplate({
+					name: 'feature-mobile_app',
+					data: featureUser,
+					submodule: 'users'
+				})),
+				featureForm = featureTemplate.find('#mobile_app_form');
+
+			featureTemplate.find('.send-email').on('click', function() {
+				self.usersSendMobileAppCredentials(featureUser.id, function(message) {
+					monster.ui.alert('info', message);
+				});
+			});
+
+			featureTemplate.find('.close').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			var popup = monster.ui.dialog(featureTemplate, {
+				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.mobile_app.title,
 				position: ['center', 20]
 			});
 		},
@@ -6005,6 +6085,21 @@ define(function(require) {
 				},
 				error: function() {
 					console.log('Failed to update SMS settings');
+				}
+			});
+		},
+
+		usersSendMobileAppCredentials: function(userId, callback) {
+			monster.request({
+				resource: 'sv.credentials.send',
+				data: {
+					userId: userId
+				},
+				success: function(data) {
+					callback && callback(data.data.message);
+				},
+				error: function() {
+					callback && callback(data.message);
 				}
 			});
 		}
