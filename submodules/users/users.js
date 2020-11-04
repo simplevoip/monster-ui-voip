@@ -2706,7 +2706,7 @@ define(function(require) {
 					data: featureUser,
 					submodule: 'users'
 				})),
-				// switchFeature = featureTemplate.find('.switch-state'),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#sms_form');
 
 			jQuery.validator.addMethod("require_from_sms_options", function (value, element, options) {
@@ -2743,9 +2743,9 @@ define(function(require) {
 				}
 			});
 
-			// switchFeature.on('change', function() {
-			// 	$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
-			// });
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
@@ -6070,12 +6070,12 @@ define(function(require) {
 		},
 
 		usersUpdateSms: function(sms, callback) {
-			var self = this;
-				// enabled = sms.enabled,
-				// resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
+			var self = this,
+				enabled = sms.enabled,
+				resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
 
 			monster.request({
-				resource: 'sv.sms.update',
+				resource: resource,
 				data: {
 					accountId: self.accountId,
 					data: sms

@@ -10,9 +10,14 @@
                     {{ i18n.users.sms.headline }}
                 </div>
             </div>
+            <div class="switch">
+            {{#monsterSwitch}}
+                <input class="switch-state" type="checkbox" name="enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if sms.enabled}} checked{{/if}}></input>
+            {{/monsterSwitch}}
+            </div>
         </div>
 
-        <div class="content number-feature" data-feature="sms">
+        <div class="content number-feature{{#unless sms.enabled}} disabled{{/unless}}" data-feature="sms">
             <div class="form-group">
                 <label class="control-label col-sm-3">
                     {{ i18n.users.sms.didLabel }}
