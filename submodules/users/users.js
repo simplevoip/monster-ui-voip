@@ -352,6 +352,14 @@ define(function(require) {
 				}
 			});
 
+            var softphones = dataUser.extra.devices.filter(function(item) {
+                return item.type === 'softphone';
+            });
+            if (softphones.length) {
+                softphones[0].name = softphones[0].name.substring(0, softphones[0].name.indexOf(' (softphone)'));
+                dataUser.extra.softphone = softphones[0];
+            }
+
 			dataUser.extra.hasFeatures = (dataUser.extra.countFeatures > 0);
 
 			dataUser.extra.adminId = self.userId;
@@ -1562,10 +1570,10 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="sms"]', function() {
-                modifiedUser = _.merge({}, currentUser, {
+				modifiedUser = _.merge({}, currentUser, {
 					extra: {
-                        nonTollFreeNumbers: self.removeTollFreeNumbers(currentUser.extra.listNumbers)
-                    }
+						nonTollFreeNumbers: self.removeTollFreeNumbers(currentUser.extra.listNumbers)
+					}
 				});
 				self.usersRenderSms(modifiedUser);
 			});
@@ -1574,15 +1582,19 @@ define(function(require) {
 				if (currentUser.mobile_app.is_provisioned) {
 					self.usersRenderMobileApp(currentUser);
 				} else {
-					self.usersPromptUserCreateDevice(currentUser, function(device) {
-						self.usersRender({
-							userId: currentUser.id,
-							openedTab: 'features'//,
-							// callback: self.usersRenderMobileApp(currentUser)
+					if (currentUser.caller_id === undefined || currentUser.caller_id === null || (currentUser.caller_id.external.number === '' && currentUser.caller_id.internal.number === '')) {
+						monster.ui.alert('warning', self.i18n.active().users.mobile_app.noNumberError);
+					} else {
+						self.usersPromptUserCreateDevice(currentUser, function(device) {
+							self.usersRender({
+								userId: currentUser.id,
+								openedTab: 'features'//,
+								// callback: self.usersRenderMobileApp(currentUser)
+							});
+						}, function() {
+							monster.ui.alert('error', self.i18n.active().users.mobile_app.createDeviceError);
 						});
-					}, function() {
-						monster.ui.alert('error', self.i18n.active().users.mobile_app.createDeviceError);
-					});
+					}
 				}
 			});
 
