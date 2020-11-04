@@ -271,11 +271,11 @@ define(function(require) {
 							iconColor: 'monster-green',
 							title: self.i18n.active().users.sms.title
 						},
-                        mobile_app: {
-                            icon: 'fa fa-mobile',
-                            iconColor: 'monster-orange',
-                            title: self.i18n.active().users.mobile_app.title
-                        }
+						mobile_app: {
+							icon: 'fa fa-mobile',
+							iconColor: 'monster-orange',
+							title: self.i18n.active().users.mobile_app.title
+						}
 					},
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
@@ -1562,7 +1562,12 @@ define(function(require) {
 			});
 
 			template.on('click', '.feature[data-feature="sms"]', function() {
-				self.usersRenderSms(currentUser);
+                modifiedUser = _.merge({}, currentUser, {
+					extra: {
+                        nonTollFreeNumbers: self.removeTollFreeNumbers(currentUser.extra.listNumbers)
+                    }
+				});
+				self.usersRenderSms(modifiedUser);
 			});
 
 			template.on('click', '.feature[data-feature="mobile_app"]', function() {

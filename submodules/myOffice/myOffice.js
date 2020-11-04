@@ -916,8 +916,10 @@ define(function(require) {
 				mainNumbers = myOfficeData.mainNumbers;
 
 			self.myOfficeGetCurbside(_.map(mainNumbers, 'number'), function(curbsideData) {
+				var filtered_mainNumbers = self.removeTollFreeNumbers(_.map(mainNumbers, 'number'));
+
 				curbsideData = _.merge({}, curbsideData, {
-					mainNumbers: mainNumbers
+					mainNumbers: filtered_mainNumbers
 				});
 
 				self.myOfficeRenderCurbsidePopup(curbsideData);

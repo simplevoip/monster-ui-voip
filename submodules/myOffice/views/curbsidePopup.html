@@ -17,7 +17,7 @@
                     <select name="did" class="curbside-number-select">
                         <option{{#compare did "===" ""}} selected{{/compare}} value="">None</option>
                         {{#each mainNumbers}}
-                            <option{{#compare ../did "===" this.number}} selected{{/compare}} value="{{this.number}}">{{formatPhoneNumber this.number}}</option>
+                            <option{{#compare ../did "===" this}} selected{{/compare}} value="{{this}}">{{formatPhoneNumber this}}</option>
                         {{/each}}
                     </select>
                 </div>

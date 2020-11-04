@@ -294,6 +294,13 @@ define(function(require) {
 					.find('.grid-cell.active, .grid-row.active')
 						.removeClass('active');
 			});
+		},
+
+		removeTollFreeNumbers: function(numbers) {
+			return numbers.filter(function(number) {
+				var m = /^(?:\+?1)?(?:8(?:00|88|66|77|55|44|33)[2-9]\d{6})$/gm.exec(number);
+				return m === null || !m.length;
+			});
 		}
 	};
 
