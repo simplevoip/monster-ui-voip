@@ -352,13 +352,13 @@ define(function(require) {
 				}
 			});
 
-            var softphones = dataUser.extra.devices.filter(function(item) {
-                return item.type === 'softphone';
-            });
-            if (softphones.length) {
-                softphones[0].name = softphones[0].name.substring(0, softphones[0].name.indexOf(' (softphone)'));
-                dataUser.extra.softphone = softphones[0];
-            }
+			var softphones = dataUser.extra.devices.filter(function(item) {
+				return item.type === 'softphone';
+			});
+			if (softphones.length) {
+				softphones[0].name = softphones[0].name.substring(0, softphones[0].name.indexOf(' (softphone)'));
+				dataUser.extra.softphone = softphones[0];
+			}
 
 			dataUser.extra.hasFeatures = (dataUser.extra.countFeatures > 0);
 
@@ -2835,6 +2835,7 @@ define(function(require) {
 					data: featureUser,
 					submodule: 'users'
 				})),
+                switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#mobile_app_form');
 
 			featureTemplate.find('.send-email').on('click', function() {
@@ -2843,9 +2844,18 @@ define(function(require) {
 				});
 			});
 
-			featureTemplate.find('.close').on('click', function() {
+			switchFeature.on('change', function() {
+				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
 			});
+
+            featureTemplate.find('.save').on('click', function() {
+                var userToSave = featureUser;
+				userToSave.extra.softphone.enabled = switchFeature.prop('checked');
+            });
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.mobile_app.title,
