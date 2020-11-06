@@ -124,6 +124,14 @@ define(function(require) {
 					'X-Auth-Token'
 				]
 			},
+			'sv.device.update': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
+				verb: 'PATCH',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
 			'sv.credentials.send': {
 				apiRoot: monster.config.api.simplevoip,
 				url: 'api_functions.php?m=credentials&userId={userId}',

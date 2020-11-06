@@ -2852,10 +2852,27 @@ define(function(require) {
 				popup.dialog('close').remove();
 			});
 
-            featureTemplate.find('.save').on('click', function() {
-                var userToSave = featureUser;
+			featureTemplate.find('.save').on('click', function() {
+				var userToSave = featureUser;
 				userToSave.extra.softphone.enabled = switchFeature.prop('checked');
-            });
+
+				var deviceData = {
+					deviceId: userToSave.extra.softphone.id,
+					patchData: {
+						enabled: userToSave.extra.softphone.enabled
+					}
+				};
+
+				self.usersUpdateMobileApp(deviceData, function(data) {
+					if (data) {
+						popup.dialog('close').remove();
+						self.usersRender({
+							userId: featureUser.id,
+							openedTab: 'features'
+						});
+					}
+				});
+			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.mobile_app.title,
@@ -6127,6 +6144,25 @@ define(function(require) {
 				},
 				error: function() {
 					callback && callback(data.message);
+				}
+			});
+		},
+
+		usersUpdateMobileApp: function(deviceData, callback) {
+			var self = this;
+
+			monster.request({
+				resource: 'sv.device.update',
+				data: {
+					accountId: self.accountId,
+					deviceId: deviceData.deviceId,
+					data: deviceData.patchData
+				},
+				success: function(data) {
+					callback && callback(data);
+				},
+				error: function() {
+					console.log('Failed to update softphone settings');
 				}
 			});
 		}
