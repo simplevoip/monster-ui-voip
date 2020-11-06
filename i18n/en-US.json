@@ -344,8 +344,8 @@
 		"buy": "Buy Device",
 		"classifiers": {
 			"unknown": {
-			    "name": "Other than above",
-			    "help": "Please select this option when you want this account to place calls to ANY NUMBER other than mentioned on the list. (When the format of the number is unknown to the system.)"
+				"name": "Other than above",
+				"help": "Please select this option when you want this account to place calls to ANY NUMBER other than mentioned on the list. (When the format of the number is unknown to the system.)"
 			}
 		},
 		"noMatchingDevices": "There were no devices found matching your search",
@@ -691,6 +691,7 @@
 				"text2": " with a PDF (or TIFF) attachment will fax the attachment to ",
 				"text3": "The email must come from ",
 				"default": "{ destination number }",
+				"domain": "svefax.com",
 				"help": {
 					"showHelp": "Show help",
 					"hideHelp": "Hide help",
@@ -1189,30 +1190,30 @@
 			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number.",
 			"invalidCNAMAlert": "Caller ID Name must be no more than 15 characters and can only include letters, numbers, and spaces."
 		},
-        "curbside": {
-            "title": "Curbside",
-            "numberLabel": "Phone Number",
-            "autoResponseLabel": "Auto-Response",
-            "autoResponseHelp": "This response will be sent automatically upon receipt of an SMS from the customer.",
-            "enabledLabel": "Enable Curbside",
-            "enabled": "Enabled",
-            "disabled": "Disabled",
-            "replies": {
-                "sectionTitle": "Replies",
-                "helpLabel": "These replies will available for you to respond to the customer.",
-                "createLabel": "Add new reply"
-            },
-            "urlSectionTitle": "Curbside URL",
-            "urlHelpLabel": "Use this URL to manage curbside requests and responses.",
-            "url": "https://curbside.simplevoip.us",
-            "securitySectionTitle": "Security",
-            "securityHelpLabel": "Only use these fields if newly enabling curbside, or if you need to update your password. Otherwise, leave them blank.",
-            "passwordLabel": "Password",
-            "passwordConfirmLabel": "Confirm Password"
-        },
+		"curbside": {
+			"title": "Curbside",
+			"numberLabel": "Phone Number",
+			"autoResponseLabel": "Auto-Response",
+			"autoResponseHelp": "This response will be sent automatically upon receipt of an SMS from the customer.",
+			"enabledLabel": "Enable Curbside",
+			"enabled": "Enabled",
+			"disabled": "Disabled",
+			"replies": {
+				"sectionTitle": "Replies",
+				"helpLabel": "These replies will available for you to respond to the customer.",
+				"createLabel": "Add new reply"
+			},
+			"urlSectionTitle": "Curbside URL",
+			"urlHelpLabel": "Use this URL to manage curbside requests and responses.",
+			"url": "https://curbside.simplevoip.us",
+			"securitySectionTitle": "Security",
+			"securityHelpLabel": "Only use these fields if newly enabling curbside, or if you need to update your password. Otherwise, leave them blank.",
+			"passwordLabel": "Password",
+			"passwordConfirmLabel": "Confirm Password"
+		},
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",
-        "missingMainNumberForCurbside": "You need to add a main number to your office before configuring Curbside!",
+		"missingMainNumberForCurbside": "You need to add a main number to your office before configuring Curbside!",
 		"missingMainNumberMessage": "Please add a Main Number to your account.",
 		"totalUsers": "Total Users",
 		"totalDevices": "Total Devices",
