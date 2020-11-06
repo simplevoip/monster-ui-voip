@@ -1071,15 +1071,26 @@
     width: 600px;
 }
 
-.mobile-app-badges {
-    align-items: center;
+.monster-feature-popup-container a {
+    color: #2297ff;
+}
+
+.mobile-app-mobile {
     display: flex;
-    width: 300px;
-    margin-left: auto;
-    margin-right: auto;
+    justify-content: center;
+
+    > div {
+        flex: 0 0 40%;
+        text-align: center;
+    }
+}
+
+.mobile-app-badges {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
     img {
-        height: 100%;
-        width: 100%;
+        max-width: 150px;
     }
 }
