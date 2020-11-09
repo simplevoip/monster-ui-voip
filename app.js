@@ -12,7 +12,8 @@ define(function(require) {
 		'numbers',
 		'strategy',
 		'users',
-		'vmboxes'
+		'vmboxes',
+		'orders'
 	];
 
 	require(_.map(appSubmodules, function(name) {
@@ -136,6 +137,14 @@ define(function(require) {
 				apiRoot: monster.config.api.simplevoip,
 				url: 'api_functions.php?m=credentials&userId={userId}',
 				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.orders.list': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=orders&accountId={accountId}',
+				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
 				]
@@ -304,6 +313,11 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * filter out toll free number ranges from array of numbers
+		 * @param  {Array} numbers
+		 * @return {Array}
+		 */
 		removeTollFreeNumbers: function(numbers) {
 			return numbers.filter(function(number) {
 				var m = /^(?:\+?1)?(?:8(?:00|88|66|77|55|44|33)[2-9]\d{6})$/gm.exec(number);
