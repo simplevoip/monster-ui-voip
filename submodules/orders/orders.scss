@@ -1,0 +1,24 @@
+.nav-tabs {
+    max-height: 35px;
+}
+
+.dataTables_wrapper {
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_paginate {
+        padding: 10px;
+    }
+
+    .dataTables_info {
+        padding: 18px;
+    }
+
+    .dataTables_length select {
+        width: auto;
+    }
+
+    .dataTables_length select,
+    .dataTables_filter input {
+        margin-bottom: 2px;
+    }
+}

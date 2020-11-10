@@ -10,10 +10,10 @@ define(function(require) {
 		'groups',
 		'myOffice',
 		'numbers',
+		'orders',
 		'strategy',
 		'users',
-		'vmboxes',
-		'orders'
+		'vmboxes'
 	];
 
 	require(_.map(appSubmodules, function(name) {

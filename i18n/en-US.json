@@ -1151,6 +1151,41 @@
 		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
 	},
 
+    "orders": {
+        "title": "Orders",
+        "ordersTab": "Orders",
+        "quotesTab": "Quotes",
+        "ordersGrid": {
+            "gridHeaders": {
+                "customer": "Customer",
+                "site": "Site",
+                "type": "Type",
+                "installation": "Installation",
+                "status": "Status",
+                "dueDate": "Due Date",
+                "lnpStatus": "LNP Status",
+                "focDate": "FOC Date",
+                "tns": "TNs"
+            }
+        },
+        "quotesGrid": {
+            "gridHeaders": {
+                "orderId": "Order ID",
+                "dueDate": "Due Date",
+                "type": "Type",
+                "site": "Site",
+                "phoneNumber": "Phone #",
+                "city": "City",
+                "state": "State",
+                "created": "Created",
+                "nrc": "NRC",
+                "mrc": "MRC"
+            }
+        },
+        "loaderMessage": "Scroll down or click here to load additional Orders.",
+        "loadingMessage": "Loading additional Orders..."
+    },
+
 	"myOffice": {
 		"topBarLinks": {
 			"callerID": "Caller ID",
