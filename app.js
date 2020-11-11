@@ -189,8 +189,12 @@ define(function(require) {
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
+				show_orders = !monster.apps.auth.currentAccount.superduper_admin && monster.apps.auth.currentAccount.descendants_count > 0 && monster.apps.auth.currentUser.priv_level === 'admin';
 				template = $(self.getTemplate({
-					name: 'app'
+					name: 'app',
+					data: {
+						show_orders: show_orders
+					}
 				}));
 
 			self.loadGlobalData(function() {

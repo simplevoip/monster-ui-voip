@@ -69,7 +69,7 @@ define(function(require) {
 				var did_ary = [],
 					matches = [],
 					regex = /([0-9]+)/m;
-				if (order.did.length) {
+				if (order.did && order.did.length) {
 					if ((m = regex.exec(order.did)) !== null) {
 						did_ary.push(m[0]);
 					}
@@ -98,27 +98,27 @@ define(function(require) {
 			});
 
 			var quotes = orders.data.filter(function(order) {
-				var due_date = order.duedate !== '0000-00-00' ? order.duedate : '',
-					due_date_days_diff = -9999;
-				if (due_date.length) {
-					var now_dt = moment(),
-						duedate_dt = moment(due_date),
-						duedate_days_diff = duedate_dt.diff(now_dt, 'days');
-				}
+				// var due_date = order.duedate !== '0000-00-00' ? order.duedate : '',
+				// 	due_date_days_diff = -9999;
+				// if (due_date.length) {
+				// 	var now_dt = moment(),
+				// 		duedate_dt = moment(due_date),
+				// 		duedate_days_diff = duedate_dt.diff(now_dt, 'days');
+				// }
 
-				var dispatch_config_status_complete = false;
-				if (order.orderType === 'DISPATCH') {
-					dispatch_config_status_complete = order.config_status_complete
-				}
+				// var dispatch_config_status_complete = false;
+				// if (order.orderType === 'DISPATCH') {
+				// 	dispatch_config_status_complete = order.config_status_complete
+				// }
 
 				return (
 					(order.orderStatus === 'PENDING' && (order.customerApprovalDate === null || order.customerApprovalDate === '0000-00-00' || order.customerApprovalDate === ''))
-					&& (
-						(order.orderType === 'NEWSITE' && order.duedate !== '0000-00-00' && duedate_days_diff > -1 && order.totalItems > 0)
-						|| (order.orderType === 'EQUIPMENT' && order.totalItems > 0)
-						|| (order.orderType === 'DISPATCH' && order.totalItems > 0 && dispatch_config_status_complete)
-						|| (order.orderType === 'LNP' && order.did.length)
-					)
+					// && (
+					// 	(order.orderType === 'NEWSITE' && order.duedate !== '0000-00-00' && duedate_days_diff > -1 && order.totalItems > 0)
+					// 	|| (order.orderType === 'EQUIPMENT' && order.totalItems > 0)
+					// 	|| (order.orderType === 'DISPATCH' && order.totalItems > 0 && dispatch_config_status_complete)
+					// 	|| (order.orderType === 'LNP' && order.did.length)
+					// )
 				);
 			});
 
@@ -132,8 +132,8 @@ define(function(require) {
 					columns: [
 						{
 							title: 'ID',
-							data: 'orderID',
-							render: self.render_quote_id,
+							data: 'orderID'
+							// render: self.render_quote_id,
 						},
 						{ title: 'Due', data: 'duedate' },
 						{ title: 'Type', data: 'orderType' },
@@ -154,14 +154,14 @@ define(function(require) {
 						},
 					],
 					order: [
-						[0, 'asc'],
+						[0, 'asc']
 					],
 					language: {
 						paginate: {
 							previous: '&larr;',
-							next: '&rarr;',
-						},
-					},
+							next: '&rarr;'
+						}
+					}
 				});
 			}
 
@@ -177,7 +177,7 @@ define(function(require) {
 					columns: [
 						{
 							title: 'ID',
-							data: 'orderID',
+							data: 'orderID'
 							// render: self.render_order_id,
 						},
                         { title: 'Site', data: 'siteNumber' },
@@ -187,17 +187,17 @@ define(function(require) {
 						{ title: 'Due', data: 'duedate' },
                         { title: 'LNP Status', data: 'lnpstatus' },
                         { title: 'FOC Date', data: 'focdate' },
-                        { title: 'TNs', data: 'phoneNumbers' },
+                        { title: 'TNs', data: 'phoneNumbers' }
 					],
 					order: [
-						[0, 'asc'],
+						[0, 'asc']
 					],
 					language: {
 						paginate: {
 							previous: '&larr;',
-							next: '&rarr;',
-						},
-					},
+							next: '&rarr;'
+						}
+					}
 				});
 			}
 		},
