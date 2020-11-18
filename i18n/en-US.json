@@ -1183,7 +1183,11 @@
             }
         },
         "loaderMessage": "Scroll down or click here to load additional Orders.",
-        "loadingMessage": "Loading additional Orders..."
+        "loadingMessage": "Loading additional Orders...",
+        "dialog": {
+            "quoteTitle": "Quote",
+            "orderTitle": "Order"
+        }
     },
 
 	"myOffice": {

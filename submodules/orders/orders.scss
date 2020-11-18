@@ -1,3 +1,9 @@
+.monster-popup[data-type="quote"],
+.monster-popup[data-type="order"] {
+    width: 1440px;
+    padding: 2rem 0;
+}
+
 .nav-tabs {
     max-height: 35px;
 }
@@ -20,5 +26,60 @@
     .dataTables_length select,
     .dataTables_filter input {
         margin-bottom: 2px;
+        background-color: #fff;
     }
+}
+
+.text {
+    &-right {
+        text-align: right !important;
+    }
+    &-left {
+        text-align: left !important;
+    }
+    &-center {
+        text-align: center !important;
+    }
+}
+
+table.table {
+    border-top: 1px solid #ddd;
+    font-size: 0.9rem;
+}
+
+.table-bordered {
+    border-radius: 0;
+}
+
+.table-bordered thead:first-child tr:first-child>th:first-child,
+.table-bordered tbody:first-child tr:first-child>td:first-child,
+.table-bordered tbody:first-child tr:first-child>th:first-child {
+    border-radius: 0;
+}
+
+.table-bordered thead:last-child tr:last-child>th:first-child,
+.table-bordered tbody:last-child tr:last-child>td:first-child,
+.table-bordered tbody:last-child tr:last-child>th:first-child,
+.table-bordered tfoot:last-child tr:last-child>td:first-child,
+.table-bordered tfoot:last-child tr:last-child>th:first-child {
+    border-radius: 0;
+}
+
+.table-bordered th, .table-bordered td {
+    border-left: none;
+}
+
+.table-bordered th:not(:first-child),
+.table-bordered td:not(:first-child) {
+    border-left: 1px solid #dddddd;
+}
+
+td {
+    white-space: inherit !important;
+}
+
+input,
+textarea,
+.uneditable-input {
+    width: auto;
 }
