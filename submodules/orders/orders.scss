@@ -69,10 +69,19 @@ table.table {
     border-left: none;
 }
 
+// table.table:not(.mono-color) > tbody > tr {
+//     background: #fff;
+// }
+
 .table-bordered th:not(:first-child),
 .table-bordered td:not(:first-child) {
     border-left: 1px solid #dddddd;
 }
+
+// .table-striped > tbody > tr:nth-child(odd) > td,
+// .table-striped > tbody > tr:nth-child(odd) > th {
+//     background-color: #e6fff2;
+// }
 
 td {
     white-space: inherit !important;

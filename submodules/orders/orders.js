@@ -236,13 +236,15 @@ define(function(require) {
                 duedate = moment(order.dueDate),
                 order_item_details = [];
 
-            order.orderItems.forEach(function(item) {
-                item.orderItemDetails.forEach(function(itemDetail) {
-                    itemDetail.itemName = item.name;
-                    order_item_details.push(itemDetail);
+            if (order.linkedOrder) {
+                order.linkedOrder.orderItems.forEach(function(item) {
+                    item.orderItemDetails.forEach(function(itemDetail) {
+                        itemDetail.itemName = item.name;
+                        order_item_details.push(itemDetail);
+                    });
                 });
-            });
-            order.allOrderItemDetails = order_item_details;
+            }
+            order.linkedOrderItemDetails = order_item_details;
 
             if (order.orderType.toLowerCase() === 'newsite') {
                 if (order.term === 0) {
@@ -268,7 +270,7 @@ define(function(require) {
             }
 
             if (order.orderType.toLowerCase() === 'dispatch') {
-                if (order.allOrderItemDetails.length === 0) {
+                if (order.linkedOrderItemDetails.length === 0) {
                     validation_messages.push('ERROR: No valid order item details found.');
                     orderValidated = false;
                 }
@@ -342,7 +344,7 @@ define(function(require) {
             order.grandTotalPurchaseNrc = order.totalNrc + order.totalPurchaseNrc;
             order.grandTotalPurchaseMrc = order.totalMrc - order.totalPurchase;
             order.grandTotalRentalNrc = order.totalNrc - order.totalRentalNrc;
-            order.grandTotalRentalMrc = order.totalMrc - order.totalRental;
+            order.grandTotalRentalMrc = order.totalMrc + order.totalRental;
 
             // set purchase/rental options
             order.hasPurchaseOption = false;
