@@ -3918,14 +3918,16 @@ define(function(require) {
 				unassigned = _.flatten([
 					_.filter(devices, { owner_id: '' }),
 					_.reject(devices, _.partial(_.has, _, 'owner_id'))
-				]);
+				]),
+				isSuperDuper = monster.apps.auth.currentAccount.superduper_admin;
 
 			return {
 				countSpare: _.size(unassigned),
 				emptyAssigned: _.isEmpty(assigned),
 				emptySpare: _.isEmpty(unassigned),
 				assignedDevices: _.keyBy(assigned, 'id'),
-				unassignedDevices: _.keyBy(unassigned, 'id')
+				unassignedDevices: _.keyBy(unassigned, 'id'),
+				isSuperDuper: isSuperDuper
 			};
 		},
 

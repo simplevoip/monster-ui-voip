@@ -17,7 +17,7 @@
                         {{#compare orderType "!==" "LNP"}}
                             {{#compare orderType "!==" "DISPATCH"}}
                                 <tr>
-                                    <td>
+                                    <td class="wrap">
                                         <b>Requested Due Date: <i class="fa fa-info-circle" title="Minimum 10 business days for LNP requests and NEWSITE orders. Service will be provisioned and equipment shipped 7-10 days prior to this date. Select today for ASAP."></i></b>
                                     </td>
                                     <td><input type="date" name="dueDate" value="{{dueDate}}" required></td>
@@ -27,7 +27,7 @@
                         {{#compare orderType "===" "LNP"}}
                             {{#compare lnpOrderSubmitDays "===" "444"}}
                                 <tr>
-                                    <td>
+                                    <td class="wrap">
                                         <b>Customer Requested Due Date: <i class="fa fa-info-circle" title="Minimum 10 business days for LNP requests and NEWSITE orders. Service will be provisioned and equipment shipped 7-10 days prior to this date. Select today for ASAP."></i></b>
                                     </td>
                                     <td><input type="date" name="dueDate" value="{{dueDate}}" required></td>

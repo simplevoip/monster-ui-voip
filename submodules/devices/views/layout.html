@@ -11,14 +11,23 @@
 				{{i18n.devices.add }}
 			</a>
 			<ul class="dropdown-menu">
-			{{#each deviceTypesToAdd}}
-				<li>
-					<a class="create-device" data-type="{{type}}">
-						<i class="{{icon}}"></i>
-						{{tryI18n @root.i18n.devices.types type}}
-					</a>
-				</li>
-			{{/each}}
+            {{#if isSuperDuper}}
+    			{{#each deviceTypesToAdd}}
+    				<li>
+    					<a class="create-device" data-type="{{type}}">
+    						<i class="{{icon}}"></i>
+    						{{tryI18n @root.i18n.devices.types type}}
+    					</a>
+    				</li>
+    			{{/each}}
+            {{else}}
+                <li>
+                    <a class="create-device" data-type="{{i18n.devices.types.cellphone}}">
+                        <i class="{{cellPhoneIcon}}"></i>
+                        {{i18n.devices.types.cellphone}}
+                    </a>
+                </li>
+            {{/if}}
 			</ul>
 		</div>
 

@@ -1185,7 +1185,8 @@ define(function(require) {
 				},
 				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice,
-				registeredDevicesById = _.map(data.status, 'device_id');
+				registeredDevicesById = _.map(data.status, 'device_id'),
+				isSuperDuper = monster.apps.auth.currentAccount.superduper_admin;
 
 			return {
 				countDevices: _.size(data.devices),
@@ -1259,7 +1260,9 @@ define(function(require) {
 						type: type,
 						icon: _.get(self.appFlags.devices.iconClassesByDeviceTypes, type)
 					};
-				})
+				}),
+				isSuperDuper: isSuperDuper,
+				cellPhoneIcon: _.get(self.appFlags.devices.iconClassesByDeviceTypes, 'cellphone')
 			};
 		},
 
