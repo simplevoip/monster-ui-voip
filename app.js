@@ -10,6 +10,7 @@ define(function(require) {
 		'groups',
 		'myOffice',
 		'numbers',
+		'orders',
 		'strategy',
 		'users',
 		'vmboxes'
@@ -139,6 +140,30 @@ define(function(require) {
 				removeHeaders: [
 					'X-Auth-Token'
 				]
+			},
+			'sv.orders.list': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=orders&accountId={accountId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.order.update': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=order&orderId={orderId}',
+				verb: 'PATCH',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.order.get': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=order&orderId={orderId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
 			}
 		},
 		subscribe: {},
@@ -161,6 +186,8 @@ define(function(require) {
 		load: function(callback) {
 			var self = this;
 
+			self.registerHandlebarHelpers();
+
 			self.initApp(function() {
 				callback && callback(self);
 			});
@@ -180,8 +207,12 @@ define(function(require) {
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
+				show_orders = !monster.apps.auth.currentAccount.superduper_admin && monster.apps.auth.currentAccount.descendants_count > 0 && monster.apps.auth.currentUser.priv_level === 'admin';
 				template = $(self.getTemplate({
-					name: 'app'
+					name: 'app',
+					data: {
+						show_orders: show_orders
+					}
 				}));
 
 			self.loadGlobalData(function() {
@@ -304,10 +335,31 @@ define(function(require) {
 			});
 		},
 
+		/**
+		 * filter out toll free number ranges from array of numbers
+		 * @param  {Array} numbers
+		 * @return {Array}
+		 */
 		removeTollFreeNumbers: function(numbers) {
 			return numbers.filter(function(number) {
 				var m = /^(?:\+?1)?(?:8(?:00|88|66|77|55|44|33)[2-9]\d{6})$/gm.exec(number);
 				return m === null || !m.length;
+			});
+		},
+
+		registerHandlebarHelpers: function() {
+			Handlebars.registerHelper({
+
+				foreach: function(arr, options) {
+					if(options.inverse && !arr.length)
+						return options.inverse(this);
+
+					return arr.map(function(item, index) {
+					  	item.$prev = arr[index - 1];
+						return options.fn(item);
+					}).join('');
+				},
+
 			});
 		}
 	};

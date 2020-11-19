@@ -1,0 +1,20 @@
+<div id="orders_container">
+	<div class="orders-content">
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="active">
+				<a href="#tab_quotes" aria-controls="tab_quotes" role="tab" data-toggle="tab">{{ i18n.orders.quotesTab }}</a>
+			</li>
+			<li role="presentation">
+				<a href="#tab_orders" aria-controls="tab_orders" role="tab" data-toggle="tab">{{ i18n.orders.ordersTab }}</a>
+			</li>
+		</ul>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="tab_quotes">
+				<table id="table_quotes" class="table table-hover" width="100%"></table>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="tab_orders">
+				<table id="table_orders" class="table table-hover" width="100%"></table>
+			</div>
+		</div>
+	</div>
+</div>
