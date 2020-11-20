@@ -1187,7 +1187,9 @@
         "dialog": {
             "quoteTitle": "Quote",
             "orderTitle": "Order"
-        }
+        },
+        "dueDateUpdatedMessage": "The due date has been updated in the system.",
+        "dueDateNotUpdatedMessage": "The due date was not updated in the system."
     },
 
 	"myOffice": {

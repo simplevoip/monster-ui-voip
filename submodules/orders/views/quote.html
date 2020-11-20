@@ -20,7 +20,7 @@
                                     <td class="wrap">
                                         <b>Requested Due Date: <i class="fa fa-info-circle" title="Minimum 10 business days for LNP requests and NEWSITE orders. Service will be provisioned and equipment shipped 7-10 days prior to this date. Select today for ASAP."></i></b>
                                     </td>
-                                    <td><input type="date" name="dueDate" value="{{dueDate}}" required></td>
+                                    <td><form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form></td>
                                 </tr>
                             {{/compare}}
                         {{/compare}}
@@ -30,7 +30,7 @@
                                     <td class="wrap">
                                         <b>Customer Requested Due Date: <i class="fa fa-info-circle" title="Minimum 10 business days for LNP requests and NEWSITE orders. Service will be provisioned and equipment shipped 7-10 days prior to this date. Select today for ASAP."></i></b>
                                     </td>
-                                    <td><input type="date" name="dueDate" value="{{dueDate}}" required></td>
+                                    <td><form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form></td>
                                 </tr>
                             {{/compare}}
                             {{#compare lnpOrderSubmitDays "!==" "444"}}
@@ -42,7 +42,7 @@
                                 {{else}}
                                     <tr>
                                         <td><b>Port Date:</b></td>
-                                        <td><input type="date" name="dueDate" value="{{dueDate}}" required></td>
+                                        <td><form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form></td>
                                     </tr>
                                 {{/if}}
                             {{/compare}}
@@ -341,9 +341,10 @@
                     </div>
                 {{else}}
                     <label for="name">Accepted by:</label>
-                    <input type="text" name="signature">
-
+                    <form id="form_quote_approve"><input type="text" name="signature"></form>
                     <a class="btn btn-success">{{approvalMessage}}</a>
+                    <br><br>
+                    <div id="showSignature"></div>
                 {{/if}}
             </div>
         </div>

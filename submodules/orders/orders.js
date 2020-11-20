@@ -188,203 +188,203 @@ define(function(require) {
 			return orders;
 		},
 
-        ordersOrderDataFormat: function(order) {
-            order.notes = order.notes.replace(/(\r\n|\n|\r)/gm, '<br>');
+		ordersOrderDataFormat: function(order) {
+			order.notes = order.notes.replace(/(\r\n|\n|\r)/gm, '<br>');
 
-            return order;
-        },
+			return order;
+		},
 
-        ordersQuoteDataFormat: function(order) {
-            // set LNP trigger message for quotes
-            var lnp_trigger_message = '';
-            if (order.lnpOrderSubmitDays === 100) {
-                lnp_trigger_message = 'Submit After Install/QA';
-            } else if (order.lnpOrderSubmitDays === 0) {
-                lnp_trigger_message = 'Port On NEWSITE Order Due Date';
-            } else if (order.lnpOrderSubmitDays > 0) {
-                lnp_trigger_message = `NEWSITE Due Date + ${order.lnpOrderSubmitDays} Business Day(s)`;
-            } else if (order.lnpOrderSubmitDays < 0) {
-                lnp_trigger_message = `NEWSITE Due Date ${order.lnpOrderSubmitDays} Business Day(s)`;
-            }
-            order.lnpTriggerMessage = lnp_trigger_message;
+		ordersQuoteDataFormat: function(order) {
+			// set LNP trigger message for quotes
+			var lnp_trigger_message = '';
+			if (order.lnpOrderSubmitDays === 100) {
+				lnp_trigger_message = 'Submit After Install/QA';
+			} else if (order.lnpOrderSubmitDays === 0) {
+				lnp_trigger_message = 'Port On NEWSITE Order Due Date';
+			} else if (order.lnpOrderSubmitDays > 0) {
+				lnp_trigger_message = `NEWSITE Due Date + ${order.lnpOrderSubmitDays} Business Day(s)`;
+			} else if (order.lnpOrderSubmitDays < 0) {
+				lnp_trigger_message = `NEWSITE Due Date ${order.lnpOrderSubmitDays} Business Day(s)`;
+			}
+			order.lnpTriggerMessage = lnp_trigger_message;
 
-            // set dispatchdate and duedaterequired
-            var dispatch_date = '',
-                duedate_required = false;
-            if (order.orderType.toLowerCase() === 'dispatch') {
-                if (order.focDispatchDays === null) {
-                    dispatch_date = order.dueDate;
-                    duedate_required = true;
-                } else if (order.focDispatchDays === 0) {
-                    dispatch_date = 'On FOC Date';
-                } else if (order.focDispatchDays > 0) {
-                    dispatch_date = `FOC + ${foc_dispatch_days} Business Days`;
-                } else if (order.focDispatchDays < 0) {
-                    dispatch_date = `FOC ${foc_dispatch_days} Business Days`;
-                }
-            }
-            order.dispatchDate = dispatch_date;
-            order.dueDateRequired = duedate_required;
+			// set dispatchdate and duedaterequired
+			var dispatch_date = '',
+				duedate_required = false;
+			if (order.orderType.toLowerCase() === 'dispatch') {
+				if (order.focDispatchDays === null) {
+					dispatch_date = order.dueDate;
+					duedate_required = true;
+				} else if (order.focDispatchDays === 0) {
+					dispatch_date = 'On FOC Date';
+				} else if (order.focDispatchDays > 0) {
+					dispatch_date = `FOC + ${foc_dispatch_days} Business Days`;
+				} else if (order.focDispatchDays < 0) {
+					dispatch_date = `FOC ${foc_dispatch_days} Business Days`;
+				}
+			}
+			order.dispatchDate = dispatch_date;
+			order.dueDateRequired = duedate_required;
 
-            // set orderdate
-            order.orderDate = moment().format('YYYY-MM-DD');
+			// set orderdate
+			order.orderDate = moment().format('YYYY-MM-DD');
 
-            // set validation messages
-            var validation_messages = [],
-                orderValidated = true,
-                now = moment(),
-                duedate = moment(order.dueDate),
-                order_item_details = [];
+			// set validation messages
+			var validation_messages = [],
+				orderValidated = true,
+				now = moment(),
+				duedate = moment(order.dueDate),
+				order_item_details = [];
 
-            if (order.linkedOrder) {
-                order.linkedOrder.orderItems.forEach(function(item) {
-                    item.orderItemDetails.forEach(function(itemDetail) {
-                        itemDetail.itemName = item.name;
-                        order_item_details.push(itemDetail);
-                    });
-                });
-            }
-            order.linkedOrderItemDetails = order_item_details;
+			if (order.linkedOrder) {
+				order.linkedOrder.orderItems.forEach(function(item) {
+					item.orderItemDetails.forEach(function(itemDetail) {
+						itemDetail.itemName = item.name;
+						order_item_details.push(itemDetail);
+					});
+				});
+			}
+			order.linkedOrderItemDetails = order_item_details;
 
-            if (order.orderType.toLowerCase() === 'newsite') {
-                if (order.term === 0) {
-                    validation_messages.push('ERROR: Missing Term.');
-                    orderValidated = false;
-                }
-                if (order.didType === null || order.didType === '') {
-                    validation_messages.push('ERROR: Porting option.');
-                    orderValidated = false;
-                }
-                if (order.installation === null || order.installation === '') {
-                    validation_messages.push('ERROR: Missing installation option.');
-                    orderValidated = false;
-                }
-                if (order.shipSpeed === null || order.shipSpeed === '') {
-                    validation_messages.push('ERROR: Missing ship speed.');
-                    orderValidated = false;
-                }
-                if (duedate.diff(now) < 0) {
-                    validation_messages.push('ERROR: Invalid due date.');
-                    orderValidated = false;
-                }
-            }
+			if (order.orderType.toLowerCase() === 'newsite') {
+				if (order.term === 0) {
+					validation_messages.push('ERROR: Missing Term.');
+					orderValidated = false;
+				}
+				if (order.didType === null || order.didType === '') {
+					validation_messages.push('ERROR: Porting option.');
+					orderValidated = false;
+				}
+				if (order.installation === null || order.installation === '') {
+					validation_messages.push('ERROR: Missing installation option.');
+					orderValidated = false;
+				}
+				if (order.shipSpeed === null || order.shipSpeed === '') {
+					validation_messages.push('ERROR: Missing ship speed.');
+					orderValidated = false;
+				}
+				if (duedate.diff(now) < 0) {
+					validation_messages.push('ERROR: Invalid due date.');
+					orderValidated = false;
+				}
+			}
 
-            if (order.orderType.toLowerCase() === 'dispatch') {
-                if (order.linkedOrderItemDetails.length === 0) {
-                    validation_messages.push('ERROR: No valid order item details found.');
-                    orderValidated = false;
-                }
-                if (duedate_required && duedate.diff(now) < 0) {
-                    validation_messages.push('ERROR: Invalid due date.');
-                    orderValidated = false;
-                }
-                if (order.sow === null || (order.quoteNotes === null || order.quoteNotes.length === 0)) {
-                    validation_messages.push('ERROR: No valid SOW details attached.');
-                    orderValidated = false;
-                }
-            }
+			if (order.orderType.toLowerCase() === 'dispatch') {
+				if (order.linkedOrderItemDetails.length === 0) {
+					validation_messages.push('ERROR: No valid order item details found.');
+					orderValidated = false;
+				}
+				if (duedate_required && duedate.diff(now) < 0) {
+					validation_messages.push('ERROR: Invalid due date.');
+					orderValidated = false;
+				}
+				if (order.sow === null || (order.quoteNotes === null || order.quoteNotes.length === 0)) {
+					validation_messages.push('ERROR: No valid SOW details attached.');
+					orderValidated = false;
+				}
+			}
 
-            if (order.orderType.toLowerCase() === 'lnp') {
-                if (order.did === null || order.did === '') {
-                    validation_messages.push('ERROR: No phone numbers on order.');
-                    orderValidated = false;
-                }
-            } else {
-                if (order.orderItems.length === 0) {
-                    validation_messages.push('ERROR: No order items found.');
-                    orderValidated = false;
-                }
-            }
+			if (order.orderType.toLowerCase() === 'lnp') {
+				if (order.did === null || order.did === '') {
+					validation_messages.push('ERROR: No phone numbers on order.');
+					orderValidated = false;
+				}
+			} else {
+				if (order.orderItems.length === 0) {
+					validation_messages.push('ERROR: No order items found.');
+					orderValidated = false;
+				}
+			}
 
-            order.validationMessages = validation_messages;
+			order.validationMessages = validation_messages;
 
-            // split the SOW into two parts to allow for inserting order data
-            if (order.sow !== null && order.sow.length) {
-                var sow = order.sow.split('{{SOW_DETAILS}}');
-                order.sowPart1 = sow[0];
-                order.sowPart2 = sow[1];
-            }
+			// split the SOW into two parts to allow for inserting order data
+			if (order.sow !== null && order.sow.length) {
+				var sow = order.sow.split('{{SOW_DETAILS}}');
+				order.sowPart1 = sow[0];
+				order.sowPart2 = sow[1];
+			}
 
-            // set orderitem options/calculations
-            var rental_options = 0,
-                total_rental = 0,
-                total_rental_nrc = 0,
-                total_purchase = 0,
-                total_purchase_nrc = 0,
-                has_rental_items = false;
+			// set orderitem options/calculations
+			var rental_options = 0,
+				total_rental = 0,
+				total_rental_nrc = 0,
+				total_purchase = 0,
+				total_purchase_nrc = 0,
+				has_rental_items = false;
 
-            order.orderItems.forEach(function(item, itemIndex) {
-                if (item.itemType.toLowerCase() === 'product') {
-                    order.orderItems[itemIndex].mrc = 0;
-                }
+			order.orderItems.forEach(function(item, itemIndex) {
+				if (item.itemType.toLowerCase() === 'product') {
+					order.orderItems[itemIndex].mrc = 0;
+				}
 
-                order.orderItems[itemIndex].totalMrc += order.orderItems[itemIndex].mrc * order.orderItems[itemIndex].qty;
-                order.orderItems[itemIndex].totalNrc += order.orderItems[itemIndex].nrc * order.orderItems[itemIndex].qty;
+				order.orderItems[itemIndex].totalMrc += order.orderItems[itemIndex].mrc * order.orderItems[itemIndex].qty;
+				order.orderItems[itemIndex].totalNrc += order.orderItems[itemIndex].nrc * order.orderItems[itemIndex].qty;
 
-                if (item.itemSubType.toLowerCase() === 'rental') {
-                    rental_options++;
-                }
+				if (item.itemSubType.toLowerCase() === 'rental') {
+					rental_options++;
+				}
 
-                if (item.rentalMrc > 0) {
-                    has_rental_items = true;
-                    total_rental += item.rentalMrc * item.qty;
-                    total_rental_nrc += item.nrc * item.qty;
-                }
-                if (item.purchaseNrc > 0) {
-                    total_purchase += item.mrc * item.qty;
-                    total_purchase_nrc += item.purchaseNrc * item.qty;
-                }
-            });
-            order.rentalOptions = rental_options;
-            order.totalRental = total_rental;
-            order.totalRentalNrc = total_rental_nrc;
-            order.totalPurchase = total_purchase;
-            order.totalPurchaseNrc = total_purchase_nrc;
-            order.hasRentalItems = has_rental_items;
-            order.grandTotalPurchaseNrc = order.totalNrc + order.totalPurchaseNrc;
-            order.grandTotalPurchaseMrc = order.totalMrc - order.totalPurchase;
-            order.grandTotalRentalNrc = order.totalNrc - order.totalRentalNrc;
-            order.grandTotalRentalMrc = order.totalMrc + order.totalRental;
+				if (item.rentalMrc > 0) {
+					has_rental_items = true;
+					total_rental += item.rentalMrc * item.qty;
+					total_rental_nrc += item.nrc * item.qty;
+				}
+				if (item.purchaseNrc > 0) {
+					total_purchase += item.mrc * item.qty;
+					total_purchase_nrc += item.purchaseNrc * item.qty;
+				}
+			});
+			order.rentalOptions = rental_options;
+			order.totalRental = total_rental;
+			order.totalRentalNrc = total_rental_nrc;
+			order.totalPurchase = total_purchase;
+			order.totalPurchaseNrc = total_purchase_nrc;
+			order.hasRentalItems = has_rental_items;
+			order.grandTotalPurchaseNrc = order.totalNrc + order.totalPurchaseNrc;
+			order.grandTotalPurchaseMrc = order.totalMrc - order.totalPurchase;
+			order.grandTotalRentalNrc = order.totalNrc - order.totalRentalNrc;
+			order.grandTotalRentalMrc = order.totalMrc + order.totalRental;
 
-            // set purchase/rental options
-            order.hasPurchaseOption = false;
-            order.hasRentalOption = false;
-            if (order.rentalOptions > 0) {
-                if (order.orderType.toLowerCase() === 'newsite' || order.orderType.toLowerCase() === 'equipment' || order.orderType.toLowerCase() === 'change') {
-                    order.hasPurchaseOption = true;
-                }
-            } else {
-                // if (($orderType == 'NEWSITE' || $orderType == 'CHANGE') && $hasRentalItems) {
-                if ((order.orderType.toLowerCase() === 'newsite' || order.orderType.toLowerCase() === 'change') && order.hasRentalItems) {
-                    order.hasRentalOption = true;
-                }
-            }
+			// set purchase/rental options
+			order.hasPurchaseOption = false;
+			order.hasRentalOption = false;
+			if (order.rentalOptions > 0) {
+				if (order.orderType.toLowerCase() === 'newsite' || order.orderType.toLowerCase() === 'equipment' || order.orderType.toLowerCase() === 'change') {
+					order.hasPurchaseOption = true;
+				}
+			} else {
+				// if (($orderType == 'NEWSITE' || $orderType == 'CHANGE') && $hasRentalItems) {
+				if ((order.orderType.toLowerCase() === 'newsite' || order.orderType.toLowerCase() === 'change') && order.hasRentalItems) {
+					order.hasRentalOption = true;
+				}
+			}
 
-            // set tax message flag
-            order.getsTaxMessage = false;
-            if (order.orderType.toLowerCase() === 'newsite' || order.orderType.toLowerCase() === 'equipment' || order.orderType.toLowerCase() === 'change') {
-                order.getsTaxMessage = true;
-            }
+			// set tax message flag
+			order.getsTaxMessage = false;
+			if (order.orderType.toLowerCase() === 'newsite' || order.orderType.toLowerCase() === 'equipment' || order.orderType.toLowerCase() === 'change') {
+				order.getsTaxMessage = true;
+			}
 
-            // set install note flag
-            order.getsInstallNote = false;
-            if (order.installation === 'customer') {
-                order.getsInstallNote = true;
-            }
+			// set install note flag
+			order.getsInstallNote = false;
+			if (order.installation === 'customer') {
+				order.getsInstallNote = true;
+			}
 
-            // set approval message
-            order.approvalMessage = 'I approve this order';
-            if (order.orderType.toLowerCase() === 'equipment') {
-                order.approvalMessage = 'Submit Order';
-            }
+			// set approval message
+			order.approvalMessage = 'I approve this order';
+			if (order.orderType.toLowerCase() === 'equipment') {
+				order.approvalMessage = 'Submit Order';
+			}
 
-            return order;
-        },
+			return order;
+		},
 
 		render_quote_id: function(data, type, row, meta) {
 			var self = this;
 
-			if (type === 'display') {
+			if (type === 'display' && row.dueDate !== '') {
 				return `<a href="#" class="quote-link" data-quoteid="${data}">${data}</a>`;
 			}
 			return data;
@@ -413,10 +413,10 @@ define(function(require) {
 
 			template.find('#table_quotes tbody').on('click', '.quote-link', function(evt) {
 				var orderId = $(evt.target).data('quoteid');
-                self.ordersGetOrder(orderId, function(order) {
-                    var formattedOrder = self.ordersQuoteDataFormat(order.data);
-                    self.ordersRenderQuote(formattedOrder);
-                });
+				self.ordersGetOrder(orderId, function(order) {
+					var formattedOrder = self.ordersQuoteDataFormat(order.data);
+					self.ordersRenderQuote(formattedOrder);
+				});
 			});
 
 			template.find('#table_orders tbody').on('click', '.order-link', function(evt) {
@@ -425,10 +425,10 @@ define(function(require) {
 					// 	return item.orderId === orderId;
 					// });
 
-                self.ordersGetOrder(orderId, function(order) {
-                    var formattedOrder = self.ordersOrderDataFormat(order.data);
-				    self.ordersRenderOrder(formattedOrder);
-                });
+				self.ordersGetOrder(orderId, function(order) {
+					var formattedOrder = self.ordersOrderDataFormat(order.data);
+					self.ordersRenderOrder(formattedOrder);
+				});
 			});
 		},
 
@@ -459,13 +459,13 @@ define(function(require) {
 					submodule: 'orders'
 				}));
 
-            var popup = monster.ui.dialog(template, {
+			var popup = monster.ui.dialog(template, {
 				title: self.i18n.active().orders.dialog.orderTitle
 			});
 
 			self.ordersOrderBindEvents({
 				template: template,
-                data: currentOrder,
+				data: currentOrder,
 				popup: popup
 			});
 		},
@@ -476,45 +476,59 @@ define(function(require) {
 				data = args.data,
 				popup = args.popup;
 
-            if (template.find('#sowPart1').length) {
-                template.find('#sowPart1').html(data.sowPart1);
-            }
+			if (template.find('#sowPart1').length) {
+				template.find('#sowPart1').html(data.sowPart1);
+			}
 
-            if (template.find('#sowPart2').length) {
-                template.find('#sowPart2').html(data.sowPart2);
-            }
+			if (template.find('#sowPart2').length) {
+				template.find('#sowPart2').html(data.sowPart2);
+			}
+
+			template.find('[name="dueDate"]').on('change', function(evt) {
+				var formData = monster.ui.getFormData('form_quote_update'),
+					dataToSave = $.extend(true, {}, data, formData);
+				self.ordersUpdateQuote(dataToSave, function(response) {
+					if (response.status === 'success') {
+						monster.ui.alert('info', self.i18n.active().orders.dueDateUpdatedMessage);
+					} else {
+						monster.ui.alert('warning', self.i18n.active().orders.dueDateNotUpdatedMessage);
+					}
+				});
+			});
+			template.find('[name="signature"]').on('keyup', self.showSignature);
 
 			template.find('.close-link').on('click', function(evt) {
 				popup.dialog('close').remove();
 			});
 
 			template.find('.approve-link').on('click', function(evt) {
-				var formData = monster.ui.getFormData('form_quote_approve');
-				self.ordersApproveQuote(data, formData.signature, function(response) {
+				var formData = monster.ui.getFormData('form_quote_approve'),
+					dataToSave = $.extend(true, {}, data, formData);
+				self.ordersApproveQuote(dataToSave, function(response) {
 					self.ordersRender();
 
-                    popup.dialog('close').remove();
+					popup.dialog('close').remove();
 				});
 			});
 		},
 
-        ordersOrderBindEvents: function(args) {
-            var self = this,
+		ordersOrderBindEvents: function(args) {
+			var self = this,
 				template = args.template,
-                data = args.data,
+				data = args.data,
 				popup = args.popup;
 
-            if (template.find('#notes').length) {
-                template.find('#notes').html(data.notes);
-            }
+			if (template.find('#notes').length) {
+				template.find('#notes').html(data.notes);
+			}
 
 			template.find('.close-link').on('click', function(evt) {
 				popup.dialog('close').remove();
 			});
-        },
+		},
 
-        ordersGetOrder: function(orderId, callback) {
-            monster.request({
+		ordersGetOrder: function(orderId, callback) {
+			monster.request({
 				resource: 'sv.order.get',
 				data: {
 					orderId: orderId
@@ -526,13 +540,30 @@ define(function(require) {
 					console.log('Failed to retrieve order');
 				}
 			});
-        },
+		},
+
+		ordersUpdateQuote: function(order, callback) {
+			monster.request({
+				resource: 'sv.quote.update',
+				data: {
+					orderId: order.orderId,
+					data: {
+						dueDate: order.dueDate
+					}
+				},
+				success: function(data) {
+					callback && callback(data);
+				},
+				error: function() {
+					console.log('Failed to approve quote');
+				}
+			});
+		},
 
 		ordersApproveQuote: function(order, signature, callback) {
 			monster.request({
 				resource: 'sv.quote.approve',
 				data: {
-					orderId: order.orderId,
 					data: order
 				},
 				success: function(data) {
@@ -543,6 +574,11 @@ define(function(require) {
 				}
 			});
 		},
+
+		showSignature: function(evt) {
+			var signature = $(this).val();
+			$('#showSignature').text(signature);
+		}
 
 	};
 

@@ -164,6 +164,14 @@ define(function(require) {
 				removeHeaders: [
 					'X-Auth-Token'
 				]
+			},
+			'sv.quote.approve': {
+				apiRoot: monster.config.api.simplevoip,
+				url: 'api_functions.php?m=quote&orderId={orderId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
 			}
 		},
 		subscribe: {},
