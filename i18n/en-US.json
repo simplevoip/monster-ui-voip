@@ -16,7 +16,7 @@
 		"__comment": "UI-1220: Added VMBox module",
 		"__version": "3.19",
 		"vmboxes": "Voicemail Boxes",
-		"orders": "Orders"
+		"accountManagement": "Account"
 	},
 
 	"commonMisc": {

@@ -10,7 +10,7 @@ define(function(require) {
 		'groups',
 		'myOffice',
 		'numbers',
-		'orders',
+		'accountManagement',
 		'strategy',
 		'users',
 		'vmboxes'
@@ -25,6 +25,11 @@ define(function(require) {
 
 		// Hack to fix an unset accountId property bug that I haven't tracked down yet
 		isMasqueradable: true,
+
+		// endpoints: {
+		// 	// simplevoip: 'https://staging.simplevoip.us/',
+		// 	simplevoip: 'http://svportal.local/'
+		// },
 
 		css: [ 'app' ],
 
@@ -172,6 +177,22 @@ define(function(require) {
 				removeHeaders: [
 					'X-Auth-Token'
 				]
+			},
+			'sv.quote.update.duedate': {
+				apiRoot: 'http://svportal.local/',
+				url: 'ajax_functions.php?fn=quote_update&orderID={orderId}&duedate={dueDate}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.quote.update.rental': {
+				apiRoot: 'http://svportal.local/',
+				url: 'ajax_functions.php?fn=quote_toggle_rental&orderID={orderId}&toggle={toggle}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
 			}
 		},
 		subscribe: {},
@@ -215,11 +236,11 @@ define(function(require) {
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
-				show_orders = !monster.apps.auth.currentAccount.superduper_admin && monster.apps.auth.currentAccount.descendants_count > 0 && monster.apps.auth.currentUser.priv_level === 'admin';
+				show_accountManagement = !monster.apps.auth.currentAccount.superduper_admin && monster.apps.auth.currentUser.priv_level === 'admin';
 				template = $(self.getTemplate({
 					name: 'app',
 					data: {
-						show_orders: show_orders
+						show_accountManagement: show_accountManagement
 					}
 				}));
 

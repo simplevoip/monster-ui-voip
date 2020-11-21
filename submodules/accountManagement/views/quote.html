@@ -20,7 +20,10 @@
                                     <td class="wrap">
                                         <b>Requested Due Date: <i class="fa fa-info-circle" title="Minimum 10 business days for LNP requests and NEWSITE orders. Service will be provisioned and equipment shipped 7-10 days prior to this date. Select today for ASAP."></i></b>
                                     </td>
-                                    <td><form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form></td>
+                                    <td>
+                                        <form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form>
+                                        <div id="approved_due_date" style="display:none;"></div>
+                                    </td>
                                 </tr>
                             {{/compare}}
                         {{/compare}}
@@ -30,7 +33,10 @@
                                     <td class="wrap">
                                         <b>Customer Requested Due Date: <i class="fa fa-info-circle" title="Minimum 10 business days for LNP requests and NEWSITE orders. Service will be provisioned and equipment shipped 7-10 days prior to this date. Select today for ASAP."></i></b>
                                     </td>
-                                    <td><form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form></td>
+                                    <td>
+                                        <form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form>
+                                        <div id="approved_due_date" style="display:none;"></div>
+                                    </td>
                                 </tr>
                             {{/compare}}
                             {{#compare lnpOrderSubmitDays "!==" "444"}}
@@ -42,7 +48,10 @@
                                 {{else}}
                                     <tr>
                                         <td><b>Port Date:</b></td>
-                                        <td><form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form></td>
+                                        <td>
+                                            <form id="form_quote_update"><input type="date" name="dueDate" value="{{dueDate}}" required></form>
+                                            <div id="approved_due_date" style="display:none;"></div>
+                                        </td>
                                     </tr>
                                 {{/if}}
                             {{/compare}}
@@ -199,7 +208,7 @@
                                 </tr>
 
                                 {{#if hasPurchaseOption}}
-                                    <tr >
+                                    <tr id="approved_total_purchase">
                                         <td colspan="6"><br></td>
                                     </tr>
                                     <tr class="error">
@@ -222,7 +231,7 @@
                                 </tr>
 
                                 {{#if hasRentalOption}}
-                                    <tr >
+                                    <tr id="approved_total_rental">
                                         <td colspan="6"></td>
                                     </tr>
                                     <tr class="error">
@@ -340,11 +349,22 @@
                         <br><b>Please contact your account manager.</b>
                     </div>
                 {{else}}
-                    <label for="name">Accepted by:</label>
-                    <form id="form_quote_approve"><input type="text" name="signature"></form>
-                    <a class="btn btn-success">{{approvalMessage}}</a>
-                    <br><br>
-                    <div id="showSignature"></div>
+                    <div id="unapproved_signature">
+                        <label for="name">Accepted by:</label>
+                        <form id="form_quote_approve"><input type="text" name="signature"></form>
+                        <a class="btn btn-success approve-link">{{approvalMessage}}</a>
+                        <br><br>
+                    </div>
+                    <div id="approved_signature" style="display:none;">
+                        <b>ACCEPTED AND AGREED TO BY:</b>
+                        <br><br>
+                    </div>
+                    <div id="signature" class="showSignature"></div>
+                    <div id="approved_signature_details" style="display:none;">
+                        <br>
+                        <div class="showSignature"></div>
+                        <div id="approved_signature_date"></div>
+                    </div>
                 {{/if}}
             </div>
         </div>

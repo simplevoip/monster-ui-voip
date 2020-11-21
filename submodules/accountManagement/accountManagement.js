@@ -11,7 +11,7 @@ define(function(require) {
 		requests: {},
 
 		subscribe: {
-			'voip.orders.render': 'ordersRender'
+			'voip.accountManagement.render': 'ordersRender'
 		},
 
 		appFlags: {},
@@ -30,7 +30,7 @@ define(function(require) {
 			self.ordersGetData(function(orders) {
 				var template = $(self.getTemplate({
 						name: 'layout',
-						submodule: 'orders'
+						submodule: 'accountManagement'
 					}));
 
 				parent
@@ -437,7 +437,7 @@ define(function(require) {
 				template = $(self.getTemplate({
 					name: 'quote',
 					data: currentOrder,
-					submodule: 'orders'
+					submodule: 'accountManagement'
 				}));
 
 			var popup = monster.ui.dialog(template, {
@@ -456,7 +456,7 @@ define(function(require) {
 				template = $(self.getTemplate({
 					name: 'order',
 					data: currentOrder,
-					submodule: 'orders'
+					submodule: 'accountManagement'
 				}));
 
 			var popup = monster.ui.dialog(template, {
@@ -487,12 +487,9 @@ define(function(require) {
 			template.find('[name="dueDate"]').on('change', function(evt) {
 				var formData = monster.ui.getFormData('form_quote_update'),
 					dataToSave = $.extend(true, {}, data, formData);
-				self.ordersUpdateQuote(dataToSave, function(response) {
-					if (response.status === 'success') {
-						monster.ui.alert('info', self.i18n.active().orders.dueDateUpdatedMessage);
-					} else {
-						monster.ui.alert('warning', self.i18n.active().orders.dueDateNotUpdatedMessage);
-					}
+
+				self.ordersUpdateQuoteDueDate(dataToSave, function(response) {
+					monster.ui.alert('info', response);
 				});
 			});
 			template.find('[name="signature"]').on('keyup', self.showSignature);
@@ -504,11 +501,26 @@ define(function(require) {
 			template.find('.approve-link').on('click', function(evt) {
 				var formData = monster.ui.getFormData('form_quote_approve'),
 					dataToSave = $.extend(true, {}, data, formData);
-				self.ordersApproveQuote(dataToSave, function(response) {
-					self.ordersRender();
 
-					popup.dialog('close').remove();
-				});
+				// show/hide sections
+				$('#approved_due_date').text($('[name="dueDate"]').val())
+				$('#form_quote_update').hide();
+				$('#approved_due_date').show();
+				$('#approved_total_purchase').hide();
+				$('#approved_total_rental').hide();
+
+				$('#unapproved_signature').hide();
+				$('#approved_signature').show();
+				$('#approved_signature_date').text(moment().format("MM/DD/YYYY"));
+				$('#approved_signature_details').show();
+				// get modal markup
+
+
+				// self.ordersApproveQuote(dataToSave, function(response) {
+				// 	self.ordersRender();
+				//
+				// 	popup.dialog('close').remove();
+				// });
 			});
 		},
 
@@ -542,20 +554,18 @@ define(function(require) {
 			});
 		},
 
-		ordersUpdateQuote: function(order, callback) {
+		ordersUpdateQuoteDueDate: function(order, callback) {
 			monster.request({
-				resource: 'sv.quote.update',
+				resource: 'sv.quote.update.duedate',
 				data: {
 					orderId: order.orderId,
-					data: {
-						dueDate: order.dueDate
-					}
+					dueDate: order.dueDate
 				},
 				success: function(data) {
 					callback && callback(data);
 				},
 				error: function() {
-					console.log('Failed to approve quote');
+					console.log('Failed to update due date');
 				}
 			});
 		},
@@ -577,7 +587,7 @@ define(function(require) {
 
 		showSignature: function(evt) {
 			var signature = $(this).val();
-			$('#showSignature').text(signature);
+			$('.showSignature').text(signature);
 		}
 
 	};
