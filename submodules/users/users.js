@@ -1582,9 +1582,8 @@ define(function(require) {
 				if (currentUser.mobile_app.is_provisioned) {
 					self.usersRenderMobileApp(currentUser);
 				} else {
-					if (currentUser.caller_id === undefined || currentUser.caller_id === null || (currentUser.caller_id.external.number === '' && currentUser.caller_id.internal.number === '')) {
-						monster.ui.alert('warning', self.i18n.active().users.mobile_app.noNumberError);
-					} else {
+					// user must have a phone number or an extension (presence_id)
+					if (currentUser.extra.extension !== '' || currentUser.extra.phoneNumber !== '') {
 						self.usersPromptUserCreateDevice(currentUser, function(device) {
 							self.usersRender({
 								userId: currentUser.id,
@@ -1594,6 +1593,8 @@ define(function(require) {
 						}, function() {
 							monster.ui.alert('error', self.i18n.active().users.mobile_app.createDeviceError);
 						});
+					} else {
+						monster.ui.alert('warning', self.i18n.active().users.mobile_app.noNumberError);
 					}
 				}
 			});
@@ -2835,7 +2836,7 @@ define(function(require) {
 					data: featureUser,
 					submodule: 'users'
 				})),
-                switchFeature = featureTemplate.find('.switch-state'),
+				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#mobile_app_form');
 
 			featureTemplate.find('.send-email').on('click', function() {
