@@ -14,7 +14,9 @@ define(function(require) {
 			'voip.accountManagement.render': 'ordersRender'
 		},
 
-		appFlags: {},
+		appFlags: {
+			quote_updated: false
+		},
 
 		deviceIcons: {},
 
@@ -438,10 +440,24 @@ define(function(require) {
 					name: 'quote',
 					data: currentOrder,
 					submodule: 'accountManagement'
-				}));
+				})),
+				approveForm = template.find('#form_quote_approve');
+
+			monster.ui.validate(approveForm, {
+				rules: {
+					'signature': {
+						required: true
+					}
+				}
+			});
 
 			var popup = monster.ui.dialog(template, {
-				title: self.i18n.active().orders.dialog.quoteTitle
+				title: self.i18n.active().orders.dialog.quoteTitle,
+				onClose: function() {
+					if (self.appFlags.quote_updated) {
+						self.ordersRender();
+					}
+				}
 			});
 
 			self.ordersQuoteBindEvents({
@@ -485,13 +501,35 @@ define(function(require) {
 			}
 
 			template.find('[name="dueDate"]').on('change', function(evt) {
-				var formData = monster.ui.getFormData('form_quote_update'),
-					dataToSave = $.extend(true, {}, data, formData);
+				var formData = monster.ui.getFormData('form_quote_update');
 
-				self.ordersUpdateQuoteDueDate(dataToSave, function(response) {
-					monster.ui.alert('info', response);
+				self.ordersUpdateQuoteDueDate(data.orderId, formData.dueDate, function(response) {
+					let message = '';
+					if (response.error) {
+						message = response.error;
+					} else {
+						self.appFlags.quote_updated = true;
+						message = response.data.message;
+					}
+					monster.ui.alert('info', response.data.message);
 				});
 			});
+
+			template.find('[name="rb_rental"]').on('click', function(evt) {
+				var toggle = $(this).val().toUpperCase();
+
+				self.ordersToggleQuotePurchaseRental(data.orderId, toggle, function(response) {
+					let message = '';
+					if (response.error) {
+						message = response.error;
+					} else {
+						self.appFlags.quote_updated = true;
+						message = response.data.message;
+					}
+					monster.ui.alert('info', response.data.message);
+				});
+			});
+
 			template.find('[name="signature"]').on('keyup', self.showSignature);
 
 			template.find('.close-link').on('click', function(evt) {
@@ -500,27 +538,43 @@ define(function(require) {
 
 			template.find('.approve-link').on('click', function(evt) {
 				var formData = monster.ui.getFormData('form_quote_approve'),
-					dataToSave = $.extend(true, {}, data, formData);
+					approveForm = template.find('#form_quote_approve');
 
-				// show/hide sections
-				$('#approved_due_date').text($('[name="dueDate"]').val())
-				$('#form_quote_update').hide();
-				$('#approved_due_date').show();
-				$('#approved_total_purchase').hide();
-				$('#approved_total_rental').hide();
+				if (monster.ui.valid(approveForm)) {
+					// show/hide sections
+					$('#approved_due_date').text($('[name="dueDate"]').val())
+					$('#form_quote_update').hide();
+					$('#approved_due_date').show();
+					$('#approved_total_purchase').hide();
+					$('#approved_total_rental').hide();
 
-				$('#unapproved_signature').hide();
-				$('#approved_signature').show();
-				$('#approved_signature_date').text(moment().format("MM/DD/YYYY"));
-				$('#approved_signature_details').show();
-				// get modal markup
+					$('#unapproved_signature').hide();
+					$('#approved_signature').show();
+					$('#approved_signature_date').text(moment().format("YYYY-MM-DD HH:mm:ss") + ' CST');
+					$('#approved_signature_details').show();
 
+					$('[name="rb_rental"]').hide();
 
-				// self.ordersApproveQuote(dataToSave, function(response) {
-				// 	self.ordersRender();
-				//
-				// 	popup.dialog('close').remove();
-				// });
+					$('.row-fluid').addClass('row');
+					$('.row').removeClass('row-fluid');
+					// get modal markup
+					var markup = $('.monster-popup[data-type="quote"]').html();
+
+					$('.row').addClass('row-fluid');
+					$('.row-fluid').removeClass('row');
+
+					self.ordersApproveQuote(data.orderId, formData.signature, markup, function(response) {
+						let message = '';
+						if (response.error) {
+							message = response.error;
+						} else {
+							self.ordersRender();
+							message = response.data.message;
+						}
+						popup.dialog('close').remove();
+						monster.ui.alert('info', message);
+					});
+				}
 			});
 		},
 
@@ -554,12 +608,12 @@ define(function(require) {
 			});
 		},
 
-		ordersUpdateQuoteDueDate: function(order, callback) {
+		ordersUpdateQuoteDueDate: function(orderId, dueDate, callback) {
 			monster.request({
 				resource: 'sv.quote.update.duedate',
 				data: {
-					orderId: order.orderId,
-					dueDate: order.dueDate
+					orderId: orderId,
+					dueDate: dueDate
 				},
 				success: function(data) {
 					callback && callback(data);
@@ -570,11 +624,33 @@ define(function(require) {
 			});
 		},
 
-		ordersApproveQuote: function(order, signature, callback) {
+		ordersToggleQuotePurchaseRental: function(orderId, toggle, callback) {
+			monster.request({
+				resource: 'sv.quote.toggle.rental',
+				data: {
+					orderId: orderId,
+					toggle: toggle
+				},
+				success: function(data) {
+					callback && callback(data);
+				},
+				error: function() {
+					console.log('Failed to update rental/purchase status');
+				}
+			});
+		},
+
+		ordersApproveQuote: function(orderId, signature, markup, callback) {
 			monster.request({
 				resource: 'sv.quote.approve',
 				data: {
-					data: order
+					orderId: orderId,
+					name: signature,
+					data: {
+						firstname: monster.apps.auth.currentUser.first_name,
+						lastname: monster.apps.auth.currentUser.last_name,
+						markup: markup
+					}
 				},
 				success: function(data) {
 					callback && callback(data);

@@ -44,7 +44,7 @@ define(function(require) {
 		requests: {
 			'sv.numbers.get': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -52,7 +52,7 @@ define(function(require) {
 			},
 			'sv.numbers.update': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
 				verb: 'POST',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -60,7 +60,7 @@ define(function(require) {
 			},
 			'sv.numbers.create': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
 				verb: 'PUT',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -68,7 +68,7 @@ define(function(require) {
 			},
 			'sv.curbside.get': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=curbside&dids={dids}',
+				url: 'monster/api_functions.php?m=curbside&dids={dids}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -76,7 +76,7 @@ define(function(require) {
 			},
 			'sv.sms.get': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=sms&did={did}',
+				url: 'monster/api_functions.php?m=sms&did={did}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -84,7 +84,7 @@ define(function(require) {
 			},
 			'sv.sms.create': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=sms',
+				url: 'monster/api_functions.php?m=sms',
 				verb: 'PUT',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -92,7 +92,7 @@ define(function(require) {
 			},
 			'sv.sms.update': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=sms',
+				url: 'monster/api_functions.php?m=sms',
 				verb: 'POST',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -100,7 +100,7 @@ define(function(require) {
 			},
 			'sv.sms.delete': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=sms',
+				url: 'monster/api_functions.php?m=sms',
 				verb: 'DELETE',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -108,7 +108,7 @@ define(function(require) {
 			},
 			'sv.user.list': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=users&accountId={accountId}',
+				url: 'monster/api_functions.php?m=users&accountId={accountId}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -116,7 +116,7 @@ define(function(require) {
 			},
 			'sv.user.get': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -124,7 +124,7 @@ define(function(require) {
 			},
 			'sv.device.create': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=device&accountId={accountId}',
+				url: 'monster/api_functions.php?m=device&accountId={accountId}',
 				verb: 'PUT',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -132,7 +132,7 @@ define(function(require) {
 			},
 			'sv.device.update': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
+				url: 'monster/api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
 				verb: 'PATCH',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -140,7 +140,7 @@ define(function(require) {
 			},
 			'sv.credentials.send': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=credentials&userId={userId}',
+				url: 'monster/api_functions.php?m=credentials&userId={userId}',
 				verb: 'POST',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -148,7 +148,7 @@ define(function(require) {
 			},
 			'sv.orders.list': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=orders&accountId={accountId}',
+				url: 'monster/api_functions.php?m=orders&accountId={accountId}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -156,7 +156,7 @@ define(function(require) {
 			},
 			'sv.order.update': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=order&orderId={orderId}',
+				url: 'monster/api_functions.php?m=order&orderId={orderId}',
 				verb: 'PATCH',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -164,7 +164,7 @@ define(function(require) {
 			},
 			'sv.order.get': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=order&orderId={orderId}',
+				url: 'monster/api_functions.php?m=order&orderId={orderId}',
 				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -172,7 +172,7 @@ define(function(require) {
 			},
 			'sv.quote.approve': {
 				apiRoot: monster.config.api.simplevoip,
-				url: 'api_functions.php?m=quote&orderId={orderId}',
+				url: 'quote_pdf_s3.php?orderID={orderId}&name={name}',
 				verb: 'POST',
 				removeHeaders: [
 					'X-Auth-Token'
@@ -186,7 +186,7 @@ define(function(require) {
 					'X-Auth-Token'
 				]
 			},
-			'sv.quote.update.rental': {
+			'sv.quote.toggle.rental': {
 				apiRoot: 'http://svportal.local/',
 				url: 'ajax_functions.php?fn=quote_toggle_rental&orderID={orderId}&toggle={toggle}',
 				verb: 'GET',
