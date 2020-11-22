@@ -179,7 +179,7 @@ define(function(require) {
 				]
 			},
 			'sv.quote.update.duedate': {
-				apiRoot: 'http://svportal.local/',
+				apiRoot: monster.config.api.simplevoip,
 				url: 'ajax_functions.php?fn=quote_update&orderID={orderId}&duedate={dueDate}',
 				verb: 'GET',
 				removeHeaders: [
@@ -187,7 +187,7 @@ define(function(require) {
 				]
 			},
 			'sv.quote.toggle.rental': {
-				apiRoot: 'http://svportal.local/',
+				apiRoot: monster.config.api.simplevoip,
 				url: 'ajax_functions.php?fn=quote_toggle_rental&orderID={orderId}&toggle={toggle}',
 				verb: 'GET',
 				removeHeaders: [
