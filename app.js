@@ -193,6 +193,15 @@ define(function(require) {
 				removeHeaders: [
 					'X-Auth-Token'
 				]
+			},
+			'sv.user.sync': {
+				apiRoot: monster.config.api.simplevoip,
+				// url: 'api_kazoo/kazoo_refresh_single_user.php?accountId={accountId}&userId={userId}',
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
 			}
 		},
 		subscribe: {},

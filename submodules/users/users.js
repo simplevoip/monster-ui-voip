@@ -893,6 +893,19 @@ define(function(require) {
 									callback(null, userData.data);
 								});
 							},
+							sv_sync: function(callback) {
+								self.usersSyncUser(userToSave.id, {
+									success: function(response) {
+										callback(null, {});
+									},
+									error: function(message) {
+										if (message) {
+											monster.ui.alert('info', message);
+										}
+										callback(null, {});
+									}
+								})
+							},
 							conference: function(callback) {
 								if (isUserNameDifferent) {
 									self.usersListConferences(userToSave.id, function(conferences) {
@@ -4231,7 +4244,7 @@ define(function(require) {
 				},
 				function(_dataUser, callback) {
 					if (!deviceData) {
-						callback(null);
+						callback(null, _dataUser);
 						return;
 					}
 
@@ -4241,14 +4254,27 @@ define(function(require) {
 							data: deviceData
 						},
 						success: function(_device) {
-							callback(null);
+							callback(null, _dataUser);
 						},
 						error: function() {
 							callback(true);
 						},
 						onChargesCancelled: function() {
 							// Allow to complete without errors, although the device won't be created
+							callback(null, _dataUser);
+						}
+					});
+				},
+				function(_dataUser, callback) {
+					self.usersSyncUser(_dataUser.id, {
+						success: function(response) {
 							callback(null);
+						},
+						error: function(message) {
+							if (message) {
+								monster.ui.alert('info', message);
+							}
+							callback(true);
 						}
 					});
 				}
@@ -6166,6 +6192,25 @@ define(function(require) {
 				},
 				error: function() {
 					console.log('Failed to update softphone settings');
+				}
+			});
+		},
+
+		usersSyncUser: function(userId, callbacks) {
+			var self = this;
+
+			monster.request({
+				resource: 'sv.user.sync',
+				data: {
+					accountId: self.accountId,
+					userId: userId
+				},
+				success: function(data) {
+					callbacks.success && callbacks.success(data);
+				},
+				error: function(response) {
+					callbacks.error && callbacks.error(response.error);
+					console.log('Failed to sync user in SV database');
 				}
 			});
 		}
