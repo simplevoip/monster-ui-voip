@@ -1135,6 +1135,9 @@ define(function(require) {
 						'region': {
 							required: '*'
 						},
+						'country': {
+							required: '*'
+						},
 						notification_contact_emails: {
 							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
 						}
@@ -1165,6 +1168,7 @@ define(function(require) {
 				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
 				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
 				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
+                emergencyCountryInput = popupTemplate.find('.caller-id-emergency-country'),
 				emergencyEmailInput = popupTemplate.find('.caller-id-emergency-email'),
 				emergencyERLIDInput = popupTemplate.find('[name="erlid"]'),
 				editableFeatures = [ 'e911', 'cnam' ],
@@ -1205,6 +1209,7 @@ define(function(require) {
 									emergencyAddress2Input.val(numberData.e911.extended_address);
 									emergencyCityInput.val(numberData.e911.locality);
 									emergencyStateInput.val(numberData.e911.region);
+                                    emergencyCountryInput.val(numberData.e911.country);
 									emergencyEmailInput.val(_
 										.chain(numberData.e911)
 										.get('notification_contact_emails', [])
@@ -1218,6 +1223,7 @@ define(function(require) {
 									emergencyAddress2Input.val('');
 									emergencyCityInput.val('');
 									emergencyStateInput.val('');
+                                    emergencyCountryInput.val('');
 									emergencyEmailInput.val('');
 									emergencyERLIDInput.val('');
 								}
