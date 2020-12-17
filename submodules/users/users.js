@@ -1586,6 +1586,9 @@ define(function(require) {
 				modifiedUser = _.merge({}, currentUser, {
 					extra: {
 						nonTollFreeNumbers: self.removeTollFreeNumbers(currentUser.extra.listNumbers)
+					},
+					sms: {
+						kazoo_account_id: self.accountId
 					}
 				});
 				self.usersRenderSms(modifiedUser);
