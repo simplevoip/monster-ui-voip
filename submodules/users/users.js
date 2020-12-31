@@ -3636,6 +3636,12 @@ define(function(require) {
 			self.usersGetUser(userId, function(userData) {
 				_.each(listUsers.users, function(user) {
 					if (user.id === userData.id) {
+						if (userData.mobile_app.is_provisioned) {
+							user.extra.mapFeatures.mobile_app.active = true;
+						}
+						if (userData.sms.enabled) {
+							user.extra.mapFeatures.sms.active = true;
+						}
 						userData = $.extend(true, userData, user);
 					}
 				});
@@ -5039,8 +5045,8 @@ define(function(require) {
 
 			monster.parallel({
 				users: function(callback) {
-					monster.request({
-						resource: 'sv.user.list',
+					self.callApi({
+						resource: 'user.list',
 						data: {
 							accountId: self.accountId,
 							filters: {
