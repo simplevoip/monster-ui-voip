@@ -1146,7 +1146,8 @@
 		"loading": "Loading additional information...",
 		"actions": {
 			"report": "Report Call",
-			"details": "Technical Details"
+			"details": "Technical Details",
+			"playRecording": "Play Recording"
 		},
 		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
 	},
