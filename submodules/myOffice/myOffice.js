@@ -305,20 +305,7 @@ define(function(require) {
 						data: {
 							accountId: self.accountId,
 							filters: {
-								paginate: 'false'
-							}
-						},
-						success: function(data) {
-							parallelCallback && parallelCallback(null, data.data);
-						}
-					});
-				},
-				devicesStatus: function(parallelCallback) {
-					self.callApi({
-						resource: 'device.getStatus',
-						data: {
-							accountId: self.accountId,
-							filters: {
+								with_status: 'true',
 								paginate: 'false'
 							}
 						},
@@ -536,8 +523,7 @@ define(function(require) {
 							subcategory: 'callerIdDialog'
 						}
 						: undefined;
-				}(specialNumbers.mainNumbers, data.account, data.numbers)),
-				registeredDevices = _.map(data.devicesStatus, 'device_id');
+				}(specialNumbers.mainNumbers, data.account, data.numbers));
 
 			return _.merge({
 				assignedNumbersData: _
@@ -626,12 +612,10 @@ define(function(require) {
 					.chain(data.devices)
 					.filter(function(device) {
 						var type = _.get(device, 'device_type'),
+							isDeviceRegistered = device.registrable ? device.registered : true,
 							isDeviceTypeKnown = _.includes(knownDeviceTypes, type),
 							isDeviceDisabled = !_.get(device, 'enabled', false),
-							isDeviceRegistered = _.includes(registeredDevices, device.id),
-							isSipDevice = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], type),
-							isUnregisteredSipDevice = isSipDevice && !isDeviceRegistered,
-							isDeviceOffline = isDeviceDisabled || isUnregisteredSipDevice;
+							isDeviceOffline = isDeviceDisabled || !isDeviceRegistered;
 
 						return isDeviceTypeKnown && isDeviceOffline;
 					})
@@ -1118,8 +1102,7 @@ define(function(require) {
 				monster.ui.validate(e911Form, {
 					rules: {
 						notification_contact_emails: {
-							normalizer: _.trim,
-							regex: /^(?:([\w+-.%]+@[\w-.]+\.[A-Za-z]{2,4})(?: ?))*$/
+							listOf: 'email'
 						}
 					},
 					messages: {
@@ -1449,7 +1432,7 @@ define(function(require) {
 				resource: 'sv.numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(number)
+					phoneNumber: number
 				},
 				success: function(data, status) {
 					success && success(data.data);
@@ -1524,7 +1507,7 @@ define(function(require) {
 				resource: resource,
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(numberData.id),
+					phoneNumber: numberData.id,
 					data: numberData
 				},
 				success: function(data, status) {

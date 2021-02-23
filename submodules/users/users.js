@@ -404,135 +404,133 @@ define(function(require) {
 
 		usersFormatListData: function(data, _sortBy) {
 			var self = this,
-				dataTemplate = {
-					showLicensedUserRoles: false,
-					existingExtensions: [],
-					countUsers: data.users.length
-				},
-				mapUsers = {},
-				mapCallflows = _.chain(data.callflows)
-					.filter(function(callflow) {
-						return callflow.type === 'mainUserCallflow';
-					})
+				userSort = _.flow(
+					_.partial(_.get, _, _sortBy || 'first_name'),
+					_.toLower
+				),
+				getTailSize = _.flow(
+					_.tail,
+					_.size
+				),
+				mainUserCallflowsPerUserId = _
+					.chain(data.callflows)
+					.filter({ type: 'mainUserCallflow' })
 					.groupBy('owner_id')
+					.mapValues(_.head)
 					.value(),
-				registeredDevices = _.map(data.deviceStatus, function(device) { return device.device_id; });
-
-			if (_.size(self.appFlags.global.servicePlansRole) > 0) {
-				dataTemplate.showLicensedUserRoles = true;
-			}
-
-			_.each(data.users, function(user) {
-				var userCallflows = _.get(mapCallflows, user.id),
-					userMainCallflow = _.head(userCallflows);
-
-				mapUsers[user.id] = self.usersFormatUserData({
-					user: user,
-					userMainCallflow: userMainCallflow
-				});
-			});
-
-			_.each(data.callflows, function(callflow) {
-				if (callflow.type !== 'faxing') {
-					var userId = callflow.owner_id;
-
-					_.each(callflow.numbers, function(number) {
-						if (number && number.length < 7) {
-							dataTemplate.existingExtensions.push(number);
-						}
+				formatUser = _.partial(function(mainUserCallflowsPerUserId, user) {
+					return self.usersFormatUserData({
+						user: user,
+						userMainCallflow: _.get(mainUserCallflowsPerUserId, user.id)
 					});
-
-					if (userId in mapUsers) {
-						var user = mapUsers[userId];
-
-						//User can only have one phoneNumber and one extension displayed with this code
-						_.each(callflow.numbers, function(number) {
-							if (number.length < 7) {
-								user.extra.listExtensions.push(number);
-							} else {
-								user.extra.listCallerId.push(number);
-
-								user.extra.listNumbers.push(number);
-
-								if (user.extra.phoneNumber === '') {
-									user.extra.phoneNumber = number;
-								} else {
-									user.extra.additionalNumbers++;
-								}
-							}
+				}, mainUserCallflowsPerUserId),
+				getNumbersExtra = function(numbers, extra) {
+					var extensions = _
+							.chain(numbers)
+							.filter(function(number) {
+								return _.size(number) < 7;
+							})
+							.concat(extra.listExtensions)
+							.value(),
+						phoneNumbers = _.filter(numbers, function(number) {
+							return _.size(number) >= 7;
 						});
 
-						// The additional extensions show how many more extensions than 1 a user has.
-						// So if the user has at least 1 extension, then we count how many he has minus the one we already display, otherwise we display 0.
-						user.extra.additionalExtensions = user.extra.listExtensions.length >= 1 ? user.extra.listExtensions.length - 1 : 0;
-
-						// If the main extension hasn't been defined because the presence_id isn't set, just pick the first extension
-						if (user.extra.extension === '' && user.extra.listExtensions.length > 0) {
-							user.extra.extension = user.extra.listExtensions[0];
-						}
-					}
-				}
-			});
-
-			dataTemplate.existingExtensions.sort(self.usersSortExtensions);
-
-			_.each(data.devices, function(device) {
-				var userId = device.owner_id;
-
-				if (userId in mapUsers) {
-					var isRegistered = device.enabled && (['sip_device', 'smartphone', 'softphone', 'fax', 'ata', 'application'].indexOf(device.device_type) >= 0 ? registeredDevices.indexOf(device.id) >= 0 : true);
-					var isEnabled = device.enabled;
-
-					if (mapUsers[userId].extra.devices.length >= 2) {
-						if (mapUsers[userId].extra.additionalDevices === 0) {
-							mapUsers[userId].extra.additionalDevices = {
-								count: 0,
-								tooltip: ''
-							};
-						}
-
-						mapUsers[userId].extra.additionalDevices.count++;
-						mapUsers[userId].extra.additionalDevices.tooltip += '<i class="device-popover-icon ' + self.deviceIcons[device.device_type] + (isEnabled ? (isRegistered ? ' monster-green' : ' monster-red') : ' monster-grey') + '"></i>'
-																			+ device.name + ' (' + device.device_type.replace('_', ' ') + ')<br>';
-					}
-
-					var deviceDataToTemplate = {
+					return {
+						listExtensions: extensions,
+						listCallerId: phoneNumbers,
+						listNumbers: phoneNumbers,
+						phoneNumber: _.head(phoneNumbers),
+						extension: _.isEmpty(extra.extension)
+							? _.head(extensions)
+							: extra.extension,
+						additionalNumbers: getTailSize(phoneNumbers),
+						additionalExtensions: getTailSize(extensions)
+					};
+				},
+				isRegistered = function(device) {
+					return _.every([
+						device.enabled,
+						device.registrable ? device.registered : true
+					]);
+				},
+				formatDevice = function(device) {
+					return _.merge({
 						id: device.id,
 						name: device.name + ' (' + device.device_type.replace('_', ' ') + ')',
 						type: device.device_type,
-						registered: isRegistered,
-						enabled: isEnabled,
+						registered: isRegistered(device),
+						enabled: device.enabled,
 						icon: self.deviceIcons[device.device_type]
-					};
+					}, device.device_type === 'mobile' ? {
+						mobile: device.mobile
+					} : {});
+				},
+				getTooltip = function(device) {
+					var statusClass = !device.enabled ? 'monster-grey'
+						: device.registered ? 'monster-green'
+						: 'monster-red';
 
-					if (device.device_type === 'mobile') {
-						deviceDataToTemplate.mobile = device.mobile;
-					}
+					return '<i class="' + _.join(['device-popover-icon', self.deviceIcons[device.type], statusClass], ' ') + '"></i>'
+						+ device.name
+						+ '<br>';
+				},
+				getDevicesExtra = function(devices) {
+					var additionals = _.slice(devices, 2);
 
-					mapUsers[userId].extra.devices.push(deviceDataToTemplate);
-				}
-			});
+					return _.merge({
+						devices: devices
+					}, !_.isEmpty(additionals) ? {
+						additionalDevices: {
+							count: _.size(additionals),
+							tooltip: _
+								.chain(additionals)
+								.map(getTooltip)
+								.join('')
+								.value()
+						}
+					} : {});
+				},
+				usableCallflows = _.reject(data.callflows, { type: 'faxing' }),
+				numbersPerUserId = _
+					.chain(usableCallflows)
+					.groupBy('owner_id')
+					.mapValues(_.partial(_.flatMap, _, 'numbers'))
+					.value(),
+				devicesPerUserId = _
+					.chain(data.devices)
+					.groupBy('owner_id')
+					.mapValues(_.partial(_.map, _, formatDevice))
+					.value(),
+				augmentUserExtras = _.partial(function(numbersPerUserId, devicesPerUserId, user) {
+					return _.merge({}, user, {
+						extra: _.merge(
+							getNumbersExtra(_.get(numbersPerUserId, user.id), user.extra),
+							getDevicesExtra(_.get(devicesPerUserId, user.id))
+						)
+					});
+				}, numbersPerUserId, devicesPerUserId);
 
-			var sortedUsers = [];
-			//Set blank presence_id for ability to sort by presence_id
-			_.each(mapUsers, function(user) {
-				if (!user.hasOwnProperty('presence_id')) {
-					user.presence_id = '';
-				}
-
-				sortedUsers.push(user);
-			});
-
-			//Default sort by presence_id
-			if (typeof _sortBy === 'undefined') {
-				_sortBy = 'first_name';
-			}
-
-			sortedUsers = self.sort(sortedUsers, _sortBy);
-
-			dataTemplate.users = sortedUsers;
-
-			return dataTemplate;
+			return {
+				countUsers: _.size(data.users),
+				existingExtensions: _
+					.chain(usableCallflows)
+					.flatMap('numbers')
+					.filter(function(string) {
+						return string && _.size(string) < 7;
+					})
+					.sort(self.usersSortExtensions)
+					.value(),
+				showLicensedUserRoles: !_.isEmpty(self.appFlags.global.servicePlansRole),
+				users: _
+					.chain(data.users)
+					.map(_.flow(
+						formatUser,
+						augmentUserExtras
+					))
+					.sortBy(userSort)
+					.value()
+			};
 		},
 
 		/* Automatically sorts an array of objects. secondArg can either be a custom sort to be applied to the dataset, or a fieldName to sort alphabetically on */
@@ -3057,114 +3055,116 @@ define(function(require) {
 
 		usersFormatCallRecording: function(params) {
 			var self = this,
-				formattedData = $.extend(true, {}, {
-					user: params.currentUser,
-					hasStorageConfigured: params.hasStorageConfigured,
-					canShowFields: false,
-					timeLimit: 3600
-				}),
-				setValueSetting = function(category, direction) {
-					var found = false,
-						currentAccount = monster.apps.auth.currentAccount;
-
-					if (params.currentUser.hasOwnProperty('call_recording')) {
-						if (params.currentUser.call_recording.hasOwnProperty(category)) {
-							if (params.currentUser.call_recording[category].hasOwnProperty(direction) && params.currentUser.call_recording[category][direction].hasOwnProperty('enabled')) {
-								found = true;
-
-								formattedData.extra[category][direction].enabled = params.currentUser.call_recording[category][direction].enabled;
-							}
-						}
-					}
-
-					if (currentAccount.hasOwnProperty('call_recording') && currentAccount.call_recording.hasOwnProperty('endpoint')) {
-						if (currentAccount.call_recording.endpoint.hasOwnProperty(category)) {
-							if (currentAccount.call_recording.endpoint[category].hasOwnProperty(direction) && currentAccount.call_recording.endpoint[category][direction].hasOwnProperty('enabled')) {
-								formattedData.extra[category][direction].accountValue = currentAccount.call_recording.endpoint[category][direction].enabled === true ? self.i18n.active().users.callRecording.toggleValues.on : self.i18n.active().users.callRecording.toggleValues.off;
-
-								if (!found) {
-									formattedData.extra[category][direction].enabled = 'default';
-								}
-							}
-						}
-					}
-				};
-
-			// First set the defaults, then we'll try to set them based on the hierarchy user > account
-			formattedData.extra = {
-				inbound: {
-					onnet: {
+				getDefaultValue = function() {
+					return {
 						enabled: 'default',
 						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					},
-					offnet: {
-						enabled: 'default',
-						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					}
+					};
 				},
-				outbound: {
-					onnet: {
-						enabled: 'default',
-						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					},
-					offnet: {
-						enabled: 'default',
-						accountValue: self.i18n.active().users.callRecording.toggleValues.off
-					}
-				}
-			};
+				getCallflowValue = function(direction) {
+					var defaultValue = getDefaultValue();
 
-			_.each(formattedData.extra, function(category, categoryName) {
-				_.each(category, function(direction, directionName) {
-					setValueSetting(categoryName, directionName);
-				});
-			});
-
-			// If feature is active then we search for value of the 3 other fields
-			if (params.currentUser.extra.mapFeatures.call_recording.active) {
-				// If it's using new data structure, then we look for a customization at any level.
-				// Since the app only lets you set it thru 3 generic fields, we know it will all be the same so we can just take the first results we find
-				if (params.currentUser.hasOwnProperty('call_recording')) {
-					_.each(params.currentUser.call_recording, function(category, categoryName) {
-						_.each(category, function(direction, directionName) {
-							if (direction.enabled === true && !formattedData.hasOwnProperty('url')) {
-								formattedData.url = direction.url;
-								formattedData.format = direction.format;
-								formattedData.timeLimit = direction.time_limit;
-							}
-						});
+					return _.merge({}, defaultValue, direction === 'inbound' && {
+						enabled: true
 					});
-				} else if (params.userCallflow && params.userCallflow.hasOwnProperty('flow') && params.userCallflow.flow.module === 'record_call') {
-					// Otherwise it's using the old callflow logic
-					formattedData = $.extend(true, formattedData, {
-						url: params.userCallflow.flow.data.url,
-						format: params.userCallflow.flow.data.format,
-						timeLimit: params.userCallflow.flow.data.time_limit,
-						// In old logic we were setting the call recording on the inbound calls only
-						extra: {
-							inbound: {
-								onnet: {
-									enabled: true
-								},
-								offnet: {
-									enabled: true
-								}
-							}
-						}
+				},
+				getHierarchicalValue = _.partial(function(entities, direction, network) {
+					var isUserEnabled = _.get(entities.user, ['call_recording', direction, network, 'enabled']),
+						isUserConfigured = _.isBoolean(isUserEnabled),
+						isAccountEnabled = _.get(entities.account, ['call_recording', direction, network, 'enabled']),
+						isAccountConfigured = _.every([
+							_.isBoolean(isAccountEnabled),
+							_.has(entities.account, 'call_recording.endpoint')
+						]),
+						accountValueProp = isAccountEnabled ? 'on' : 'off',
+						defaultValue = getDefaultValue();
+
+					return _.merge({}, defaultValue, isUserConfigured && {
+						enabled: isUserEnabled
+					}, isAccountConfigured && {
+						accountValue: monster.util.tryI18n(self.i18n.active().users.callRecording.toggleValues, accountValueProp)
 					});
-				}
-			}
+				}, {
+					account: monster.apps.auth.currentAccount,
+					user: params.currentUser
+				}),
+				getCallRecordingStructure = function(valueGetter) {
+					var callDirections = [
+							'inbound',
+							'outbound'
+						],
+						networkTypes = [
+							'onnet',
+							'offnet'
+						];
 
-			// We only display the storage settings if one of the toggle is set to On
-			_.each(formattedData.extra, function(category, categoryName) {
-				_.each(category, function(direction, directionName) {
-					if (formattedData.extra[categoryName][directionName].enabled === true) {
-						formattedData.canShowFields = true;
-					}
-				});
-			});
+					return _
+						.chain(callDirections)
+						.flatMap(function(direction) {
+							return _.map(networkTypes, function(network) {
+								return {
+									direction: direction,
+									network: network,
+									config: valueGetter(direction, network)
+								};
+							});
+						})
+						.keyBy('direction')
+						.mapValues(_.flow(
+							_.partial(_.keyBy, _, 'network'),
+							_.partial(_.mapValues, _, 'config')
+						));
+				},
+				getConfigForSettings = function(settings, valueGetter) {
+					return _.merge({
+						timeLimit: _.get(settings, 'time_limit'),
+						extra: getCallRecordingStructure(valueGetter)
+					}, _.pick(settings, [
+						'url',
+						'format'
+					]));
+				},
+				defaultSettings = {
+					time_limit: 3600
+				},
+				callflowSettings = _.get(params.userCallflow, 'flow.data', {}),
+				userSettings = _
+					.chain(params.currentUser)
+					.get('call_recording', {})
+					.flatMap(_.unary(_.map))
+					.find('enabled')
+					.value(),
+				configGeneratorsPerType = {
+					defaults: _.partial(getConfigForSettings, defaultSettings, getDefaultValue),
+					callflow: _.partial(getConfigForSettings, callflowSettings, getCallflowValue),
+					hierarchical: _.partial(getConfigForSettings, userSettings, getHierarchicalValue)
+				},
+				isFeatureEnabled = params.currentUser.extra.mapFeatures.call_recording.active,
+				isUserConfigured = _.has(params.currentUser, 'call_recording'),
+				isCallflowConfigured = _.get(params.userCallflow, 'flow.module') === 'record_call',
+				configType = _
+					.chain(isFeatureEnabled ? [
+						isUserConfigured && 'hierarchical',
+						isCallflowConfigured && 'callflow'
+					] : [])
+					.find(_.isString)
+					.defaultTo('defaults')
+					.value(),
+				config = configGeneratorsPerType[configType]();
 
-			return formattedData;
+			return _.merge({
+				user: params.currentUser,
+				canShowFields: _
+					.chain(config.extra)
+					.flatMap(_.unary(_.map))
+					.find('enabled')
+					.thru(_.negate(_.isUndefined))
+					.value()
+			}, _.pick(params, [
+				'hasStorageConfigured'
+			]), _.pick(self.appFlags.common.callRecording, [
+				'supportedAudioFormats'
+			]), config);
 		},
 
 		usersAnalyzeCallRecordingCallflow: function(callflow) {
@@ -3286,16 +3286,7 @@ define(function(require) {
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
-			monster.ui.validate(featureForm, {
-				rules: {
-					'time_limit': {
-						digits: true
-					},
-					'url': {
-						required: true
-					}
-				}
-			});
+			monster.ui.validate(featureForm, self.appFlags.common.callRecording.validationConfig);
 
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
@@ -3734,17 +3725,19 @@ define(function(require) {
 			});
 		},
 
-		usersGetDevicesData: function(callback) {
-			var self = this;
+		usersGetDevicesData: function(data, pCallback) {
+			var self = this,
+				callback = _.isFunction(data) ? data : pCallback,
+				data = _.isFunction(data) ? {} : data;
 
 			self.callApi({
 				resource: 'device.list',
-				data: {
+				data: _.merge({
 					accountId: self.accountId,
 					filters: {
 						paginate: 'false'
 					}
-				},
+				}, data.data),
 				success: function(data) {
 					callback && callback(data.data);
 				}
@@ -4062,6 +4055,15 @@ define(function(require) {
 			var self = this,
 				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
+				provisionData = _
+					.chain(data.user.device)
+					.pick([
+						'brand',
+						'family',
+						'model'
+					])
+					.mapValues(_.toLower)
+					.value(),
 				formattedData = {
 					user: $.extend(true, {}, {
 						service: {
@@ -4138,9 +4140,9 @@ define(function(require) {
 				mac_address: data.user.device.mac_address,
 				name: data.user.device.name,
 				provision: {
-					endpoint_brand: data.user.device.brand,
-					endpoint_family: data.user.device.family,
-					endpoint_model: data.user.device.model
+					endpoint_brand: provisionData.brand,
+					endpoint_family: provisionData.family,
+					endpoint_model: provisionData.model
 				},
 				sip: {
 					password: monster.util.randomString(12),
@@ -4566,7 +4568,7 @@ define(function(require) {
 				resource: 'callflow.searchByNumber',
 				data: {
 					accountId: self.accountId,
-					value: encodeURIComponent(phoneNumber),
+					value: phoneNumber,
 					filter_owner_id: userId,
 					filter_type: 'mobile'
 				},
@@ -4977,37 +4979,6 @@ define(function(require) {
 			});
 		},
 
-		usersGetDevice: function(deviceId, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'device.get',
-				data: {
-					accountId: self.accountId,
-					deviceId: deviceId
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
-		usersUpdateDevice: function(data, callback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'device.update',
-				data: {
-					accountId: self.accountId,
-					data: data,
-					deviceId: data.id
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
 		usersListDeviceUser: function(userId, callback) {
 			var self = this;
 
@@ -5064,22 +5035,14 @@ define(function(require) {
 					});
 				},
 				devices: function(callback) {
-					self.usersGetDevicesData(function(devices) {
-						callback(null, devices);
-					});
-				},
-				deviceStatus: function(callback) {
-					self.callApi({
-						resource: 'device.getStatus',
+					self.usersGetDevicesData({
 						data: {
-							accountId: self.accountId,
 							filters: {
-								paginate: 'false'
+								with_status: 'true'
 							}
-						},
-						success: function(data, status) {
-							callback(null, data.data);
 						}
+					}, function(devices) {
+						callback(null, devices);
 					});
 				}
 			}, function(err, results) {
@@ -5087,146 +5050,146 @@ define(function(require) {
 			});
 		},
 
-		usersUpdateDevices: function(data, userId, callbackAfterUpdate) {
+		/**
+		 * @param  {Object} data
+		 * @param  {String[]} data.newDevices List of device IDs to assign
+		 * @param  {String[]} data.oldDevices List of device IDs to unassign
+		 * @param  {String} userId
+		 * @param  {Function} callback
+		 */
+		usersUpdateDevices: function(data, userId, callback) {
 			var self = this,
-				updateDevices = function(userCallflow) {
-					var listFnParallel = [],
-						updateDeviceRequest = function(newDataDevice, callback) {
-							self.usersUpdateDevice(newDataDevice, function(updatedDataDevice) {
-								callback(null, updatedDataDevice);
-							});
-						};
-
-					_.each(data.newDevices, function(deviceId) {
-						listFnParallel.push(function(callback) {
-							self.usersGetDevice(deviceId, function(data) {
-								data.owner_id = userId;
-
-								if (data.device_type === 'mobile') {
-									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-										self.callApi({
-											resource: 'callflow.get',
-											data: {
-												accountId: self.accountId,
-												callflowId: listCallflowData.id
-											},
-											success: function(rawCallflowData, status) {
-												var callflowData = rawCallflowData.data;
-
-												if (userCallflow) {
-													$.extend(true, callflowData, {
-														owner_id: userId,
-														flow: {
-															module: 'callflow',
-															data: {
-																id: userCallflow.id
-															}
-														}
-													});
-												} else {
-													$.extend(true, callflowData, {
-														owner_id: userId,
-														flow: {
-															module: 'device',
-															data: {
-																id: deviceId
-															}
-														}
-													});
-												}
-
-												self.usersUpdateCallflow(callflowData, function() {
-													updateDeviceRequest(data, callback);
-												});
-											}
-										});
-									});
-								} else {
-									updateDeviceRequest(data, callback);
+				getUserMainCallflow = function getUserMainCallflow(userId, next) {
+					self.usersGetMainCallflow(userId, _.partial(next, null));
+				},
+				assignDeviceFactory = function assignDeviceFactory(userId, userMainCallflowId, deviceId) {
+					return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, userId, userMainCallflowId);
+				},
+				unassignDeviceFactory = function unassignDeviceFactory(deviceId) {
+					return _.bind(self.usersUpdateDeviceAssignmentFromUser, self, deviceId, null, null);
+				},
+				updateCallflowEndpoints = function updateCallflowEndpoints(updatedEndpoints, callflowId, next) {
+					self.patchCallflow({
+						data: {
+							callflowId: callflowId,
+							data: {
+								flow: _.isEmpty(updatedEndpoints) ? {
+									module: 'user',
+									data: {
+										can_call_self: false,
+										endpoints: null,
+										id: userId,
+										timeout: 20
+									}
+								} : {
+									data: {
+										endpoints: updatedEndpoints
+									}
 								}
-							});
-						});
-					});
-
-					_.each(data.oldDevices, function(deviceId) {
-						listFnParallel.push(function(callback) {
-							self.usersGetDevice(deviceId, function(data) {
-								delete data.owner_id;
-
-								if (data.device_type === 'mobile') {
-									self.usersSearchMobileCallflowsByNumber(userId, data.mobile.mdn, function(listCallflowData) {
-										self.callApi({
-											resource: 'callflow.get',
-											data: {
-												accountId: self.accountId,
-												callflowId: listCallflowData.id
-											},
-											success: function(rawCallflowData, status) {
-												var callflowData = rawCallflowData.data;
-
-												delete callflowData.owner_id;
-												$.extend(true, callflowData, {
-													flow: {
-														module: 'device',
-														data: {
-															id: deviceId
-														}
-													}
-												});
-
-												self.usersUpdateCallflow(callflowData, function() {
-													updateDeviceRequest(data, callback);
-												});
-											}
-										});
-									});
-								} else {
-									updateDeviceRequest(data, callback);
-								}
-							});
-						});
-					});
-
-					if (data.oldDevices.length > 0 && userCallflow && userCallflow.flow.module === 'ring_group') {
-						var endpointsCount = userCallflow.flow.data.endpoints.length;
-
-						userCallflow.flow.data.endpoints = _.filter(userCallflow.flow.data.endpoints, function(endpoint) {
-							return (data.oldDevices.indexOf(endpoint.id) < 0);
-						});
-
-						if (userCallflow.flow.data.endpoints.length < endpointsCount) {
-							if (userCallflow.flow.data.endpoints.length === 0) {
-								userCallflow.flow.module = 'user';
-								userCallflow.flow.data = {
-									can_call_self: false,
-									id: userId,
-									timeout: '20'
-								};
-								listFnParallel.push(function(callback) {
-									self.usersGetUser(userId, function(user) {
-										user.smartpbx.find_me_follow_me.enabled = false;
-										self.usersUpdateUser(user, function(data) {
-											callback(null, data);
-										});
-									});
-								});
 							}
-							listFnParallel.push(function(callback) {
-								self.usersUpdateCallflow(userCallflow, function(data) {
-									callback(null, data);
-								});
-							});
-						}
-					}
-
-					monster.parallel(listFnParallel, function(err, results) {
-						callbackAfterUpdate && callbackAfterUpdate(results);
+						},
+						success: _.partial(next, null),
+						error: _.partial(next, true)
 					});
+				},
+				disableFindMeFollowMeForUserId = function disableFindMeFollowMeForUserId(userId, next) {
+					self.usersPatchUser({
+						data: {
+							userId: userId,
+							data: {
+								smartpbx: {
+									find_me_follow_me: false
+								}
+							}
+						},
+						success: _.partial(next, null),
+						error: _.partial(next, true)
+					});
+				},
+				maybeUpdateUserAndCallflow = function maybeUpdateUserAndCallflow(userId, userCallflow, deviceIdsRemoved, next) {
+					var hasRingGroupModule = _.get(userCallflow, 'flow.module') === 'ring_group',
+						currentEndpoints = _.get(userCallflow, 'flow.data.endpoints', []),
+						updatedEndpoints = _.reject(currentEndpoints, _.flow(
+							_.partial(_.get, _, 'id'),
+							_.partial(_.includes, deviceIdsRemoved)
+						)),
+						whereEndpointsRemoved = _.size(updatedEndpoints) < _.size(currentEndpoints);
+
+					monster.parallel(_.flatten([
+						hasRingGroupModule && whereEndpointsRemoved ? [
+							_.partial(updateCallflowEndpoints, updatedEndpoints, userCallflow.id)
+						] : [],
+						hasRingGroupModule && whereEndpointsRemoved && _.isEmpty(updatedEndpoints) ? [
+							_.partial(disableFindMeFollowMeForUserId, userId)
+						] : []
+					]), next);
+				},
+				updateEntities = function updateEntities(userId, devices, userMainCallflow, next) {
+					monster.parallel(_.flatten([
+						_.map(data.newDevices, _.partial(assignDeviceFactory, userId, _.get(userMainCallflow, 'id'))),
+						_.map(data.oldDevices, unassignDeviceFactory),
+						_.partial(maybeUpdateUserAndCallflow, userId, userMainCallflow, data.oldDevices)
+					]), next);
 				};
 
-			self.usersGetMainCallflow(userId, function(callflow) {
-				updateDevices(callflow);
-			});
+			monster.waterfall([
+				_.partial(getUserMainCallflow, userId),
+				_.partial(updateEntities, userId, data)
+			], callback);
+		},
+
+		usersUpdateDeviceAssignmentFromUser: function(deviceId, userId, userMainCallflowId, mainCallback) {
+			var self = this,
+				getDevice = function getDevice(deviceId, callback) {
+					self.callApi({
+						resource: 'device.get',
+						data: {
+							accountId: self.accountId,
+							deviceId: deviceId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
+				},
+				patchDevice = function patchDevice(data, deviceId, callback) {
+					self.callApi({
+						resource: 'device.patch',
+						data: {
+							accountId: self.accountId,
+							deviceId: deviceId,
+							data: data
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(callback, null)
+						),
+						error: _.partial(callback, true)
+					});
+				},
+				maybeUpdateMobileCallflowAssignment = function maybeUpdateMobileCallflowAssignment(userId, userMainCallflowId, device, callback) {
+					if (device.device_type !== 'mobile') {
+						return callback(null);
+					}
+					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
+				},
+				updateDeviceAssignment = function updateDeviceAssignment(userId, userMainCallflowId, device, callback) {
+					var updatedDevice = {
+						owner_id: userId
+					};
+
+					monster.parallel([
+						_.partial(maybeUpdateMobileCallflowAssignment, userId, userMainCallflowId, device),
+						_.partial(patchDevice, updatedDevice, device.id)
+					], callback);
+				};
+
+			monster.waterfall([
+				_.partial(getDevice, deviceId),
+				_.partial(updateDeviceAssignment, userId, userMainCallflowId)
+			], mainCallback);
 		},
 
 		usersUpdateCallflowNumbers: function(userId, callflowId, numbers, callback) {
