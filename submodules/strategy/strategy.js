@@ -10,6 +10,7 @@ define(function(require) {
 		},
 
 		subscribe: {
+			'voip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
 			'voip.strategy.render': 'strategyRender',
 			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated'
 		},
@@ -418,7 +419,6 @@ define(function(require) {
 				strategyNumbersContainer = template.find('.element-container.main-number .element-content'),
 				strategyConfNumContainer = template.find('.element-container.strategy-confnum .element-content'),
 				strategyFaxingNumContainer = template.find('.element-container.strategy-faxingnum .element-content'),
-				strategyHoursContainer = template.find('.element-container.strategy-hours .element-content'),
 				strategyHolidaysContainer = template.find('.element-container.strategy-holidays .element-content'),
 				strategyCallsContainer = template.find('.element-container.strategy-calls .element-content');
 
@@ -460,7 +460,6 @@ define(function(require) {
 			self.strategyNumbersBindEvents(strategyNumbersContainer, strategyData);
 			self.strategyConfNumBindEvents(strategyConfNumContainer, strategyData);
 			self.strategyFaxingNumBindEvents(strategyFaxingNumContainer, strategyData);
-			self.strategyHoursBindEvents(strategyHoursContainer, strategyData);
 			self.strategyHolidaysBindEvents(strategyHolidaysContainer, strategyData);
 			self.strategyCallsBindEvents(strategyCallsContainer, strategyData);
 		},
@@ -713,116 +712,16 @@ define(function(require) {
 
 					break;
 				case 'hours':
-					var is12hMode = monster.apps.auth.currentUser.ui_flags && monster.apps.auth.currentUser.ui_flags.twelve_hours_mode ? true : false,
-						secondsToTime = function(seconds) {
-							var hours = parseInt(seconds / 3600) % 24,
-								minutes = (parseInt(seconds / 60) % 60).toString(),
-								suffix = '';
-
-							if (is12hMode) {
-								suffix = hours >= 12 ? 'PM' : 'AM';
-								hours = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours);
-							}
-							return hours.toString() + ':' + (minutes.length < 2 ? '0' + minutes : minutes) + suffix;
-						},
-						weekdaysRules = strategyData.temporalRules.weekdays,
-						templateData = {
-							alwaysOpen: true,
-							companyTimezone: timezone.formatTimezone(strategyData.callflows.MainCallflow.flow.data.timezone || monster.apps.auth.currentAccount.timezone),
-							days: [],
-							lunchbreak: {
-								enabled: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows.MainCallflow.flow.children),
-								from: secondsToTime(parseInt(strategyData.temporalRules.lunchbreak.time_window_start, 10)),
-								to: secondsToTime(parseInt(strategyData.temporalRules.lunchbreak.time_window_stop, 10))
-							}
-						},
-						template;
-
-					_.each(self.weekdayLabels, function(val) {
-						var isOpen = (weekdaysRules[val].id in strategyData.callflows.MainCallflow.flow.children);
-						templateData.days.push({
-							name: val,
-							label: self.i18n.active().strategy.weekdays[val.substring(4).toLowerCase()],
-							open: isOpen,
-							from: secondsToTime(parseInt(weekdaysRules[val].time_window_start, 10)),
-							to: secondsToTime(parseInt(weekdaysRules[val].time_window_stop, 10))
-						});
-
-						if (isOpen) {
-							templateData.alwaysOpen = false;
-						}
+					monster.pub('voip.strategyHours.render', {
+						container: $container,
+						strategyData: strategyData,
+						callback: callback
 					});
-
-					// Setting Monday to Friday enabled by default for 9AM-5PM, when switching from 24hours Open to Custom Hours.
-					if (templateData.alwaysOpen) {
-						_.each(templateData.days, function(val) {
-							if (val.name !== 'MainSaturday' && val.name !== 'MainSunday') {
-								val.open = true;
-								val.from = is12hMode ? '9:00AM' : '9:00';
-								val.to = is12hMode ? '5:00PM' : '17:00';
-							}
-						});
-					}
-
-					template = $(self.getTemplate({
-						name: 'strategy-' + templateName,
-						data: templateData,
-						submodule: 'strategy'
-					}));
-
-					var validationOptions = {
-						rules: {
-							'lunchbreak.from': {},
-							'lunchbreak.to': {
-								greaterDate: template.find('input[name="lunchbreak.from"]')
-							}
-						},
-						groups: {
-							lunchbreak: 'lunchbreak.from lunchbreak.to'
-						},
-						errorPlacement: function(error, element) {
-							error.appendTo(element.parent());
-						}
-					};
-
-					if (is12hMode) {
-						validationOptions.rules['lunchbreak.from'].time12h = true;
-						validationOptions.rules['lunchbreak.to'].time12h = true;
-					} else {
-						validationOptions.rules['lunchbreak.from'].time24h = true;
-						validationOptions.rules['lunchbreak.to'].time24h = true;
-					}
-
-					_.each(self.weekdayLabels, function(wday) {
-						validationOptions.rules['weekdays.' + wday + '.from'] = {};
-						validationOptions.rules['weekdays.' + wday + '.to'] = {
-							greaterDate: template.find('input[name="weekdays.' + wday + '.from"]')
-						};
-						if (is12hMode) {
-							validationOptions.rules['weekdays.' + wday + '.from'].time12h = true;
-							validationOptions.rules['weekdays.' + wday + '.to'].time12h = true;
-						} else {
-							validationOptions.rules['weekdays.' + wday + '.from'].time24h = true;
-							validationOptions.rules['weekdays.' + wday + '.to'].time24h = true;
-						}
-						validationOptions.groups[wday] = 'weekdays.' + wday + '.from weekdays.' + wday + '.to';
-					});
-
-					monster.ui.validate(template.find('#strategy_custom_hours_form'), validationOptions);
-
-					$container
-						.find('.element-content')
-							.empty()
-							.append(template);
-
-					monster.ui.timepicker(template.find('.timepicker'));
-
-					callback && callback();
 
 					break;
 				case 'holidays':
 					var templateData = {
-							enabled: !$.isEmptyObject(strategyData.temporalRules.holidays)
+							enabled: !_.isEmpty(strategyData.temporalRules.holidays)
 						},
 						template = $(self.getTemplate({
 							name: 'strategy-' + templateName,
@@ -838,7 +737,7 @@ define(function(require) {
 
 					holidayList.empty();
 
-					_.each(strategyData.temporalRules.holidays, function(val, key) {
+					_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 						if (val.id in strategyData.callflows.MainCallflow.flow.children) {
 							var holidayType,
 								holidayData = {
@@ -880,93 +779,11 @@ define(function(require) {
 
 					break;
 				case 'calls':
-					var templateData = {
-							lunchbreak: (strategyData.temporalRules.lunchbreak.id in strategyData.callflows.MainCallflow.flow.children),
-							holidays: !$.isEmptyObject(strategyData.temporalRules.holidays),
-							afterhours: false
-						},
-						template;
-
-					_.each(self.weekdayLabels, function(val) {
-						if (strategyData.temporalRules.weekdays[val].id in strategyData.callflows.MainCallflow.flow.children) {
-							templateData.afterhours = true;
-						}
-					});
-
-					template = $(self.getTemplate({
-						name: 'strategy-' + templateName,
-						data: templateData,
-						submodule: 'strategy'
-					}));
-
-					$container
-						.find('.element-content')
-							.empty()
-							.append(template);
-
-					$.each(template.find('.callflow-tab'), function() {
-						var $this = $(this),
-							callflowName = $this.data('callflow'),
-							menuName = callflowName + 'Menu',
-							tabData = {
-								callOption: {
-									type: 'default'
-								},
-								hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
-								callflow: callflowName,
-								callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
-								voicemails: strategyData.voicemails,
-								tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
-							};
-
-						if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
-							tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-							tabData.callOption.type = 'advanced-callflow';
-						} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
-							tabData.callOption.callEntityId = 'none';
-							tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
-							tabData.callOption.type = 'user-voicemail';
-						} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
-							tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
-							if ('_' in strategyData.callflows[callflowName].flow.children
-							&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
-								tabData.callOption.type = 'user-voicemail';
-								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
-							} else {
-								tabData.callOption.type = 'user-menu';
-							}
-						}
-
-						if (menuName in strategyData.callflows) {
-							tabData.menu = menuName;
-						}
-
-						$(this)
-							.empty()
-								.append($(self.getTemplate({
-									name: 'callsTab',
-									data: tabData,
-									submodule: 'strategy'
-								})));
-					});
-
-					$.each(template.find('.user-select select'), function() {
-						var $this = $(this);
-						monster.ui.chosen($this, {
-							width: '160px'
-						});
-						$this.siblings('.title').text($this.find('option:selected').closest('optgroup').prop('label'));
-					});
-
-					monster.ui.chosen(template.find('.voicemail-select select'), {
-						width: '160px'
-					});
-
-					monster.ui.chosen(template.find('.advancedCallflows-select select'), {
-						width: '160px'
-					});
-
-					callback && callback();
+					self.strategyRefreshTemplateCalls(_.pick(args, [
+						'container',
+						'strategyData',
+						'callback'
+					]));
 
 					break;
 				default:
@@ -1059,6 +876,166 @@ define(function(require) {
 		},
 
 		/**
+		 * @param  {Object} args
+		 * @param  {jQuery} args.container
+		 * @param  {Object} args.strategyData
+		 * @param  {Function} args.callback
+		 */
+		strategyRefreshTemplateCalls: function(args) {
+			var self = this,
+				$container = args.container,
+				strategyData = args.strategyData,
+				callback = args.callback,
+				getRulesStatuses = _.partial(function(strategyData) {
+					var isRuleIdActive = _.partial(_.includes, _.keys(strategyData.callflows.MainCallflow.flow.children)),
+						hasAtLeatOneActiveRule = _.flow(
+							_.partial(_.map, _, 'id'),
+							_.partial(_.some, _, isRuleIdActive)
+						),
+						rules = strategyData.temporalRules,
+						hasWeekdays = hasAtLeatOneActiveRule(rules.weekdays),
+						hasLunchbreak = hasAtLeatOneActiveRule(rules.lunchbreak),
+						isAlwaysOpen = !_.every([hasWeekdays, hasLunchbreak]),
+						hasCustomHours = _.some([hasWeekdays, hasLunchbreak]);
+
+					return {
+						weekdays: hasWeekdays || isAlwaysOpen,
+						holidays: hasAtLeatOneActiveRule(rules.holidays),
+						lunchbreak: hasLunchbreak,
+						afterhours: hasCustomHours
+					};
+				}, strategyData),
+				initTemplate = function() {
+					var rulesStatuses = getRulesStatuses(),
+						shouldTabBeRendered = _.flow(
+							_.partial(_.get, _, 'type'),
+							_.partial(_.get, rulesStatuses)
+						),
+						tabs = _.filter([{
+							type: 'weekdays',
+							cssClass: 'open-hours-tab',
+							href: 'strategy_calls_open_hours_tab',
+							iconClass: 'fa fa-sun-o',
+							label: self.i18n.active().strategy.calls.openHoursTitle,
+							callflowType: 'MainOpenHours'
+						}, {
+							type: 'lunchbreak',
+							cssClass: 'lunch-hours-tab',
+							href: 'strategy_calls_lunch_hours_tab',
+							iconClass: 'fa fa-cutlery',
+							label: self.i18n.active().strategy.calls.lunchHoursTitle,
+							callflowType: 'MainLunchHours'
+						}, {
+							type: 'afterhours',
+							cssClass: 'after-hours-tab',
+							href: 'strategy_calls_after_hours_tab',
+							iconClass: 'fa fa-moon-o',
+							label: self.i18n.active().strategy.calls.afterHoursTitle,
+							callflowType: 'MainAfterHours'
+						}, {
+							type: 'holidays',
+							cssClass: 'holidays-tab',
+							href: 'strategy_calls_holidays_tab',
+							iconClass: 'fa fa-glass',
+							label: self.i18n.active().strategy.calls.holidaysTitle,
+							callflowType: 'MainHolidays'
+						}], shouldTabBeRendered),
+						$template = $(self.getTemplate({
+							name: 'strategy-calls',
+							data: {
+								tabs: tabs
+							},
+							submodule: 'strategy'
+						}));
+
+					$.each($template.find('.callflow-tab'), renderTabContent);
+
+					return $template;
+				},
+				renderTabContent = _.partial(function(strategyData) {
+					var $tabContentWrapper = $(this),
+						callflowName = $tabContentWrapper.data('callflow'),
+						menuName = callflowName + 'Menu',
+						initTemplate = function() {
+							var $template = $(self.getTemplate({
+									name: 'callsTab',
+									data: getTabData(),
+									submodule: 'strategy'
+								})),
+								$voicemailSelects = $template.find('.voicemail-select select'),
+								$advCallflowsSelects = $template.find('.advancedCallflows-select select'),
+								$entitiesSelects = $template.find('.user-select select');
+
+							$.each($entitiesSelects, function() {
+								var $select = $(this),
+									selectedOptionGroupLabel = $select.find('option:selected').closest('optgroup').prop('label');
+
+								$select.siblings('.title').text(selectedOptionGroupLabel);
+							});
+
+							_.forEach([
+								$voicemailSelects,
+								$advCallflowsSelects,
+								$entitiesSelects
+							], function($select) {
+								monster.ui.chosen($select, {
+									width: '160'
+								});
+							});
+
+							return $template;
+						},
+						getTabData = _.partial(function(strategyData, callflowName, menuName) {
+							var tabData = {
+								callOption: {
+									type: 'default'
+								},
+								hideAdvancedCallflows: _.isEmpty(strategyData.callEntities.advancedCallflows),
+								callflow: callflowName,
+								callEntities: self.strategyGetCallEntitiesDropdownData(strategyData.callEntities, true, true),
+								voicemails: strategyData.voicemails,
+								tabMessage: self.i18n.active().strategy.calls.callTabsMessages[callflowName]
+							};
+
+							if (strategyData.callflows[callflowName].flow.hasOwnProperty('is_main_number_cf')) {
+								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+								tabData.callOption.type = 'advanced-callflow';
+							} else if (strategyData.callflows[callflowName].flow.module === 'voicemail') {
+								tabData.callOption.callEntityId = 'none';
+								tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.data.id;
+								tabData.callOption.type = 'user-voicemail';
+							} else if (!_.isEmpty(strategyData.callflows[callflowName].flow.children)) {
+								tabData.callOption.callEntityId = strategyData.callflows[callflowName].flow.data.id;
+								if ('_' in strategyData.callflows[callflowName].flow.children
+								&& strategyData.callflows[callflowName].flow.children._.module === 'voicemail') {
+									tabData.callOption.type = 'user-voicemail';
+									tabData.callOption.voicemailId = strategyData.callflows[callflowName].flow.children._.data.id;
+								} else {
+									tabData.callOption.type = 'user-menu';
+								}
+							}
+
+							if (menuName in strategyData.callflows) {
+								tabData.menu = menuName;
+							}
+
+							return tabData;
+						}, strategyData, callflowName, menuName);
+
+					$tabContentWrapper
+						.empty()
+							.append(initTemplate());
+				}, strategyData);
+
+			$container
+				.find('.element-content')
+					.empty()
+					.append(initTemplate());
+
+			callback && callback();
+		},
+
+		/**
 		 * Changes a caller ID for the current account
 		 * @param  {Object}   args
 		 * @param  {('emergency'|'external')}  args.callerIdType  Caller ID type: emergency, external
@@ -1136,7 +1113,7 @@ define(function(require) {
 				refreshNumbersTemplate = function() {
 					var mainCallflow = strategyData.callflows.MainCallflow,
 						parentContainer = container.parents('.element-container'),
-						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+						headerSpan = parentContainer.find('.element-header-inner .summary .content');
 
 					// Refresh headers
 					if (mainCallflow.numbers.length > 1) {
@@ -1350,7 +1327,7 @@ define(function(require) {
 				},
 				refreshConfNumHeader = function(parentContainer) {
 					var mainConference = strategyData.callflows.MainConference,
-						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+						headerSpan = parentContainer.find('.element-header-inner .summary .content');
 					if (mainConference.numbers.length > 0 && mainConference.numbers[0] !== 'undefinedconf') {
 						headerSpan.html(monster.util.formatPhoneNumber(mainConference.numbers[0]));
 						if (mainConference.numbers.length > 2) {
@@ -1380,108 +1357,7 @@ define(function(require) {
 				monster.pub('common.numbers.dialogSpare', args);
 			});
 
-			container.on('click', '.action-links .greeting-link', function(e) {
-				e.preventDefault();
-				var confCallflow = strategyData.callflows.MainConference;
-				if (confCallflow) {
-					self.strategyGetMainConferenceGreetingMedia(confCallflow, function(greetingMedia) {
-						var greetingTemplate = $(self.getTemplate({
-								name: 'customConferenceGreeting',
-								data: {
-									enabled: ('welcome_prompt' in confCallflow.flow.data),
-									greeting: greetingMedia && greetingMedia.tts
-										? greetingMedia.tts.text
-										: ''
-								},
-								submodule: 'strategy'
-							})),
-							greetingPopup = monster.ui.dialog(greetingTemplate, {
-								title: self.i18n.active().strategy.customConferenceGreeting.title,
-								position: ['center', 20]
-							});
-
-						greetingTemplate.find('.switch-state').on('change', function() {
-							$(this).prop('checked') ? greetingTemplate.find('.content').slideDown() : greetingTemplate.find('.content').slideUp();
-						});
-
-						greetingTemplate.find('.cancel').on('click', function() {
-							greetingPopup.dialog('close').remove();
-						});
-
-						greetingTemplate.find('.save').on('click', function() {
-							if (greetingTemplate.find('.switch-state').prop('checked')) {
-								var updateMedia = function(callback) {
-									if (greetingMedia) {
-										greetingMedia.description = '<Text to Speech>';
-										greetingMedia.media_source = 'tts';
-										greetingMedia.tts = {
-											text: greetingTemplate.find('.custom-greeting-text').val(),
-											voice: 'female/en-US'
-										};
-
-										self.callApi({
-											resource: 'media.update',
-											data: {
-												accountId: self.accountId,
-												mediaId: greetingMedia.id,
-												data: greetingMedia
-											},
-											success: function(data, status) {
-												callback && callback(data.data);
-											}
-										});
-									} else {
-										self.callApi({
-											resource: 'media.create',
-											data: {
-												accountId: self.accountId,
-												data: {
-													description: '<Text to Speech>',
-													media_source: 'tts',
-													name: 'MainConferenceGreeting',
-													streamable: true,
-													type: 'mainConfGreeting',
-													tts: {
-														text: greetingTemplate.find('.custom-greeting-text').val(),
-														voice: 'female/en-US'
-													}
-												}
-											},
-											success: function(data, status) {
-												callback && callback(data.data);
-											}
-										});
-									}
-								};
-
-								updateMedia(function(updatedGreeting) {
-									confCallflow.flow.data.welcome_prompt = {
-										media_id: updatedGreeting.id
-									};
-									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-										strategyData.callflows.MainConference = updatedCallflow;
-										greetingPopup.dialog('close').remove();
-										$('#strategy_container .custom-greeting-icon').show();
-									});
-								});
-							} else {
-								if ('welcome_prompt' in confCallflow.flow.data) {
-									delete confCallflow.flow.data.welcome_prompt;
-									self.strategyUpdateCallflow(confCallflow, function(updatedCallflow) {
-										strategyData.callflows.MainConference = updatedCallflow;
-										greetingPopup.dialog('close').remove();
-										$('#strategy_container .custom-greeting-icon').hide();
-									});
-								} else {
-									greetingPopup.dialog('close').remove();
-								}
-							}
-						});
-					});
-				} else {
-					monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
-				}
-			});
+			container.on('click', '.action-links .greeting-link', _.bind(self.strategyConfGreetingRender, self, strategyData));
 
 			container.on('click', '.action-links .buy-link', function(e) {
 				e.preventDefault();
@@ -1534,32 +1410,96 @@ define(function(require) {
 			});
 		},
 
-		strategyGetMainConferenceGreetingMedia: function(mainConferenceCallflow, callback) {
+		strategyConfGreetingRender: function(strategyData) {
 			var self = this,
-				mediaId = _.get(mainConferenceCallflow, 'flow.data.welcome_prompt.media_id');
-
-			monster.waterfall([
-				function(cb) {
-					if (_.isUndefined(mediaId)) {
-						return cb(null, null);
-					}
-					self.callApi({
-						resource: 'media.get',
-						data: {
-							accountId: self.accountId,
-							mediaId: mediaId
-						},
-						success: function(data) {
-							cb(null, data.data);
-						},
-						error: function() {
-							cb(true);
-						}
+				confCallflow = strategyData.callflows.MainConference,
+				$greetingTemplate = $(self.getTemplate({
+					name: 'customConferenceGreeting',
+					data: {
+						enabled: _.has(confCallflow, 'flow.data.welcome_prompt')
+					},
+					submodule: 'strategy'
+				})),
+				onMediaSelectRender = function onMediaSelectRender(mediaControl) {
+					var greetingPopup = monster.ui.dialog($greetingTemplate, {
+						title: self.i18n.active().strategy.customConferenceGreeting.title
 					});
-				}
-			], function(err, media) {
-				callback(err ? null : media);
+
+					self.strategyConfGreetingBindEvents(greetingPopup, mediaControl, confCallflow.id, function afterSaveHandler(err, updatedCallflow, isEnabled) {
+						if (err) {
+							return monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
+						}
+						strategyData.callflows.MainConference = updatedCallflow;
+						greetingPopup.dialog('close');
+						$('#strategy_container .custom-greeting-icon')[isEnabled ? 'fadeIn' : 'fadeOut']();
+					});
+				};
+
+			if (_.isUndefined(confCallflow)) {
+				return monster.ui.alert('error', self.i18n.active().strategy.customConferenceGreeting.mainConfMissing);
+			}
+
+			monster.pub('common.mediaSelect.render', {
+				container: $greetingTemplate.find('.media-wrapper'),
+				selectedOption: _.get(confCallflow, 'flow.data.welcome_prompt.media_id', null),
+				skin: 'tabs',
+				enableTTS: true,
+				tts: {
+					name: 'MainConferenceGreeting',
+					type: 'conferencingCallInNumber',
+					entity: self.i18n.active().strategy.customConferenceGreeting.entity
+				},
+				required: true,
+				callback: onMediaSelectRender
 			});
+		},
+
+		strategyConfGreetingBindEvents: function($popup, mediaControl, callflowId, afterSave) {
+			var self = this,
+				$switch = $popup.find('.switch-state'),
+				isEnabled = function() {
+					return $switch.prop('checked');
+				};
+
+			$popup.find('.save').on('click', function() {
+				monster.waterfall([
+					function maybeGetMediaId(next) {
+						if (!isEnabled()) {
+							return next(null, null);
+						}
+						mediaControl.getValue(_.partial(next, null));
+					},
+					function updateConfCallflow(mediaId, next) {
+						var welcomePrompt = _.isNull(mediaId) ? null : { media_id: mediaId };
+
+						self.callApi({
+							resource: 'callflow.patch',
+							data: {
+								accountId: self.accountId,
+								callflowId: callflowId,
+								data: {
+									flow: {
+										data: {
+											welcome_prompt: welcomePrompt
+										}
+									}
+								}
+							},
+							success: _.flow(
+								_.partial(_.get, _, 'data'),
+								_.partial(next, null)
+							),
+							error: _.partial(next, true)
+						});
+					}
+				], _.partialRight(afterSave, isEnabled()));
+			});
+
+			$switch.on('change', function() {
+				isEnabled() ? $popup.find('.content').slideDown() : $popup.find('.content').slideUp();
+			});
+
+			$popup.find('.cancel').on('click', _.bind($popup.dialog, $popup, 'close'));
 		},
 
 		strategyFaxingNumBindEvents: function(container, strategyData) {
@@ -1641,7 +1581,7 @@ define(function(require) {
 				},
 				refreshFaxingNumHeader = function(parentContainer) {
 					var mainFaxing = strategyData.callflows.MainFaxing,
-						headerSpan = parentContainer.find('.element-header-inner .summary > span');
+						headerSpan = parentContainer.find('.element-header-inner .summary .content');
 					if (mainFaxing.numbers.length > 0 && mainFaxing.numbers[0] !== 'undefinedfaxing') {
 						headerSpan.html(monster.util.formatPhoneNumber(mainFaxing.numbers[0]));
 						if (mainFaxing.numbers.length > 2) {
@@ -1820,141 +1760,6 @@ define(function(require) {
 			});
 		},
 
-		strategyHoursBindEvents: function(container, strategyData) {
-			var self = this;
-
-			container.on('change', '.custom-hours-toggler input[type="radio"]', function(e) {
-				var toggleDiv = container.find('.custom-hours-div');
-				if ($(this).val() === 'true') {
-					toggleDiv.slideDown();
-				} else {
-					toggleDiv.slideUp();
-				}
-			});
-
-			container.on('change', '.custom-days input[type="checkbox"]', function(e) {
-				var parent = $(this).parents('.custom-day'),
-					timepickers = parent.find('.timepickers'),
-					status = parent.find('.status');
-				if ($(this).prop('checked')) {
-					timepickers.fadeIn(200);
-					status.fadeOut(100, function() {
-						status.html(self.i18n.active().strategy.open);
-						status.fadeIn(100);
-					});
-				} else {
-					timepickers.fadeOut(200);
-					status.fadeOut(100, function() {
-						status.html(self.i18n.active().strategy.closed);
-						status.fadeIn(100);
-					});
-				}
-			});
-
-			container.on('change', '.custom-hours-lunchbreak input[type="checkbox"]', function(e) {
-				if ($(this).prop('checked')) {
-					$(this).parents('.custom-hours-lunchbreak').find('.timepickers').fadeIn(200);
-				} else {
-					$(this).parents('.custom-hours-lunchbreak').find('.timepickers').fadeOut(200);
-				}
-			});
-
-			container.on('click', '.save-button', function(e) {
-				e.preventDefault();
-
-				if (monster.ui.valid(container.find('#strategy_custom_hours_form'))) {
-					var parent = $(this).parents('.element-container'),
-						customHours = monster.ui.getFormData('strategy_custom_hours_form'),
-						mainCallflow = strategyData.callflows.MainCallflow,
-						formatChildModule = function(callflowId) {
-							return {
-								children: {},
-								data: {
-									id: callflowId
-								},
-								module: 'callflow'
-							};
-						};
-
-					_.each(strategyData.temporalRules.weekdays, function(val, key) {
-						delete mainCallflow.flow.children[val.id];
-					});
-					delete mainCallflow.flow.children[strategyData.temporalRules.lunchbreak.id];
-
-					if (customHours.enabled === 'false' || !customHours.opendays || customHours.opendays.length === 0) {
-						mainCallflow.flow.children._ = formatChildModule(strategyData.callflows.MainOpenHours.id);
-					} else {
-						var tmpRulesRequests = {};
-
-						mainCallflow.flow.children._ = formatChildModule(strategyData.callflows.MainAfterHours.id);
-
-						if (customHours.lunchbreak.enabled) {
-							var lunchbreakRule = strategyData.temporalRules.lunchbreak;
-
-							_.assign(lunchbreakRule, {
-								wdays: _.map(customHours.opendays, function(item) {
-									// make sure the lunch rule is only valid on days the business is open
-									return _
-										.chain(item)
-										.toLower()
-										.replace(/^main/, '')
-										.value();
-								}),
-								time_window_start: monster.util.timeToSeconds(customHours.lunchbreak.from),
-								time_window_stop: monster.util.timeToSeconds(customHours.lunchbreak.to)
-							});
-
-							tmpRulesRequests.lunchbreak = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.update',
-									data: {
-										accountId: self.accountId,
-										ruleId: lunchbreakRule.id,
-										data: lunchbreakRule
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
-								});
-							};
-
-							mainCallflow.flow.children[lunchbreakRule.id] = formatChildModule(strategyData.callflows.MainLunchHours.id);
-						}
-
-						_.each(customHours.opendays, function(val) {
-							var temporalRule = strategyData.temporalRules.weekdays[val];
-							temporalRule.time_window_start = monster.util.timeToSeconds(customHours.weekdays[val].from);
-							temporalRule.time_window_stop = monster.util.timeToSeconds(customHours.weekdays[val].to);
-							tmpRulesRequests[val] = function(callback) {
-								self.callApi({
-									resource: 'temporalRule.update',
-									data: {
-										accountId: self.accountId,
-										ruleId: temporalRule.id,
-										data: temporalRule
-									},
-									success: function(data, status) {
-										callback(null, data.data);
-									}
-								});
-							};
-
-							mainCallflow.flow.children[temporalRule.id] = formatChildModule(strategyData.callflows.MainOpenHours.id);
-						});
-
-						monster.parallel(tmpRulesRequests, function(err, results) {});
-					}
-
-					self.strategyRebuildMainCallflowRuleArray(strategyData);
-					self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
-						strategyData.callflows.MainCallflow = updatedCallflow;
-						parent.find('.element-content').hide();
-						parent.removeClass('open');
-					});
-				}
-			});
-		},
-
 		strategyHolidaysBindEvents: function(container, strategyData) {
 			var self = this;
 
@@ -1985,7 +1790,7 @@ define(function(require) {
 						self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 							strategyData.callflows.MainCallflow = updatedCallflow;
 							var afterDelete = function(data) {
-								delete strategyData.temporalRules.holidays[data.name];
+								_.unset(strategyData.temporalRules, ['holidays', data.name]);
 								holidaysElement.remove();
 							};
 
@@ -2057,6 +1862,8 @@ define(function(require) {
 							});
 
 							_.each(results, function(val, key) {
+								var identifier = _.get(val, _.has(val, 'temporal_rules') ? 'name' : 'id');
+
 								mainCallflow.flow.children[val.id] = {
 									children: {},
 									data: {
@@ -2064,7 +1871,7 @@ define(function(require) {
 									},
 									module: 'callflow'
 								};
-								strategyData.temporalRules.holidays[val.name] = val;
+								_.set(strategyData.temporalRules, ['holidays', identifier], val);
 							});
 
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
@@ -2081,7 +1888,7 @@ define(function(require) {
 					}
 				} else {
 					monster.ui.confirm(self.i18n.active().strategy.confirmMessages.disableHolidays, function() {
-						_.each(strategyData.temporalRules.holidays, function(val, key) {
+						_.each(_.get(strategyData.temporalRules, 'holidays', {}), function(val, key) {
 							holidayRulesRequests[key] = function(callback) {
 								if (val.hasOwnProperty('temporal_rules')) {
 									self.strategyDeleteRuleSetAndRules(val.id, function() {
@@ -2098,7 +1905,7 @@ define(function(require) {
 						});
 
 						monster.parallel(holidayRulesRequests, function(err, results) {
-							strategyData.temporalRules.holidays = {};
+							_.set(strategyData.temporalRules, 'holidays', {});
 							self.strategyRebuildMainCallflowRuleArray(strategyData);
 							self.strategyUpdateCallflow(mainCallflow, function(updatedCallflow) {
 								strategyData.callflows.MainCallflow = updatedCallflow;
@@ -3483,25 +3290,6 @@ define(function(require) {
 
 		strategyHandleFeatureCodes: function() {
 			var self = this,
-				featureCodeConfigs = _.keyBy(self.featureCodeConfigs, 'name'),
-				configToEntries = {
-					pattern: 'patterns',
-					callflowNumber: 'numbers'
-				},
-				isMalformed = function isMalformed(featureCode) {
-					var config = _.get(featureCodeConfigs, featureCode.featurecode.name),
-						configProp = _
-							.chain(configToEntries)
-							.keys()
-							.find(_.partial(_.has, config))
-							.value(),
-						expectedEntry = _.get(config, configProp),
-						entriesProp = _.get(configToEntries, configProp),
-						entries = _.get(featureCode, entriesProp);
-
-					return _.isUndefined(config)
-						|| !_.isEqual(entries, [expectedEntry]);
-				},
 				createFeatureCodeFactory = function createFeatureCodeFactory(featureCode) {
 					return function(callback) {
 						self.strategyCreateCallflow({
@@ -3536,31 +3324,6 @@ define(function(require) {
 			monster.waterfall([
 				function fetchExistingFeatureCodes(callback) {
 					self.strategyGetFeatureCodes(_.partial(callback, null));
-				},
-				function maybeDeleteMalformedFeatureCodes(existing, callback) {
-					monster.parallel(_
-						.chain(existing)
-						.filter(isMalformed)
-						.keyBy('id')
-						.mapValues(function(featureCode) {
-							return function(callback) {
-								self.strategyDeleteCallflow({
-									bypassProgressIndicator: true,
-									data: {
-										callflowId: featureCode.id
-									},
-									success: _.partial(callback, null),
-									error: _.partial(callback, null)
-								});
-							};
-						})
-						.value()
-					, function(err, results) {
-						callback(null, _.reject(existing, _.flow([
-							_.partial(_.get, _, 'id'),
-							_.partial(_.includes, _.keys(results))
-						])));
-					});
 				},
 				function maybeCreateMissingFeatureCodes(existing, callback) {
 					monster.parallel(_
@@ -3659,100 +3422,49 @@ define(function(require) {
 		},
 
 		strategyGetTemporalRules: function(callback) {
-			var self = this;
+			var self = this,
+				types = [
+					'main_holidays',
+					'main_lunchbreak',
+					'main_weekdays'
+				],
+				getTypeProp = _.partial(_.get, _, 'type'),
+				isTypeValid = _.flow(
+					getTypeProp,
+					_.partial(_.includes, types)
+				),
+				getStripedType = _.flow(
+					getTypeProp,
+					_.partial(_.replace, _, 'main_', '')
+				),
+				getRule = function(ruleId, next) {
+					self.strategyGetRule(ruleId, _.partial(next, null));
+				};
 
-			self.strategyGetAllRules(function(data) {
-				var parallelRequests = {};
-
-				_.each(data.rules, function(val, key) {
-					parallelRequests[val.name] = function(callback) {
-						self.strategyGetRule(val.id, function(data) {
-							callback(null, data);
-						});
-					};
-				});
-
-				// Always check that the necessary time rules exist, or re-create them
-				_.each(self.weekdayLabels, function(val) {
-					if (!(val in parallelRequests)) {
-						parallelRequests[val] = function(callback) {
-							self.callApi({
-								resource: 'temporalRule.create',
-								data: {
-									accountId: self.accountId,
-									data: {
-										cycle: 'weekly',
-										interval: 1,
-										name: val,
-										type: 'main_weekdays',
-										time_window_start: 32400, // 9:00AM
-										time_window_stop: 61200, // 5:00PM
-										wdays: [val.substring(4).toLowerCase()]
-									}
-								},
-								success: function(data, status) {
-									callback(null, data.data);
-								}
-							});
-						};
-					}
-				});
-
-				if (!('MainLunchHours' in parallelRequests)) {
-					parallelRequests.MainLunchHours = function(callback) {
-						self.callApi({
-							resource: 'temporalRule.create',
-							data: {
-								accountId: self.accountId,
-								data: {
-									cycle: 'weekly',
-									interval: 1,
-									name: 'MainLunchHours',
-									type: 'main_lunchbreak',
-									time_window_start: 43200,
-									time_window_stop: 46800,
-									wdays: self.weekdays
-								}
-							},
-							success: function(data, status) {
-								callback(null, data.data);
-							}
-						});
-					};
+			monster.waterfall([
+				function(next) {
+					self.strategyGetAllRules(_.partial(next, null));
+				},
+				function(data, next) {
+					monster.parallel(_.map(data.rules, function(rule) {
+						return _.partial(getRule, rule.id);
+					}), _.partialRight(next, data.sets));
 				}
-
-				monster.parallel(parallelRequests, function(err, results) {
-					var temporalRules = {
-						weekdays: {},
-						lunchbreak: {},
-						holidays: {}
-					};
-
-					_.each(results, function(val, key) {
-						switch (val.type) {
-							case 'main_weekdays':
-								temporalRules.weekdays[key] = val;
-
-								break;
-							case 'main_lunchbreak':
-								temporalRules.lunchbreak = val;
-
-								break;
-							case 'main_holidays':
-								temporalRules.holidays[key] = val;
-
-								break;
-						}
-					});
-
-					_.each(data.sets, function(set) {
-						if (!_.isEmpty(set)) {
-							temporalRules.holidays[set.name] = set;
-						}
-					});
-
-					callback(temporalRules);
-				});
+			], function(err, rules, sets) {
+				callback(_
+					.chain(rules)
+					.filter(isTypeValid)
+					.groupBy(getStripedType)
+					.mapValues(_.partial(_.keyBy, _, 'id'))
+					.merge({
+						holidays: _
+							.chain(sets)
+							.reject(_.isEmpty)
+							.keyBy('name')
+							.value()
+					})
+					.value()
+				);
 			});
 		},
 
@@ -3962,7 +3674,7 @@ define(function(require) {
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(phoneNumber),
+					phoneNumber: phoneNumber,
 					generateError: false
 				},
 				success: function(data, status) {
@@ -3981,7 +3693,7 @@ define(function(require) {
 				resource: 'numbers.update',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(phoneNumber),
+					phoneNumber: phoneNumber,
 					data: data
 				},
 				success: function(data, status) {
@@ -3998,7 +3710,7 @@ define(function(require) {
 			mainCallflow.flow.data.rules = _
 				.chain([
 					_.map(rules.holidays, 'id'),
-					_.has(rules.lunchbreak, 'id') ? [rules.lunchbreak.id] : [],
+					_.keys(rules.lunchbreak),
 					_.map(rules.weekdays, 'id')
 				])
 				.flatten()
@@ -4631,6 +4343,217 @@ define(function(require) {
 
 			return _.filter(mainCallflow.numbers, function(val) {
 				return val !== '0' && val !== 'undefinedMainNumber';
+			});
+		},
+
+		strategyAddOfficeHoursPopup: function(args) {
+			var self = this,
+				meta = _.pick(self.appFlags.strategyHours.intervals, [
+					'max',
+					'min',
+					'unit',
+					'step',
+					'timepicker'
+				]),
+				timepickerStep = meta.timepicker.step,
+				existing = args.existing,
+				callback = args.callback,
+				$template = $(self.getTemplate({
+					name: 'addOfficeHours',
+					data: {
+						days: _.map(
+							self.weekdays,
+							_.partial(monster.util.tryI18n, self.i18n.active().strategy.hours.days)
+						)
+					},
+					submodule: 'strategy'
+				})),
+				$startTimepicker = $template.find('.start-time'),
+				$endTimepicker = $template.find('.end-time'),
+				endTime = 3600 * 17,
+				endRemainder = endTime % timepickerStep,
+				startPickerMaxTime = endTime - endRemainder - (endRemainder > 0 ? 0 : timepickerStep),
+				startTime = 3600 * 9,
+				startRemainder = startTime % timepickerStep,
+				endPickerMinTime = startTime - startRemainder + timepickerStep,
+				popup;
+
+			$template.find('input[name="days[]"]').on('change', function(event) {
+				event.preventDefault();
+
+				var atLeastOneChecked = _.some($template.find('input[name="days[]"]'), function(input) {
+					return $(input).prop('checked');
+				});
+
+				$template.find('.no-days-error')[atLeastOneChecked ? 'slideUp' : 'slideDown'](200);
+			});
+
+			monster.ui.timepicker($startTimepicker, {
+				listWidth: 1,
+				minTime: meta.min,
+				maxTime: startPickerMaxTime
+			});
+			$startTimepicker.timepicker('setTime', startTime);
+
+			monster.ui.timepicker($endTimepicker, {
+				listWidth: 1,
+				minTime: endPickerMinTime,
+				maxTime: meta.max - timepickerStep
+			});
+			$endTimepicker.timepicker('setTime', endTime);
+
+			$startTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					isBumping = startSeconds >= endSeconds,
+					isOverMax = (startSeconds + meta.step) >= meta.max;
+
+				if (isBumping && isOverMax) {
+					$startTimepicker
+						.timepicker('setTime', endSeconds - meta.step);
+				} else if (isBumping) {
+					$endTimepicker
+						.timepicker('setTime', startSeconds + meta.step)
+						.change();
+				}
+			});
+
+			$endTimepicker.on('change', function(event) {
+				event.preventDefault();
+
+				var endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					isUnderMin = endSeconds === meta.min,
+					isBumping = endSeconds <= startSeconds;
+
+				if (isUnderMin) {
+					$endTimepicker
+						.timepicker('setTime', meta.min + meta.step);
+					$startTimepicker
+						.timepicker('setTime', meta.min)
+						.change();
+				} else if (isBumping) {
+					$startTimepicker
+						.timepicker('setTime', endSeconds - meta.step)
+						.change();
+				}
+			});
+
+			$startTimepicker.on('change', function() {
+				$template.find('.overlapping-hours-error').slideUp(200);
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = startSeconds % timepickerStep;
+
+				$endTimepicker.timepicker('option', 'minTime',
+					startSeconds - remainder + timepickerStep
+				);
+
+				if (!_.isNull(endSeconds)) {
+					$endTimepicker.timepicker('setTime', endSeconds);
+				}
+			});
+
+			$endTimepicker.on('change', function() {
+				$template.find('.overlapping-hours-error').slideUp(200);
+
+				var startSeconds = $startTimepicker.timepicker('getSecondsFromMidnight'),
+					endSeconds = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					remainder = endSeconds % timepickerStep;
+
+				$startTimepicker.timepicker('option', 'maxTime',
+					endSeconds - remainder - (remainder > 0 ? 0 : timepickerStep)
+				);
+
+				if (!_.isNull(endSeconds)) {
+					$startTimepicker.timepicker('setTime', startSeconds);
+				}
+			});
+
+			$template.find('.cancel').on('click', function(event) {
+				event.preventDefault();
+				popup.dialog('close');
+			});
+
+			$template.on('submit', function(event) {
+				event.preventDefault();
+				var formData = monster.ui.getFormData($template.get(0)),
+					endTime = $endTimepicker.timepicker('getSecondsFromMidnight'),
+					formattedData = _.merge({
+						start: $startTimepicker.timepicker('getSecondsFromMidnight'),
+						end: endTime === 0 ? meta.max : endTime,
+						type: formData.type
+					}, _.pick(formData, [
+						'days'
+					])),
+					overlapsExisting = _
+						.chain(formattedData.days)
+						.map(function(v, index) {
+							return {
+								selected: v,
+								overlaps: _
+									.chain((existing || [])[index])
+									.map(function(interval) {
+										var start = interval.start,
+											end = interval.end,
+											startsWithinExistingInterval = formattedData.start >= start && formattedData.start < end,
+											endsWithinExistingInterval = formattedData.end > start && formattedData.end <= end,
+											overlapsExistingInterval = formattedData.start <= start && formattedData.end >= end;
+
+										return startsWithinExistingInterval
+											|| endsWithinExistingInterval
+											|| overlapsExistingInterval;
+									})
+									.some()
+									.value()
+							};
+						})
+						.filter('selected')
+						.map('overlaps')
+						.some()
+						.value();
+
+				if (!monster.ui.valid($template)) {
+					return;
+				}
+
+				if (!_.some(formattedData.days)) {
+					$template.find('.no-days-error').slideDown(200);
+					return;
+				}
+
+				if (overlapsExisting) {
+					$template.find('.overlapping-hours-error').slideDown(200);
+					return;
+				}
+
+				popup.dialog('close');
+
+				callback(null, _
+					.chain(existing)
+					.map(function(intervals, index) {
+						var isDaySelected = formattedData.days[index];
+
+						return _
+							.chain(intervals)
+							.concat(isDaySelected ? [_.pick(formattedData, [
+								'start',
+								'end',
+								'type'
+							])] : [])
+							.sortBy('start')
+							.value();
+					})
+					.value()
+				);
+			});
+
+			popup = monster.ui.dialog($template, {
+				autoScroll: false,
+				title: self.i18n.active().strategy.addOfficeHours.title
 			});
 		}
 	};

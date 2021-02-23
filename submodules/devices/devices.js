@@ -3,6 +3,10 @@ define(function(require) {
 		_ = require('lodash'),
 		monster = require('monster');
 
+	var overrideDestArray = function(dest, src) {
+		return _.every([dest, src], _.isArray) ? src : undefined;
+	};
+
 	var app = {
 
 		requests: {
@@ -283,7 +287,7 @@ define(function(require) {
 							resource: 'device.create',
 							data: {
 								accountId: self.accountId,
-								data: dataModel
+								data: self.devicesApplyDefaults(dataModel)
 							},
 							success: function(data, status) {
 								callback(data.data);
@@ -531,11 +535,11 @@ define(function(require) {
 				ignore: '' // Do not ignore hidden fields
 			});
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'fax', 'ata']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'sip_uri', 'fax', 'ata']) > -1) {
 				var audioCodecs = monster.ui.codecSelector('audio', templateDevice.find('#audio_codec_selector'), data.media.audio.codecs);
 			}
 
-			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone']) > -1) {
+			if ($.inArray(type, ['sip_device', 'smartphone', 'mobile', 'softphone', 'sip_uri']) > -1) {
 				var videoCodecs = monster.ui.codecSelector('video', templateDevice.find('#video_codec_selector'), data.media.video.codecs);
 			}
 
@@ -591,7 +595,7 @@ define(function(require) {
 
 					$this.prop('disabled', 'disabled');
 
-					self.devicesSaveDevice(dataToSave, function(data) {
+					self.devicesSaveDevice(data.owner_id, dataToSave, function(data) {
 						if (hasToRestart) {
 							self.devicesRestart(data.id, function() {
 								monster.ui.toast({
@@ -659,7 +663,7 @@ define(function(require) {
 						resource: 'numbers.matchClassifier',
 						data: {
 							accountId: self.accountId,
-							phoneNumber: encodeURIComponent(number)
+							phoneNumber: number
 						},
 						success: function(data, status) {
 							var matchedLine = templateDevice.find('.restriction-line[data-restriction="' + data.data.name + '"]'),
@@ -935,6 +939,19 @@ define(function(require) {
 		 */
 		devicesFormatData: function(data, dataList) {
 			var self = this,
+				getNormalizedProvisionEntriesForKeyType = _.partial(function(device, template, keyType) {
+					var iterate = _.get(template, [keyType, 'iterate'], 0),
+						entries = _.get(device, ['provision', keyType], {}),
+						getEntryValueOrDefault = _.partial(_.get, entries, _, {
+							type: 'none'
+						});
+
+					return _
+						.chain(iterate)
+						.range()
+						.map(getEntryValueOrDefault)
+						.value();
+				}, data.device, data.template),
 				keyActionsMod = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
 					['brands', _.get(data.device, 'provision.endpoint_brand'), 'keyFunctions'],
@@ -942,113 +959,29 @@ define(function(require) {
 				),
 				defaultLineKeys = _.get(
 					self.appFlags.devices.provisionerConfigFlags,
-					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys'],
-					[1]
+					['brands', _.get(data.device, 'provision.endpoint_brand'), 'lineKeys']
 				),
 				isClassifierDisabledByAccount = function isClassifierDisabledByAccount(classifier) {
 					return _.get(data.accountLimits, ['call_restriction', classifier, 'action']) === 'deny';
 				},
-				deviceDefaults = {
-					call_restriction: {},
-					device_type: 'sip_device',
-					enabled: true,
+				templateDefaults = {
 					media: {
-						audio: {
-							codecs: ['PCMA', 'PCMU']
-						},
-						encryption: {
-							enforce_security: false
-						},
-						video: {
-							codecs: []
-						}
-					},
-					suppress_unregister_notifications: true
-				},
-				callForwardSettings = {
-					call_forward: {
-						require_keypress: true,
-						keep_caller_id: true
-					},
-					contact_list: {
-						exclude: true
+						audio: {},
+						encryption: {},
+						video: {}
 					}
 				},
-				sipSettings = {
-					sip: {
-						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
-						username: 'user_' + monster.util.randomString(10)
-					}
-				},
-				deviceDefaultsForType = _.get({
-					ata: _.merge({}, sipSettings),
-					cellphone: _.merge({}, callForwardSettings),
-					fax: _.merge({
-						media: {
-							fax_option: 'false'
-						},
-						outbound_flags: [
-							'fax'
-						]
-					}, sipSettings),
-					landline: _.merge({}, callForwardSettings),
-					mobile: _.merge({}, sipSettings),
-					sip_device: _.merge({}, sipSettings),
-					sip_uri: {
-						sip: _.merge({
-							expire_seconds: 360,
-							invite_format: 'route',
-							method: 'password'
-						}, _.pick(sipSettings.sip, [
-							'password',
-							'username'
-						]))
-					},
-					smartphone: _.merge({}, sipSettings, callForwardSettings),
-					softphone: _.merge({}, sipSettings)
-				}, data.device.device_type, {}),
-				deviceOverrides = {
-					provision: _
-						.chain(data.template)
-						.thru(self.getKeyTypes)
-						.map(function(type) {
-							return {
-								type: type,
-								data: _
-									.chain(data.template)
-									.get([type, 'iterate'], 0)
-									.range()
-									.map(function(index) {
-										return _.get(data.device, ['provision', type, index], {
-											type: 'none'
-										});
-									})
-									.value()
-							};
-						})
-						.keyBy('type')
-						.mapValues('data')
-						.value()
-				},
+				deviceWithDefaults = self.devicesApplyDefaults(data.device),
 				deviceData = _.mergeWith(
 					{},
-					deviceDefaults,
-					deviceDefaultsForType,
-					data.device,
-					function(dest, src) {
-						return _.every([dest, src], _.isArray) ? src : undefined;
-					}
-				),
-				mergedDevice = _.assign(
-					{},
-					deviceData,
-					deviceOverrides
+					templateDefaults,
+					deviceWithDefaults,
+					overrideDestArray
 				);
 
 			return _.merge({
 				extra: {
-					allowVMCellphone: !_.get(mergedDevice, 'call_forward.require_keypress', true),
+					allowVMCellphone: !_.get(deviceData, 'call_forward.require_keypress', true),
 					availableCodecs: {
 						audio: [],
 						video: []
@@ -1072,13 +1005,13 @@ define(function(require) {
 							.map(function(type) {
 								var camelCasedType = _.camelCase(type),
 									i18n = _.get(self.i18n.active().devices.popupSettings.keys, camelCasedType),
-									entries = _.get(mergedDevice, ['provision', type], []),
+									entries = getNormalizedProvisionEntriesForKeyType(type),
 									entriesCount = _.size(entries);
 
 								return _.merge({
 									id: type,
 									type: camelCasedType,
-									lineKeys: defaultLineKeys,
+									lineKeys: defaultLineKeys || [1],
 									actions: _
 										.chain([
 											'presence',
@@ -1094,13 +1027,20 @@ define(function(require) {
 										})
 										.concat(['none'])
 										.map(function(action) {
-											var i18n = self.i18n.active().devices.popupSettings.keys;
+											var i18n = self.i18n.active().devices.popupSettings.keys,
+												hasDefaultLineKeys = !!defaultLineKeys,
+												allowedDefaultLineKeyActions = ['none', 'line'];
 
-											return {
+											return _.merge({
 												id: action,
 												info: _.get(i18n, ['info', 'types', action]),
 												label: _.get(i18n, ['types', action])
-											};
+											},
+											type === 'combo_keys' && hasDefaultLineKeys && !_.includes(allowedDefaultLineKeyActions, action) ? {
+												isActionRestringed: true
+											}
+											: {}
+											);
 										})
 										// Sort alphabetically while keeping `none` as first item
 										.sort(function(a, b) {
@@ -1153,8 +1093,8 @@ define(function(require) {
 							help: _.get(i18n, 'help')
 						};
 					}),
-					rtpMethod: _.get(mergedDevice, 'media.encryption.enforce_security', false)
-						? _.head(mergedDevice.media.encryption.methods)
+					rtpMethod: _.get(deviceData, 'media.encryption.enforce_security', false)
+						? _.head(deviceData.media.encryption.methods)
 						: '',
 					selectedCodecs: {
 						audio: [],
@@ -1168,7 +1108,109 @@ define(function(require) {
 							.value();
 					})
 				}
-			}, mergedDevice);
+			}, deviceData);
+		},
+
+		/**
+		 * @param  {Object} device
+		 * @param  {String} device.device_type
+		 * @param  {String} [device.id]
+		 * @return {Object}
+		 */
+		devicesApplyDefaults: function(device) {
+			var self = this;
+
+			return _.mergeWith(
+				self.devicesGetDefaults(device),
+				device,
+				overrideDestArray
+			);
+		},
+
+		/**
+		 * @param  {Object} device
+		 * @param  {String} device.device_type
+		 * @param  {String} [device.id]
+		 * @return {Object}
+		 */
+		devicesGetDefaults: function(device) {
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type');
+
+			return _.mergeWith(
+				isNew ? self.devicesGetBaseDefaults() : {},
+				self.devicesGetDefaultsForType(type),
+				overrideDestArray
+			);
+		},
+
+		devicesGetBaseDefaults: function() {
+			return {
+				call_restriction: {},
+				device_type: 'sip_device',
+				enabled: true,
+				media: {
+					audio: {
+						codecs: []
+					},
+					encryption: {
+						enforce_security: false
+					},
+					video: {
+						codecs: []
+					}
+				},
+				suppress_unregister_notifications: true
+			};
+		},
+
+		devicesGetDefaultsForType: function(type) {
+			var callForwardSettings = {
+					call_forward: {
+						require_keypress: true,
+						keep_caller_id: true
+					},
+					contact_list: {
+						exclude: true
+					}
+				},
+				sipSettings = {
+					sip: {
+						password: monster.util.randomString(12),
+						realm: monster.apps.auth.currentAccount.realm,
+						username: 'user_' + monster.util.randomString(10)
+					}
+				},
+				defaultsPerType = {
+					ata: _.merge({}, sipSettings),
+					cellphone: _.merge({}, callForwardSettings),
+					fax: _.merge({
+						media: {
+							fax_option: 'false'
+						},
+						outbound_flags: [
+							'fax'
+						]
+					}, sipSettings),
+					landline: _.merge({}, callForwardSettings),
+					mobile: _.merge({}, sipSettings),
+					sip_device: _.merge({}, sipSettings),
+					sip_uri: {
+						sip: _.merge({
+							expire_seconds: 360,
+							invite_format: 'route',
+							method: 'password'
+						}, _.pick(sipSettings.sip, [
+							'password',
+							'username'
+						]))
+					},
+					smartphone: _.merge({}, sipSettings, callForwardSettings),
+					softphone: _.merge({}, sipSettings)
+				};
+
+			return _.get(defaultsPerType, type, {});
 		},
 
 		/**
@@ -1185,8 +1227,7 @@ define(function(require) {
 					return _.get(self.appFlags.devices.iconClassesByDeviceTypes, knownType);
 				},
 				usersById = _.keyBy(data.users, 'id'),
-				unassignedString = self.i18n.active().devices.unassignedDevice,
-				registeredDevicesById = _.map(data.status, 'device_id');
+				unassignedString = self.i18n.active().devices.unassignedDevice;
 
 			return {
 				countDevices: _.size(data.devices),
@@ -1195,9 +1236,7 @@ define(function(require) {
 					.map(function(device) {
 						var staticStatusClasses = ['unregistered', 'registered'],
 							deviceType = device.device_type,
-							isRegistered = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], deviceType)
-								? _.includes(registeredDevicesById, device.id)
-								: true,
+							isRegistered = device.registrable ? device.registered : true,
 							isEnabled = _.get(device, 'enabled', false),
 							userName = _
 								.chain(usersById)
@@ -1445,18 +1484,45 @@ define(function(require) {
 		},
 
 		/**
+		 * @param  {String|undefined} originalUserId
 		 * @param  {Object} deviceData
 		 * @param  {Function} callbackSuccess
 		 * @param  {Function} [callbackError]
 		 */
-		devicesSaveDevice: function(deviceData, callbackSuccess, callbackError) {
-			var self = this;
+		devicesSaveDevice: function(originalUserId, deviceData, callbackSuccess, callbackError) {
+			var self = this,
+				isMobileDevice = deviceData.device_type === 'mobile',
+				hasDifferentUserId = originalUserId !== deviceData.owner_id,
+				shouldUpdateMobileCallflow = isMobileDevice && hasDifferentUserId,
+				maybeUpdateMobileCallflowAssignment = function maybeUpdateMobileCallflowAssignment(shouldUpdateMobileCallflow, device, callback) {
+					if (!shouldUpdateMobileCallflow) {
+						return callback(null);
+					}
+					var userId = _.get(device, 'owner_id', null),
+						userMainCallflowId = userId ? undefined : null;
 
-			if (deviceData.id) {
-				self.devicesUpdateDevice(deviceData, callbackSuccess, callbackError);
-			} else {
-				self.devicesCreateDevice(deviceData, callbackSuccess, callbackError);
-			}
+					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
+				},
+				saveDevice = function saveDevice(device, callback) {
+					var method = _.has(device, 'id') ? 'devicesUpdateDevice' : 'devicesCreateDevice';
+
+					self[method](device, _.partial(callback, null), callback);
+				};
+
+			/**
+			 * We perform both operations in parallel because, although app#updateMobileCallflowAssignment
+			 * requires an existing device to run, since it is not possible to create mobile devices
+			 * from smartpbx, that ID will always be present.
+			 */
+			monster.parallel({
+				_: _.partial(maybeUpdateMobileCallflowAssignment, shouldUpdateMobileCallflow, deviceData),
+				device: _.partial(saveDevice, deviceData)
+			}, function(err, results) {
+				if (err) {
+					return callbackError && callbackError(err);
+				}
+				callbackSuccess && callbackSuccess(results.device);
+			});
 		},
 
 		/**
@@ -1524,26 +1590,13 @@ define(function(require) {
 						}
 					});
 				},
-				status: function(callback) {
-					self.callApi({
-						resource: 'device.getStatus',
-						data: {
-							accountId: self.accountId,
-							filters: {
-								paginate: 'false'
-							}
-						},
-						success: function(dataStatus) {
-							callback && callback(null, dataStatus.data);
-						}
-					});
-				},
 				devices: function(callback) {
 					self.callApi({
 						resource: 'device.list',
 						data: {
 							accountId: self.accountId,
 							filters: {
+								with_status: 'true',
 								paginate: 'false'
 							}
 						},
@@ -1564,7 +1617,7 @@ define(function(require) {
 				resource: 'numbers.get',
 				data: {
 					accountId: self.accountId,
-					phoneNumber: encodeURIComponent(number)
+					phoneNumber: number
 				},
 				success: function(_data, status) {
 					var street_address = _data.data.e911.street_address,
