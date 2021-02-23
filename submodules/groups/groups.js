@@ -558,6 +558,7 @@ define(function(require) {
 			var self = this,
 				recordCallNode = monster.util.findCallflowNode(data.callflow, 'record_call'),
 				templateData = $.extend(true, {
+					supportedAudioFormats: self.appFlags.common.callRecording.supportedAudioFormats,
 					group: data.group
 				},
 				(data.group.extra.mapFeatures.call_recording.active && recordCallNode ? {
@@ -574,13 +575,7 @@ define(function(require) {
 				featureForm = featureTemplate.find('#call_recording_form'),
 				popup;
 
-			monster.ui.validate(featureForm, {
-				rules: {
-					'time_limit': {
-						digits: true
-					}
-				}
-			});
+			monster.ui.validate(featureForm, self.appFlags.common.callRecording.validationConfig);
 
 			featureTemplate.find('.cancel-link').on('click', function() {
 				popup.dialog('close').remove();
@@ -1210,42 +1205,7 @@ define(function(require) {
 		groupsBindNumbers: function(template, data) {
 			var self = this,
 				toastrMessages = self.i18n.active().groups.toastrMessages,
-				currentNumberSearch = '',
 				extraSpareNumbers = [];
-
-			// template.on('click', '.list-assigned-items .remove-number', function() {
-			// 	var row = $(this).parents('.item-row'),
-			// 		spare = template.find('.count-spare'),
-			// 		countSpare = spare.data('count') + 1,
-			// 		unassignedList = template.find('.list-unassigned-items');
-
-			// 	/* Alter the html */
-			// 	row.hide();
-
-			// 	row.find('button')
-			// 		.removeClass('remove-number btn-danger')
-			// 		.addClass('add-number btn-primary')
-			// 		.text(self.i18n.active().add);
-
-			// 	unassignedList.append(row);
-			// 	unassignedList.find('.empty-row').hide();
-
-			// 	spare
-			// 		.html(countSpare)
-			// 		.data('count', countSpare);
-
-			// 	var rows = template.find('.list-assigned-items .item-row');
-			// 	/* If no rows beside the clicked one, display empty row */
-			// 	if (rows.is(':visible') === false) {
-			// 		template.find('.list-assigned-items .empty-row').show();
-			// 	}
-
-			// 	/* If it matches the search string, show it */
-			// 	if (row.data('search').indexOf(currentNumberSearch) >= 0) {
-			// 		row.show();
-			// 		unassignedList.find('.empty-search-row').hide();
-			// 	}
-			// });
 
 			template.on('click', '.list-assigned-items .remove-number', function() {
 				var $this = $(this),
@@ -1262,23 +1222,6 @@ define(function(require) {
 
 					template.find('.spare-link').removeClass('disabled');
 				});
-			});
-
-			template.on('keyup', '.list-wrapper .unassigned-list-header .search-query', function() {
-				var rows = template.find('.list-unassigned-items .item-row'),
-					emptySearch = template.find('.list-unassigned-items .empty-search-row'),
-					currentRow;
-
-				currentNumberSearch = $(this).val().toLowerCase();
-
-				_.each(rows, function(row) {
-					currentRow = $(row);
-					currentRow.data('search').toLowerCase().indexOf(currentNumberSearch) < 0 ? currentRow.hide() : currentRow.show();
-				});
-
-				if (rows.size() > 0) {
-					rows.is(':visible') ? emptySearch.hide() : emptySearch.show();
-				}
 			});
 
 			template.on('click', '.actions .spare-link:not(.disabled)', function(e) {
@@ -1359,8 +1302,8 @@ define(function(require) {
 
 								monster.ui.tooltips(rowTemplate);
 
-								template.find('.list-unassigned-items .empty-row').hide();
-								template.find('.list-unassigned-items').append(rowTemplate);
+								template.find('.list-assigned-items .empty-row').hide();
+								template.find('.list-assigned-items').append(rowTemplate);
 							});
 						}
 					}
