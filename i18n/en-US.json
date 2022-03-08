@@ -773,7 +773,7 @@
 			"title": "SV Mobile App",
 			"headline": "SimpleVoIP App Credentials for",
 			"mobileLabel": "iOS or Android App",
-			"desktopLabel": "Desktop/Web App",
+			"desktopLabel": "Desktop App",
 			"usernameLabel": "Username",
 			"passwordLabel": "Password",
 			"sendEmailLabel": "Send Email",
@@ -786,8 +786,8 @@
 			"createDeviceError": "Unable to create softphone device.",
 			"noNumberError": "Mobile app requires either a phone number or extension.",
 			"qrCodeHelp": "Once the app is downloaded, scan the QR code to log in.",
-			"wikiHelp": "Click here for more detailed instructions",
-			"desktopHelp": "Click here for the web-based softphone"
+			"wikiMobileHelp": "Click here for more detailed instructions for our Mobile apps",
+			"wikiDesktopHelp": "Click here for instructions for our Desktop app"
 		},
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
