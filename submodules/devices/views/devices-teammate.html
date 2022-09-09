@@ -2,13 +2,13 @@
 	<div class="title-bar clearfix">
 		<div class="device-title pull-left">
 			<div class="device-icon">
-				<i class="icon-telicon-fax"></i>
+				{{telicon "device-mst"}}
 			</div>
 
 			{{#if id}}
 				<div class="device-model">{{name}}</div>
 			{{else}}
-				<div class="device-model">{{i18n.devices.fax.new}}</div>
+				<div class="device-model">{{i18n.devices.teammate.new}}</div>
 			{{/if}}
 		</div>
 
@@ -25,12 +25,6 @@
 				</a>
 				<ul class="dropdown-menu pull-right">
 					<li>
-						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
-							<i class="fa fa-music"></i>
-							{{ i18n.devices.popupSettings.audio.menuTitle }}
-						</a>
-					</li>
-					<li>
 						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
 							<i class="fa fa-ban"></i>
 							{{ i18n.devices.popupSettings.restrictions.menuTitle }}
@@ -44,6 +38,12 @@
 						</a>
 					</li>
 				{{/if}}
+					<li>
+						<a class="tabs-selector change-section" data-section="miscellaneous" href="javascript:void(0)">
+							<i class="fa fa-cogs"></i>
+							{{ i18n.devices.popupSettings.miscellaneous.menuTitle }}
+						</a>
+					</li>
 				</ul>
 			</li>
 		</ul>
@@ -53,7 +53,7 @@
 		<form id="form_device" class="form-horizontal">
 			<div class="tabs-section active" data-section="basic">
 				<div class="control-group">
-					<label class="control-label" for="name">{{ i18n.devices.fax.deviceName }}</label>
+					<label class="control-label" for="name">{{ i18n.devices.teammate.deviceName }}</label>
 					<div class="controls">
 						<input type="text" id="name" name="name" value="{{name}}">
 					</div>
@@ -79,45 +79,6 @@
 						<span class="displayed-realm">{{ extra.sip.realm }}</span>
 					</div>
 				</div>
-
-				<div class="control-group">
-					<label class="control-label" for="media_fax_option">{{ i18n.devices.fax.t38 }}</label>
-					<div class="controls">
-						{{#with extra.faxOptions}}
-							<select name="media.fax_option">
-							{{#select selected}}
-								{{#each options}}
-								<option value="{{value}}">
-									{{tryI18n @root.i18n.devices.fax labelKey}}
-								</option>
-								{{/each}}
-							{{/select}}
-							</select>
-						{{/with}}
-					</div>
-				</div>
-
-				<div class="control-group">
-					<label class="control-label checkbox checkbox-basic">
-						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.unregisterNotifications.label }}
-							<input type="checkbox" name="extra.notify_unregister" id="notify_unregister" {{#unless suppress_unregister_notifications}}checked{{/unless}} />
-						{{/monsterCheckbox}}
-						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.unregisterNotifications.help}}" data-placement="top" data-toggle="tooltip"></i>
-					</label>
-				</div>
-			</div>
-
-			<div class="tabs-section clearfix" data-section="audio">
-				<div class="title">
-					{{ i18n.devices.popupSettings.audio.sectionTitle }}
-				</div>
-
-				<div class="helper">
-					<i class="fa fa-info-circle"></i>
-					{{ i18n.devices.popupSettings.dragAndDrop }}
-				</div>
-
-				<div class="items-selector codec-selector" id="audio_codec_selector"></div>
 			</div>
 
 			<div class="tabs-section clearfix" data-section="restrictions">
@@ -170,6 +131,12 @@
 							<label class="control-label">{{ i18n.devices.popupSettings.callerId.emergency }}</label>
 							<div class="controls emergency-number"></div>
 						</div>
+						<div class="control-group number-address">
+							<label class="control-label">{{i18n.devices.popupSettings.callerId.address}}</label>
+							<div class="controls">
+								<p></p>
+							</div>
+						</div>
 					{{else}}
 						{{#monsterText 'error'}}
 							{{ i18n.devices.popupSettings.callerId.noE911Numbers }}
@@ -177,6 +144,22 @@
 					{{/if}}
 				</div>
 			{{/if}}
+
+			<div class="tabs-section clearfix" data-section="miscellaneous">
+				<div class="title">
+					{{ i18n.devices.popupSettings.miscellaneous.sectionTitle }}
+				</div>
+
+				<div class="control-group">
+					<label class="control-label checkbox">
+						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.unregisterNotifications.label }}
+							<input type="checkbox" name="extra.notify_unregister" id="notify_unregister" {{#unless suppress_unregister_notifications}}checked{{/unless}} />
+						{{/monsterCheckbox}}
+						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.unregisterNotifications.help}}" data-placement="top" data-toggle="tooltip"></i>
+					</label>
+				</div>
+	
+			</div>
 		</form>
 	</div>
 

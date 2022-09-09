@@ -7,6 +7,12 @@ define(function(require) {
 		return _.every([dest, src], _.isArray) ? src : undefined;
 	};
 
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
+
 	var app = {
 
 		requests: {
@@ -32,23 +38,24 @@ define(function(require) {
 		appFlags: {
 			devices: {
 				iconClassesByDeviceTypes: {
-					application: 'icon-telicon-apps',
-					ata: 'icon-telicon-ata',
-					cellphone: 'fa fa-phone',
-					fax: 'icon-telicon-fax',
-					landline: 'icon-telicon-home',
-					mobile: 'icon-telicon-sprint-phone',
-					sip_device: 'icon-telicon-voip-phone',
-					sip_uri: 'icon-telicon-voip-phone',
-					smartphone: 'icon-telicon-mobile-phone',
-					softphone: 'icon-telicon-soft-phone'
+					application: 'apps',
+					ata: 'device-ata',
+					cellphone: 'phone',
+					fax: 'device-fax',
+					landline: 'home',
+					mobile: 'device-sprint-phone',
+					sip_device: 'device-voip-phone',
+					sip_uri: 'device-voip-phone',
+					smartphone: 'device-mobile',
+					softphone: 'device-soft-phone',
+					teammate: 'device-mst'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
 				 * The order is important and controls the list rendered in DOM.
 				 * @type {Array}
 				 */
-				addableDeviceTypes: [
+				addableDeviceTypes: _.flatten([[
 					'sip_device',
 					'cellphone',
 					'smartphone',
@@ -57,12 +64,14 @@ define(function(require) {
 					'fax',
 					'ata',
 					'sip_uri'
-				],
+				], showTeammateDevice ? [
+					'teammate'
+				] : []]),
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
 				 * @type {Array}
 				 */
-				editableDeviceTypes: [
+				editableDeviceTypes: _.flatten([[
 					'ata',
 					'cellphone',
 					'fax',
@@ -73,6 +82,9 @@ define(function(require) {
 					'smartphone',
 					'softphone'
 				],
+				showTeammateDevice ? [
+					'teammate'
+				] : []]),
 				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
 		},
@@ -1100,13 +1112,29 @@ define(function(require) {
 						audio: [],
 						video: []
 					},
+					sip: {
+						realm: monster.apps.auth.currentAccount.realm
+					},
 					users: _.sortBy(data.users, function(user) {
 						return _
 							.chain(user)
 							.thru(monster.util.getUserFullName)
 							.toLower()
 							.value();
-					})
+					}),
+					faxOptions: {
+						selected: _.get(data.device, 'media.fax_option', 'auto'),
+						options: [{
+							labelKey: 'auto',
+							value: 'auto'
+						}, {
+							labelKey: 'force',
+							value: true
+						}, {
+							labelKey: 'disabled',
+							value: false
+						}]
+					}
 				}
 			}, deviceData);
 		},
@@ -1118,28 +1146,26 @@ define(function(require) {
 		 * @return {Object}
 		 */
 		devicesApplyDefaults: function(device) {
-			var self = this;
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type');
 
 			return _.mergeWith(
-				self.devicesGetDefaults(device),
+				isNew ? self.devicesGetDefaults(type) : {},
 				device,
 				overrideDestArray
 			);
 		},
 
 		/**
-		 * @param  {Object} device
-		 * @param  {String} device.device_type
-		 * @param  {String} [device.id]
+		 * @param  {String} type
 		 * @return {Object}
 		 */
-		devicesGetDefaults: function(device) {
-			var self = this,
-				isNew = !_.has(device, 'id'),
-				type = _.get(device, 'device_type');
+		devicesGetDefaults: function(type) {
+			var self = this;
 
 			return _.mergeWith(
-				isNew ? self.devicesGetBaseDefaults() : {},
+				self.devicesGetBaseDefaults(),
 				self.devicesGetDefaultsForType(type),
 				overrideDestArray
 			);
@@ -1178,7 +1204,6 @@ define(function(require) {
 				sipSettings = {
 					sip: {
 						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
 						username: 'user_' + monster.util.randomString(10)
 					}
 				},
@@ -1187,7 +1212,7 @@ define(function(require) {
 					cellphone: _.merge({}, callForwardSettings),
 					fax: _.merge({
 						media: {
-							fax_option: 'false'
+							fax_option: false
 						},
 						outbound_flags: [
 							'fax'
@@ -1207,7 +1232,25 @@ define(function(require) {
 						]))
 					},
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
-					softphone: _.merge({}, sipSettings)
+					softphone: _.merge({}, sipSettings),
+					teammate: _.merge({
+						caller_id_options: {
+							outbound_privacy: "none"
+						},
+						sip: _.merge({
+							ignore_completed_elsewhere: false,
+						}, _.pick(sipSettings.sip, ['password', 'username'])),
+						media: {
+							webrtc: false,
+							encryption: {
+								enforce_security: true,
+								methods: ['srtp']
+							},
+							audio: {
+								codecs: ['PCMU', 'PCMA']
+							}
+						}
+					}, sipSettings)
 				};
 
 			return _.get(defaultsPerType, type, {});
