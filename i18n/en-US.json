@@ -433,6 +433,12 @@
 			"new": "New Softphone",
 			"deviceName": "Device Name"
 		},
+		"teammate": {
+			"addTitle": "Adding a TeamMate Device",
+			"editTitle": "Editing TeamMate Device: {{name}}",
+			"new": "New TeamMate Device",
+			"deviceName": "Device Name"
+		},
 		"ata": {
 			"addTitle": "Adding an ATA",
 			"editTitle": "Editing ATA: {{name}}",
@@ -460,6 +466,7 @@
 			"smartphone": "Smartphone",
 			"mobile": "Business Mobile",
 			"softphone": "Soft Phone",
+			"teammate": "TeamMate",
 			"landline": "Landline",
 			"fax": "Fax",
 			"ata": "ATA",
@@ -720,7 +727,6 @@
 			"label": "Voicemail to e-mail:",
 			"title": "Voicemail Box",
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
-			"announceOnly": "Announce Only",
 			"transcribe": "Transcribe",
 			"attachVoicemail": "Attach voicemail message to email."
 		},
