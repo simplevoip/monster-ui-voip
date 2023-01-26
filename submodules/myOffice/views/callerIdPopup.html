@@ -26,54 +26,6 @@
 				{{ i18n.myOffice.callerId.nameHelp }}
 			{{/monsterText}}
 		</div>
-
-		{{#if isE911Enabled}}
-		<div class="content number-feature" data-feature="e911">
-			<div>{{ i18n.myOffice.callerId.emergencyLabel }}</div>
-
-			<form id="emergency_form">
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress1 }}</span>
-					<input required name="street_address" type="text" class="caller-id-emergency-address1">
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyAddress2 }}</span>
-					<input name="extended_address" type="text" class="caller-id-emergency-address2">
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCity }}</span>
-					<input required name="locality" type="text" class="caller-id-emergency-city">
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyState }}</span>
-					<input required name="region" type="text" class="caller-id-emergency-state">
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyZipcode }}</span>
-					<input required name="postal_code" type="text" class="caller-id-emergency-zipcode">
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyCountry }}</span>
-					<select required name="country" class="caller-id-emergency-country">
-						<option value="US">United States</option>
-						<option value="CA">Canada</option>
-					</select>
-				</label>
-				<label>
-					<span class="emergency-form-label">{{ i18n.myOffice.callerId.emergencyEmail }}</span>
-					<div class="horizontal-error-container">
-						<textarea name="notification_contact_emails" class="caller-id-emergency-email"></textarea>
-					</div>
-				</label>
-				<input type="hidden" name="erlid">
-			</form>
-
-			{{#monsterText}}
-				<p>{{ i18n.myOffice.callerId.emergencyHelp1 }}</p>
-				<p>{{ i18n.myOffice.callerId.emergencyHelp2 }}</p>
-			{{/monsterText}}
-		</div>
-		{{/if}}
 	</div>
 
 	<div class="actions clearfix">
