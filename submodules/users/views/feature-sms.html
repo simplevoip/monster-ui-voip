@@ -18,11 +18,11 @@
         </div>
 
         <div class="content number-feature{{#unless sms.enabled}} disabled{{/unless}}" data-feature="sms">
-            <div class="form-group">
+            <div class="control-group form-group">
                 <label class="control-label col-sm-3">
                     {{ i18n.users.sms.didLabel }}
                 </label>
-                <div class="col-sm-9">
+                <div class="controls col-sm-9">
                     <select name="did" class="form-control">
                         <option{{#compare sms.did "===" ""}} selected{{/compare}} value="">Please choose a number</option>
                         {{#each extra.nonTollFreeNumbers}}
@@ -32,11 +32,11 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="control-group form-group">
                 <label class="control-label col-sm-3">
                     {{ i18n.users.sms.appLabel }}
                 </label>
-                <div class="col-sm-9">
+                <div class="controls col-sm-9">
                     <select name="mobile_id" class="form-control required-by-sms">
                         <option{{#compare sms.mobile_id "===" ""}} selected{{/compare}} value="">Choose a softphone</option>
                         {{#each extra.devices}}
@@ -48,26 +48,41 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="control-group form-group">
                 <label class="control-label col-sm-3">
                     {{ i18n.users.sms.emailLabel }}
                 </label>
-                <div class="col-sm-9">
+                <div class="controls col-sm-9">
                     <input type="email" name="email" value="{{sms.email}}" class="form-control required-by-sms">
                 </div>
             </div>
 
-            <div class="helper">
+            <span class="help-block">
                 <i class="fa fa-info-circle"></i>
                 {{ i18n.users.sms.webhookHelpLabel }}
+            </span>
+
+            <div class="control-group form-group">
+                <label class="control-label col-sm-3">
+                    {{ i18n.users.sms.receiveURLLabel }}
+                </label>
+                <div class="controls col-sm-9">
+                    <input type="text" name="recv_webhook_url" value="{{sms.recv_webhook_url}}" class="form-control required-by-sms">
+                </div>
             </div>
 
             <div class="form-group">
-                <label class="control-label col-sm-3">
-                    {{ i18n.users.sms.webhookLabel }}
+                <label class="controls checkbox col-sm-9">
+                    <input type="checkbox" id="send_webhook_url_match_recv">{{ i18n.users.sms.sameAsReceivedURLLabel }}
                 </label>
-                <div class="col-sm-9">
-                    <input type="text" name="url" value="{{sms.url}}" class="form-control required-by-sms">
+            </div>
+
+            <div class="control-group form-group">
+                <label class="control-label col-sm-3">
+                    {{ i18n.users.sms.sendURLLabel }}
+                </label>
+                <div class="controls col-sm-9">
+                    <input type="text" name="send_webhook_url" value="{{sms.send_webhook_url}}" class="form-control required-by-sms">
                 </div>
             </div>
 

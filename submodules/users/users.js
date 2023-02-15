@@ -2768,7 +2768,7 @@ define(function(require) {
 					'mobile_id': {
 						require_from_sms_options: [1, '.required-by-sms']
 					},
-					'url': {
+					'recv_webhook_url': {
 						require_from_sms_options: [1, '.required-by-sms']
 					},
 					'email': {
@@ -2779,6 +2779,15 @@ define(function(require) {
 
 			switchFeature.on('change', function() {
 				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
+			});
+
+			featureTemplate.find('#send_webhook_url_match_recv').on('click', function (evt) {
+				const target = evt.currentTarget;
+				const checked = $(target).is(':checked');
+				const val = checked ? $('[name="recv_webhook_url"]').val() : '';
+				$('[name="send_webhook_url"]')
+					.val(val)
+					.attr('readonly', checked);
 			});
 
 			featureTemplate.find('.cancel-link').on('click', function() {
@@ -2806,6 +2815,10 @@ define(function(require) {
 				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.sms.title,
 				position: ['center', 20]
 			});
+
+			if (featureUser.sms.recv_webhook_url === featureUser.sms.send_webhook_url) {
+				featureTemplate.find('#send_webhook_url_match_recv').trigger('click');
+			}
 		},
 
 		usersPromptUserCreateDevice: function(featureUser, success, error) {
@@ -6155,7 +6168,7 @@ define(function(require) {
 			var self = this,
 				enabled = sms.enabled,
 				resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
-
+console.log(sms);
 			monster.request({
 				resource: resource,
 				data: {

@@ -765,8 +765,11 @@
 			"headline": "User SMS Settings",
 			"didLabel": "Add Service to Number",
 			"emailLabel": "Notify Email",
+			"receiveURLLabel": "Receive URL",
+			"sendURLLabel": "Send URL",
+			"sameAsReceivedURLLabel": "Send URL same as Received URL",
 			"webhookLabel": "Notify URL",
-			"webhookHelpLabel": "The URL option is for advanced users and will deliver incoming SMS messages to a webhook.",
+			"webhookHelpLabel": "The URL options are for advanced users and will deliver incoming and outgoing SMS messages to a webhook.",
 			"appLabel": "Deliver to Softphone"
 		},
 		"mobile_app": {
