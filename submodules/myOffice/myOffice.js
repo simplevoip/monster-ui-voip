@@ -499,11 +499,7 @@ define(function(require) {
 						hasValidCallerId = shouldBypassCnam || isExternalNumberSet,
 						shouldBypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
 						callerIdEmergencyNumber = _.get(account, 'caller_id.emergency.number'),
-						isEmergencyNumberSet = _
-							.chain(numbers)
-							.get([callerIdEmergencyNumber, 'features'])
-							.includes('e911')
-							.value(),
+						isEmergencyNumberSet = !!callerIdEmergencyNumber,
 						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet,
 						messageKey,
 						category = 'myOffice',
