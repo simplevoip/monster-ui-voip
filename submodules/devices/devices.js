@@ -1185,7 +1185,8 @@ define(function(require) {
 				},
 				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice,
-				registeredDevicesById = _.map(data.status, 'device_id'),
+				registeredDevices = _.filter(data.status, (device) => device.registered);
+				registeredDevicesById = _.map(registeredDevices, 'device_id'),
 				isSuperDuper = monster.apps.auth.currentAccount.superduper_admin;
 
 			return {

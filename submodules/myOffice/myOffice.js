@@ -523,7 +523,8 @@ define(function(require) {
 						}
 						: undefined;
 				}(specialNumbers.mainNumbers, data.account, data.numbers)),
-				registeredDevices = _.map(data.devicesStatus, 'device_id');
+				registeredDevices = _.filter(data.devicesStatus, (device) => device.registered),
+				registeredDevicesById = _.map(registeredDevices, 'device_id');
 
 			return _.merge({
 				assignedNumbersData: _
@@ -614,7 +615,7 @@ define(function(require) {
 						var type = _.get(device, 'device_type'),
 							isDeviceTypeKnown = _.includes(knownDeviceTypes, type),
 							isDeviceDisabled = !_.get(device, 'enabled', false),
-							isDeviceRegistered = _.includes(registeredDevices, device.id),
+							isDeviceRegistered = _.includes(registeredDevicesById, device.id),
 							isSipDevice = _.includes(['sip_device', 'smartphone', 'softphone', 'fax', 'ata'], type),
 							isUnregisteredSipDevice = isSipDevice && !isDeviceRegistered,
 							isDeviceOffline = isDeviceDisabled || isUnregisteredSipDevice;
