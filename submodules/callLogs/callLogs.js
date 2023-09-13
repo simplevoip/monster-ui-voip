@@ -259,7 +259,7 @@ define(function(require) {
 
 					if (!recordingRow.hasClass('data-loaded')) {
 						var base_url = monster.config.api.sv_ajax,
-							url = `${base_url}/recording/${self.accountId}/${callId}`;
+							url = `${base_url}recording/${self.accountId}/${callId}`;
 
 						gridRow.find('.recording-row')
 							.empty()
