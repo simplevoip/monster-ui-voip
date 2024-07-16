@@ -4,6 +4,12 @@ define(function(require) {
 		monster = require('monster'),
 		timezone = require('monster-timezone');
 
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
+
 	var app = {
 
 		requests: {
@@ -28,16 +34,18 @@ define(function(require) {
 		},
 
 		deviceIcons: {
-			'cellphone': 'fa fa-phone',
-			'smartphone': 'icon-telicon-mobile-phone',
-			'landline': 'icon-telicon-home',
-			'mobile': 'icon-telicon-sprint-phone',
-			'softphone': 'icon-telicon-soft-phone',
-			'sip_device': 'icon-telicon-voip-phone',
-			'sip_uri': 'icon-telicon-voip-phone',
-			'fax': 'icon-telicon-fax',
-			'ata': 'icon-telicon-ata',
-			'application': 'icon-telicon-apps'
+			'cellphone': 'phone',
+			'smartphone': 'device-mobile',
+			'landline': 'home',
+			'mobile': 'device-sprint-phone',
+			'softphone': 'device-soft-phone',
+			'sip_device': 'device-voip-phone',
+			'sip_uri': 'device-voip-phone',
+			'fax': 'device-fax',
+			'ata': 'device-ata',
+			'application': 'apps',
+			'teammate': 'device-mst',
+			'meta': 'apps'
 		},
 
 		/* Users */
@@ -123,7 +131,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get('showUsersWalkthrough');
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},
@@ -189,6 +197,25 @@ define(function(require) {
 		 */
 		usersFormatUserData: function(data) {
 			var self = this,
+				getFeatureTitle = function(featureId, defaultKey) {
+					var i18n = self.i18n.active().users[featureId].titles,
+						key = monster.util.getFeatureConfig(
+							['smartpbx', 'users', 'features', featureId, 'i18nLabelPath'],
+							defaultKey
+						);
+					return i18n[key];
+				},
+				isFeatureAvailable = function(data, id) {
+					var isFeatureAvailable = monster.util.isFeatureAvailable(
+							['smartpbx', 'users', 'features', _.camelCase(id), 'edit']
+						),
+						availabilityChecker = _.get(data, 'availabilityChecker', _.stubTrue);
+
+					return _.every([
+						isFeatureAvailable,
+						availabilityChecker()
+					]);
+				},
 				dataUser = data.user,
 				_mainDirectory = data.mainDirectory,
 				_mainCallflow = data.userMainCallflow,
@@ -209,13 +236,25 @@ define(function(require) {
 					listNumbers: [],
 					phoneNumber: '',
 					differentEmail: dataUser.email !== dataUser.username,
-					mapFeatures: {
+					mapFeatures: _.pickBy({
 						caller_id: {
+							availabilityChecker: function() {
+								var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
+										'smartpbx.users.features.callerId.editWhenSetOnAccount'
+									),
+									isNotSetOnAccount = _
+										.chain(monster.apps.auth.currentAccount)
+										.get('caller_id.external.number')
+										.isUndefined()
+										.value();
+
+								return isEditableWhenSetOnAccount || isNotSetOnAccount;
+							},
 							icon: 'fa fa-user',
 							iconColor: 'monster-blue',
 							title: self.i18n.active().users.caller_id.title
 						},
-						call_forward_failover: {
+						call_failover: {
 							icon: 'fa fa-share',
 							iconColor: 'monster-orange',
 							title: self.i18n.active().users.call_forward.failover_title,
@@ -234,12 +273,12 @@ define(function(require) {
 						vmbox: {
 							icon: 'icon-telicon-voicemail',
 							iconColor: 'monster-green',
-							title: self.i18n.active().users.vmbox.title
+							title: getFeatureTitle('vmbox', 'voicemailBox')
 						},
 						faxing: {
 							icon: 'icon-telicon-fax',
 							iconColor: 'monster-red',
-							title: self.i18n.active().users.faxing.title
+							title: getFeatureTitle('faxing', 'faxbox')
 						},
 						conferencing: {
 							icon: 'fa fa-comments',
@@ -266,7 +305,7 @@ define(function(require) {
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
 						}
-					},
+					}, isFeatureAvailable),
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
 						return {
 							key: item,
@@ -407,17 +446,17 @@ define(function(require) {
 					});
 				}, mainUserCallflowsPerUserId),
 				getNumbersExtra = function(numbers, extra) {
-					var extensions = _
+					var extensionMaxLength = 7,
+						extensions = _
 							.chain(numbers)
 							.filter(function(number) {
-								return _.size(number) < 7;
+								return _.size(number) < extensionMaxLength && self.isExtensionDisplayable(number);
 							})
 							.concat(extra.listExtensions)
 							.value(),
 						phoneNumbers = _.filter(numbers, function(number) {
-							return _.size(number) >= 7;
+							return _.size(number) >= extensionMaxLength;
 						});
-
 					return {
 						listExtensions: extensions,
 						listCallerId: phoneNumbers,
@@ -431,6 +470,10 @@ define(function(require) {
 					};
 				},
 				isRegistered = function(device) {
+					// TODO: this validation should be removed once the backend returns the actual meta device status.
+					if (device.device_type === 'meta') {
+						return true;
+					}
 					return _.every([
 						device.enabled,
 						device.registrable ? device.registered : true
@@ -564,6 +607,15 @@ define(function(require) {
 					}, function(error, results) {
 						self.usersRenderFindMeFollowMe($.extend(true, results, { currentUser: currentUser, saveCallback: featureCallback }));
 					});
+				},
+				isExtension = function(input) {
+					return _
+						.chain(input)
+						.toString()
+						.thru(function(string) {
+							return /\d/.test(string);
+						})
+						.value();
 				};
 
 			setTimeout(function() { template.find('.search-query').focus(); });
@@ -622,7 +674,9 @@ define(function(require) {
 						if (type === 'name') {
 							currentUser = data;
 
-							monster.ui.chosen(template.find('#user_timezone'));
+							if (monster.util.isFeatureAvailable('smartpbx.users.timezone.edit')) {
+								monster.ui.chosen(template.find('#user_timezone'));
+							}
 
 							data.extra.differentEmail ? template.find('.email-group').show() : template.find('.email-group').hide();
 						} else if (type === 'numbers') {
@@ -779,6 +833,21 @@ define(function(require) {
 				listExtensions.append(newLineTemplate);
 
 				existingExtensions.push(nextExtension);
+
+				newLineTemplate.find('.extesion-already-exist').hide();
+
+				newLineTemplate.find('.input-extension ').on('keyup', function() {
+					var val = $(this).val();
+
+					if (existingExtensions.indexOf(val) >= 0) {
+						newLineTemplate.find('.extesion-already-exist').show();
+						template.find('.save-extensions').attr('disabled', true)
+						return;
+					}
+
+					newLineTemplate.find('.extesion-already-exist').hide();
+					template.find('.save-extensions').attr('disabled', false)
+				});
 			});
 
 			template.on('click', '.remove-extension', function() {
@@ -800,6 +869,7 @@ define(function(require) {
 
 				if (index > -1) {
 					existingExtensions.splice(index, 1);
+					template.find('.save-extensions').attr('disabled', false)
 				}
 
 				$(this).parents('.item-row').remove();
@@ -1521,7 +1591,17 @@ define(function(require) {
 							vmboxModule = self.usersExtractDataFromCallflow({
 								callflow: data.callflow,
 								module: 'voicemail'
-							});
+							}),
+							isMissingExtension = _
+								.chain(data)
+								.get('callflow.numbers')
+								.find(isExtension)
+								.isUndefined()
+								.value();
+
+						if (isMissingExtension) {
+							return monster.ui.alert('warning', self.i18n.active().users.vmbox.missingExtension);
+						}
 
 						// Update in-memory vmbox status
 						currentUser.extra.mapFeatures.vmbox.active = !(_.isUndefined(vmboxModule) || _.get(vmboxModule, 'data.skip_module', false));
@@ -2085,22 +2165,6 @@ define(function(require) {
 				};
 
 				if (monster.ui.valid(featureForm)) {
-					data.conference = monster.ui.getFormData('conferencing_form');
-
-					if (data.conference.video) {
-						data.conference = _.merge(data.conference, {
-							video: true,
-							profile_name: 'video',
-							caller_controls: 'video-participant',
-							moderator_controls: 'video-moderator'
-						});
-					} else {
-						delete data.conference.video;
-						delete data.conference.profile_name;
-						delete data.conference.caller_controls;
-						delete data.conference.moderator_controls;
-					}
-
 					if (switchFeature.prop('checked')) {
 						self.usersUpdateConferencing(data, function(data) {
 							args.userId = data.user.id;
@@ -2265,29 +2329,38 @@ define(function(require) {
 
 		usersRenderVMBox: function(currentUser, vmbox) {
 			var self = this,
-				vmboxActive = currentUser.extra.mapFeatures.vmbox.active,
+				featureData = currentUser.extra.mapFeatures.vmbox,
+				vmboxActive = featureData.active,
 				transcription = monster.util.getCapability('voicemail.transcription'),
-				announcement_only = _.get(vmbox, 'announcement_only', false),
-				vm_to_email_enabled = currentUser.vm_to_email_enabled,
-				transcribe = _.get(vmbox, 'transcribe', transcription.defaultValue),
 				featureTemplate = $(self.getTemplate({
 					name: 'feature-vmbox',
-					data: _.merge(currentUser, {
-						vm_to_email_enabled: announcement_only ? false : vm_to_email_enabled,
-						vmbox: _.merge(vmbox, {
-							transcribe: announcement_only ? false : transcribe,
-							announcement_only: announcement_only,
-							hasTranscribe: _.get(transcription, 'isEnabled', false),
-							include_message_on_notify: _.get(vmbox, 'include_message_on_notify', true)
-						})
-					}),
+					data: _.merge({
+						feature: _.pick(featureData, [
+							'active',
+							'icon'
+						]),
+						vmbox: {
+							transcription: {
+								isEnabled: _.get(transcription, 'isEnabled', false),
+								value: _.get(vmbox, 'transcribe', transcription.defaultValue)
+							},
+							deleteAfterNotify: currentUser.extra.deleteAfterNotify,
+							includeMessageOnNotify: _.get(vmbox, 'include_message_on_notify', true),
+							vmToEmailEnabled: vmboxActive ? currentUser.vm_to_email_enabled : true
+						}
+					}, _.pick(currentUser, [
+						'email'
+					])),
 					submodule: 'users'
 				})),
 				switchFeature = featureTemplate.find('.switch-state'),
 				featureForm = featureTemplate.find('#vmbox_form'),
-				switchVmToEmail = featureForm.find('#vm_to_email_enabled'),
-				switchVmTranscribe = featureForm.find('#transcribe'),
-				switchVmAnnounceOnly = featureForm.find('#announcement_only');
+				switchTranscription = featureForm.find('#transcribe').parent(),
+				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
+
+			if (!monster.util.isFeatureAvailable('smartpbx.users.features.vmbox.transcription')) {
+				switchTranscription.addClass('disabled');
+			}
 
 			monster.ui.validate(featureForm);
 
@@ -2301,18 +2374,6 @@ define(function(require) {
 
 			switchVmToEmail.on('change', function() {
 				$(this).prop('checked') ? featureForm.find('.extra-content').slideDown() : featureForm.find('.extra-content').slideUp();
-			});
-
-			switchVmAnnounceOnly.on('change', function() {
-				var isEnabled = $(this).prop('checked');
-
-				switchVmTranscribe
-					.prop('checked', isEnabled ? false : transcribe)
-					.prop('disabled', isEnabled);
-
-				switchVmToEmail
-					.prop('checked', isEnabled ? false : vm_to_email_enabled)
-					.prop('disabled', isEnabled);
 			});
 
 			featureTemplate.find('.save').on('click', function() {
@@ -2388,7 +2449,10 @@ define(function(require) {
 						});
 					},
 					function(callback) {
-						if (currentUser.vm_to_email_enabled === vmToEmailEnabled) {
+						if (
+							vmboxActive === enabled
+							&& currentUser.vm_to_email_enabled === vmToEmailEnabled
+						) {
 							callback(null);
 							return;
 						}
@@ -2397,7 +2461,7 @@ define(function(require) {
 							data: {
 								userId: userId,
 								data: {
-									vm_to_email_enabled: vmToEmailEnabled
+									vm_to_email_enabled: enabled ? vmToEmailEnabled : null
 								}
 							},
 							success: function() {
@@ -2424,7 +2488,7 @@ define(function(require) {
 			});
 
 			var popup = monster.ui.dialog(featureTemplate, {
-				title: currentUser.extra.mapFeatures.vmbox.title,
+				title: featureData.title,
 				position: ['center', 20]
 			});
 		},
@@ -2432,89 +2496,134 @@ define(function(require) {
 		usersRenderCallerId: function(currentUser, numberChoices) {
 			var self = this,
 				allowAnyOwnedNumberAsCallerID = monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID ? true : false,
-				templateUser = $.extend(true, { allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID }, currentUser),
-				featureTemplate,
-				switchFeature;
+				selectableNumbers = numberChoices && _.get(monster.config.whitelabel, 'allowAnyOwnedNumberAsCallerID')
+					? _.keys(numberChoices)
+					: _.get(currentUser, 'extra.listNumbers', []),
+				initTemplate = function(cidNumbers) {
+					var $template = $(self.getTemplate({
+						name: 'feature-caller_id',
+						data: _.merge({
+							allowAnyOwnedNumberAsCallerID: allowAnyOwnedNumberAsCallerID
+						}, _.pick(currentUser, [
+							'caller_id',
+							'extra'
+						])),
+						submodule: 'users'
+					}));
 
-			if (numberChoices && monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID) {
-				templateUser.caller_id.numberChoices = numberChoices;
+					monster.ui.cidNumberSelector($template.find('.caller-id-select-target'), {
+						allowNone: false,
+						selected: _.get(currentUser, 'caller_id.external.number'),
+						cidNumbers: cidNumbers,
+						phoneNumbers: _.map(selectableNumbers, function(number) {
+							return {
+								number: number
+							};
+						})
+					});
+
+					bindEvents($template);
+
+					return $template;
+				},
+				bindEvents = function($template) {
+					var $switchFeature = $template.find('.switch-state'),
+						getPopup = function($node) {
+							return $node.parents('.ui-dialog-content');
+						};
+
+					$template.find('.cancel-link').on('click', function() {
+						getPopup($(this)).dialog('close').remove();
+					});
+
+					$switchFeature.on('change', function() {
+						$(this).prop('checked') ? $template.find('.content').slideDown() : $template.find('.content').slideUp();
+					});
+
+					$template.find('.save').on('click', function() {
+						var switchCallerId = $template.find('.switch-state'),
+							userToSave = $.extend(true, {}, {
+								caller_id: {
+									external: {}
+								}
+							}, currentUser),
+							args = {
+								openedTab: 'features',
+								callback: function() {
+									getPopup(switchCallerId).dialog('close').remove();
+								}
+							};
+
+						if (switchCallerId.prop('checked')) {
+							var callerIdValue = $template.find('.caller-id-select-target select').val();
+
+							userToSave.caller_id.external.number = callerIdValue;
+						} else if (userToSave.caller_id.hasOwnProperty('external')) {
+							delete userToSave.caller_id.external.number;
+						}
+
+						self.usersUpdateUser(userToSave, function(data) {
+							args.userId = data.data.id;
+
+							self.usersRender(args);
+						});
+					});
+				};
+
+			if (
+				_.isEmpty(currentUser.extra.listCallerId)
+				&& !_.get(monster.config.whitelabel, 'allowAnyOwnedNumberAsCallerID', false)
+			) {
+				return monster.ui.alert('error', self.i18n.active().users.errorCallerId);
 			}
-
-			featureTemplate = $(self.getTemplate({
-				name: 'feature-caller_id',
-				data: templateUser,
-				submodule: 'users'
-			}));
-			switchFeature = featureTemplate.find('.switch-state');
-
-			featureTemplate.find('.cancel-link').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			switchFeature.on('change', function() {
-				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
-			});
-
-			featureTemplate.find('.save').on('click', function() {
-				var switchCallerId = featureTemplate.find('.switch-state'),
-					userToSave = $.extend(true, {}, {
-						caller_id: {
-							external: {}
-						}
-					}, currentUser),
-					args = {
-						openedTab: 'features',
-						callback: function() {
-							popup.dialog('close').remove();
-						}
-					};
-
-				if (switchCallerId.prop('checked')) {
-					var callerIdValue = featureTemplate.find('.caller-id-select').val();
-
-					userToSave.caller_id.external.number = callerIdValue;
-				} else if (userToSave.caller_id.hasOwnProperty('external')) {
-					delete userToSave.caller_id.external.number;
+			monster.waterfall([
+				function(next) {
+					self.callApi({
+						resource: 'externalNumbers.list',
+						data: {
+							accountId: self.accountId
+						},
+						success: _.flow(
+							_.partial(_.get, _, 'data'),
+							_.partial(next, null)
+						),
+						error: _.partial(_.ary(next, 2), null, [])
+					});
 				}
-
-				self.usersUpdateUser(userToSave, function(data) {
-					args.userId = data.data.id;
-
-					self.usersRender(args);
-				});
-			});
-
-			if (currentUser.extra.listCallerId.length > 0 || (monster.config.whitelabel && monster.config.whitelabel.allowAnyOwnedNumberAsCallerID)) {
-				var popup = monster.ui.dialog(featureTemplate, {
+			], function(err, cidNumbers) {
+				monster.ui.dialog(initTemplate(cidNumbers), {
 					title: currentUser.extra.mapFeatures.caller_id.title,
 					position: ['center', 20]
 				});
-			} else {
-				monster.ui.alert('error', self.i18n.active().users.errorCallerId);
-			}
+			});
 		},
 
 		usersFormatCallForwardData: function(user) {
 			var self = this,
 				isCallForwardConfigured = _.has(user, 'call_forward.enabled'),
 				isCallForwardEnabled = _.get(user, 'call_forward.enabled', false),
-				isFailoverEnabled = _.get(user, 'call_forward.failover', false);
+				isFailoverEnabled = _.get(user, 'call_failover.enabled', false);
 
-			//cfmode is on if call_forward.enabled = true
-			//cfmode is failover if call_forward.enabled = false & call_forward.failover = true
-			//cfmode is off if call_forward.enabled = false & call_forward.failover = false
+			// cfmode is off if call_forward.enabled = false && call_failover.enabled = false
+			// cfmode is failover if call_failover.enabled = true
+			// cfmode is on if call_failover.enabled = false && call_forward.enabled = true
+			var callForwardMode = 'off';
+			if (isFailoverEnabled) {
+				callForwardMode = 'failover';
+			} else if (isCallForwardEnabled) {
+				callForwardMode = 'on';
+			}
+
 			return _.merge({}, user, _.merge({
 				extra: {
-					callForwardMode: !isCallForwardConfigured ? 'off'
-					: isCallForwardEnabled ? 'on'
-					: isFailoverEnabled ? 'failover'
-					: 'off'
+					callForwardMode: callForwardMode
 				}
 			}, isCallForwardConfigured && {
 				call_forward: _.merge({}, _.has(user, 'call_forward.number') && {
 					number: monster.util.unformatPhoneNumber(user.call_forward.number)
 				})
-			}));
+			}
+			));
 		},
 
 		usersRenderCallForward: function(currentUser) {
@@ -2572,23 +2681,23 @@ define(function(require) {
 
 				if (monster.ui.valid(featureForm) && isValidPhoneNumber) {
 					formData.require_keypress = !formData.require_keypress;
+					formData.number = phoneNumber;
 
 					var selectedType = featureTemplate.find('.feature-select-mode button.selected').data('value');
 					if (selectedType === 'off') {
 						formData.enabled = false;
-						formData.failover = false;
-					} else if (selectedType === 'failover') {
-						formData.enabled = false;
-						formData.failover = true;
-					} else {
-						formData.enabled = true;
-						formData.failover = false;
 					}
 
-					formData.number = phoneNumber;
-					delete formData.phoneType;
+					var payload = { call_forward: _.merge({}, formData), call_failover: _.merge({}, formData) };
+					if (selectedType === 'failover') {
+						payload.call_failover.enabled = true;
+						payload.call_forward.enabled = false;
+					} else if (selectedType === 'on') {
+						payload.call_failover.enabled = false;
+						payload.call_forward.enabled = true;
+					}
 
-					var userToSave = $.extend(true, {}, currentUser, { call_forward: formData });
+					var userToSave = $.extend(true, {}, currentUser, payload);
 
 					if (timeoutWarningBox.is(':visible')) {
 						args.openedTab = 'name';
@@ -2601,12 +2710,6 @@ define(function(require) {
 					});
 				}
 			});
-
-			if (currentUser.hasOwnProperty('call_forward') && currentUser.call_forward.number && /^(\+1)/.test(currentUser.call_forward.number)) {
-				featureTemplate.find('#phoneType').val('mobile');
-			} else {
-				featureTemplate.find('#phoneType').val('deskphone');
-			}
 
 			var popup = monster.ui.dialog(featureTemplate, {
 				title: currentUser.extra.mapFeatures.call_forward.title,
@@ -2881,11 +2984,12 @@ define(function(require) {
 								};
 							});
 						})
-						.keyBy('direction')
+						.groupBy('direction')
 						.mapValues(_.flow(
 							_.partial(_.keyBy, _, 'network'),
 							_.partial(_.mapValues, _, 'config')
-						));
+						))
+						.value();
 				},
 				getConfigForSettings = function(settings, valueGetter) {
 					return _.merge({
@@ -2903,8 +3007,8 @@ define(function(require) {
 				userSettings = _
 					.chain(params.currentUser)
 					.get('call_recording', {})
-					.flatMap(_.unary(_.map))
-					.find('enabled')
+					.flatMap(_.values)
+					.find({ enabled: true })
 					.value(),
 				configGeneratorsPerType = {
 					defaults: _.partial(getConfigForSettings, defaultSettings, getDefaultValue),
@@ -2928,8 +3032,8 @@ define(function(require) {
 				user: params.currentUser,
 				canShowFields: _
 					.chain(config.extra)
-					.flatMap(_.unary(_.map))
-					.find('enabled')
+					.flatMap(_.values)
+					.find({ enabled: true })
 					.thru(_.negate(_.isUndefined))
 					.value()
 			}, _.pick(params, [
@@ -3371,6 +3475,7 @@ define(function(require) {
 			delete userData.features;
 			delete userData.extra;
 			delete userData[''];
+			delete userData.confirm_password;
 
 			return userData;
 		},
@@ -3637,7 +3742,9 @@ define(function(require) {
 
 				template = $(self.getTemplate({
 					name: 'devices',
-					data: formattedResults,
+					data: _.merge({
+						showTeammateDevice: showTeammateDevice
+					}, formattedResults),
 					submodule: 'users'
 				}));
 
@@ -3770,7 +3877,7 @@ define(function(require) {
 						numberElement.isLocal = numberElement.features.indexOf('local') > -1;
 
 						response.assignedNumbers.push(numberElement);
-					} else {
+					} else if (self.isExtensionDisplayable(number)) {
 						response.extensions.push(number);
 					}
 				});
@@ -4577,35 +4684,45 @@ define(function(require) {
 			});
 		},
 
+		usersIsSmartConference: function(name) {
+			var self = this;
+
+			return _.includes(name, self.appFlags.users.smartPBXConferenceString);
+		},
+
 		usersGetConferenceFeature: function(userId, globalCallback) {
-			var self = this,
-				dataResponse = {
-					conference: {},
-					listConfNumbers: []
-				};
+			var self = this;
 
 			monster.parallel({
-				confNumbers: function(callback) {
+				listConfNumbers: function(callback) {
 					self.usersListConfNumbers(function(numbers) {
 						callback && callback(null, numbers);
 					});
 				},
-				listConferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						if (conferences.length > 0) {
-							self.usersGetConference(conferences[0].id, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							callback && callback(null, {});
+				conference: function(callback) {
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							var conferenceId = _
+								.chain(conferences)
+								.find(_.flow(
+									_.partial(_.get, _, 'name'),
+									_.bind(self.usersIsSmartConference, self)
+								))
+								.get('id')
+								.value();
+
+							if (!_.isString(conferenceId)) {
+								return next(null, {});
+							}
+							self.usersGetConference(conferenceId, _.partial(next, null));
 						}
-					});
+					], callback);
 				}
 			}, function(err, results) {
-				dataResponse.conference = results.listConferences;
-				dataResponse.listConfNumbers = results.confNumbers;
-
-				globalCallback && globalCallback(dataResponse);
+				globalCallback && globalCallback(results);
 			});
 		},
 
@@ -4795,7 +4912,7 @@ define(function(require) {
 					}, function(devices) {
 						callback(null, devices);
 					});
-				}
+				},
 			}, function(err, results) {
 				callback && callback(results);
 			});
@@ -5085,33 +5202,47 @@ define(function(require) {
 			monster.parallel({
 				conference: function(callback) {
 					var baseConference = {
-						name: monster.util.getUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
-						owner_id: data.user.id,
-						play_name_on_join: true,
-						member: {
-							join_muted: false
+							name: monster.util.getUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
+							owner_id: data.user.id,
+							play_name_on_join: true,
+							member: {
+								join_muted: false
+							},
+							conference_numbers: []
 						},
-						conference_numbers: []
-					};
+						formData = monster.ui.getFormData('conferencing_form');
 
 					monster.util.dataFlags.add({ source: 'smartpbx' }, baseConference);
 
-					baseConference = $.extend(true, {}, baseConference, data.conference);
+					if (formData.video) {
+						formData = _.merge(formData, {
+							video: true,
+							profile_name: 'video',
+							caller_controls: 'video-participant',
+							moderator_controls: 'video-moderator'
+						});
+					}
 
-					self.usersListConferences(data.user.id, function(conferences) {
-						var conferenceToSave = baseConference;
-						if (conferences.length > 0) {
-							conferenceToSave = $.extend(true, {}, conferences[0], baseConference);
+					baseConference = $.extend(true, {}, baseConference, formData);
 
-							self.usersUpdateConference(conferenceToSave, function(conference) {
-								callback && callback(null, conference);
-							});
-						} else {
-							self.usersCreateConference(conferenceToSave, function(conference) {
-								callback && callback(null, conference);
-							});
+					if (_.isEmpty(data.conference)) {
+						self.usersCreateConference(baseConference, function(conference) {
+							callback && callback(null, conference);
+						});
+					} else {
+						baseConference = $.extend(true, {}, data.conference, baseConference);
+
+						if (!formData.video) {
+							delete baseConference.video;
+							delete baseConference.profile_name;
+							delete baseConference.caller_controls;
+							delete baseConference.moderator_controls;
 						}
-					});
+
+						self.usersUpdateConference(baseConference, function(conference) {
+							callback && callback(null, conference);
+						});
+					}
 				},
 				user: function(callback) {
 					if (data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
@@ -5269,11 +5400,17 @@ define(function(require) {
 
 			monster.parallel({
 				conferences: function(callback) {
-					self.usersListConferences(userId, function(conferences) {
-						self.usersRemoveBulkConferences(conferences, true, function(results) {
-							callback && callback(null, results);
-						});
-					});
+					monster.waterfall([
+						function(next) {
+							self.usersListConferences(userId, _.partial(next, null));
+						},
+						function(conferences, next) {
+							self.usersRemoveBulkConferences(_.filter(conferences, _.flow(
+								_.partial(_.get, _, 'name'),
+								_.bind(self.usersIsSmartConference, self)
+							)), true, _.partial(next, null));
+						}
+					], callback);
 				},
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {

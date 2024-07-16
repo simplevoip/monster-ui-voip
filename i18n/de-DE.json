@@ -615,9 +615,6 @@
 			"headline": "Einstellungen zur Weiterleitung von Benutzeranrufen",
 			"keepCallerId": "Ursprüngliche Anrufer-ID speichern",
 			"label": "Alle Anrufe weiterleiten an" ,
-			"mobile": "Ein Mobiltelefon",
-			"deskphone": "Ein Festnetztelefon",
-			"number": "Diese Nummer",
 			"placeholder": "+49 123 4567890",
 			"requireKeyPress": "Sprachnachricht für weitergeleitete Rufnummern hinterlassen",
 			"title": "Anrufweiterleitung",
@@ -673,7 +670,9 @@
 		},
 		"faxing": {
 			"trialError": "Sie arbeiten derzeit mit einer Testversion der UI. Um auf die Faxfunktion zugreifen zu können, müssen Sie Ihren Account upgraden.",
-			"title": "Faxbox",
+			"titles": {
+				"faxbox": "Faxbox"
+			},
 			"headline": "Faxbox",
 			"defaultSettings": {
 				"nameExtension": "s Faxbox",
@@ -717,7 +716,9 @@
 			"headline": "Anrufbeantworter für Benutzer",
 			"text": "Für diesen Benutzer steht ein Anrufbeantworter zur Verfügung.",
 			"label": "Voicemail-zu-Email",
-			"title": "Anrufbeantworter",
+			"titles": {
+				"voicemailBox": "Anrufbeantworter"
+			},
 			"vmToEmailHelp": "Für jede neue Sprachnachricht wird eine E-Mail an {{variable}} gesendet. Wenn Sie den Empfänger dieser E-Mail-Benachrichtigungen ändern möchten, bearbeiten Sie bitte die E-Mail-Adresse des Benutzers im Abschnitt Benutzerverwaltung.",
 			"attachVoicemail": "Nachricht der E-Mail beifügen."
 		},

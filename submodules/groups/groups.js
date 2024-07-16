@@ -773,6 +773,9 @@ define(function(require) {
 							};
 						}
 
+						if (_.isEmpty(selectedMedia)) {
+							delete ringGroupNode.data.ringback;
+						}
 						self.groupsUpdateCallflow(data.baseCallflow, function() {
 							self.groupsUpdate(data.group, function(updatedGroup) {
 								popup.dialog('close').remove();
@@ -1854,7 +1857,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get('showGroupsWalkthrough');
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},

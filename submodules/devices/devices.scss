@@ -182,8 +182,9 @@
 	line-height: 55px;
 }
 
-#devices_container .devices-grid .grid-row .grid-cell.type .first-line > i {
-	font-size: 24px;
+#devices_container .devices-grid .grid-row .grid-cell.type .first-line > svg {
+	width: 24px;
+	height: 24px;
 }
 
 #devices_container .devices-grid .grid-row .grid-cell.type .second-line {
@@ -192,13 +193,13 @@
 	line-height: 20px;
 }
 
-#devices_container .devices-grid .grid-row .grid-cell.registered i {
+#devices_container .devices-grid .grid-row .grid-cell.registered svg {
 	color: #44CC44;
 }
-#devices_container .devices-grid .grid-row .grid-cell.unregistered i {
+#devices_container .devices-grid .grid-row .grid-cell.unregistered svg {
 	color: #EE1212;
 }
-#devices_container .devices-grid .grid-row .grid-cell.disabled i {
+#devices_container .devices-grid .grid-row .grid-cell.disabled svg {
 	color: #333333;
 }
 
@@ -225,6 +226,16 @@
 /* Adding / Edition Devices Popups */
 .voip-edit-device-popup .edit-device {
 	width: 700px;
+}
+
+.voip-edit-device-popup .edit-device .btn-group-controls {
+	font-size: 1rem;
+	margin-left: 8px;
+}
+
+.voip-edit-device-popup .edit-device .ignore-completed-elsewhere-group .control-label{
+	width: 200px;
+	margin-left: 22px;
 }
 
 .voip-edit-device-popup .edit-device .actions {
@@ -273,6 +284,12 @@
 
 .voip-edit-device-popup .edit-device .title-bar .device-title .device-icon > i {
 	font-size: 48px;
+	vertical-align: middle;
+}
+
+.voip-edit-device-popup .edit-device .title-bar .device-title .device-icon > svg {
+	height: 48px;
+	width: 48px;
 	vertical-align: middle;
 }
 

@@ -194,63 +194,6 @@ define(function(require) {
 			}
 		},
 
-		myOfficeCreateMainVMBoxIfMissing: function(callback) {
-			var self = this;
-
-			self.myOfficeHasMainVMBox(
-				function(vmbox) {
-					callback(vmbox);
-				},
-				function() {
-					self.myOfficeCreateMainVMBox(function(vmbox) {
-						callback(vmbox);
-					});
-				}
-			);
-		},
-
-		myOfficeCreateMainVMBox: function(callback) {
-			var self = this,
-				vmboxData = {
-					mailbox: '0',
-					type: 'mainVMBox',
-					name: self.i18n.active().myOffice.mainVMBoxName,
-					delete_after_notify: true
-				};
-
-			self.callApi({
-				resource: 'voicemail.create',
-				data: {
-					accountId: self.accountId,
-					data: vmboxData
-				},
-				success: function(vmbox) {
-					callback && callback(vmbox.data);
-				}
-			});
-		},
-
-		myOfficeHasMainVMBox: function(hasVMBoxCallback, noVMBoxCallback) {
-			var self = this;
-
-			self.callApi({
-				resource: 'voicemail.list',
-				data: {
-					accountId: self.accountId,
-					filters: {
-						filter_type: 'mainVMBox'
-					}
-				},
-				success: function(vmboxes) {
-					if (vmboxes.data.length > 0) {
-						hasVMBoxCallback && hasVMBoxCallback(vmboxes[0]);
-					} else {
-						noVMBoxCallback && noVMBoxCallback();
-					}
-				}
-			});
-		},
-
 		myOfficeLoadData: function(callback) {
 			var self = this;
 
@@ -266,11 +209,7 @@ define(function(require) {
 						}
 					});
 				},
-				mainVoicemailBox: function(parallelCallback) {
-					self.myOfficeCreateMainVMBoxIfMissing(function(vmbox) {
-						parallelCallback(null, vmbox);
-					});
-				},
+				mainVoicemailBox: _.bind(self.getOrCreateMainVMBox, self),
 				users: function(parallelCallback) {
 					self.callApi({
 						resource: 'user.list',
@@ -433,7 +372,8 @@ define(function(require) {
 					'landline',
 					'fax',
 					'ata',
-					'application'
+					'application',
+					'teammate'
 				],
 				userCountByServicePlanRole = _
 					.chain(data.users)
@@ -1149,7 +1089,7 @@ define(function(require) {
 			var self = this,
 				flag = self.uiFlags.user.get('showDashboardWalkthrough');
 
-			if (flag !== false) {
+			if (flag !== false && self.appFlags.disableFirstUseWalkthrough !== true) {
 				callback && callback();
 			}
 		},
@@ -1206,6 +1146,8 @@ define(function(require) {
 					phoneNumber: number
 				},
 				success: function(data, status) {
+					data.data['metadata'] = _.get(data, 'metadata', {});
+
 					success && success(data.data);
 				},
 				error: function(data, status) {
@@ -1217,6 +1159,7 @@ define(function(require) {
 		myOfficeUpdateNumber: function(numberData, success, error) {
 			var self = this;
 
+			delete numberData.metadata;
 			self.callApi({
 				resource: 'numbers.update',
 				data: {

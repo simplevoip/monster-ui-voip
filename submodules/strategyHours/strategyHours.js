@@ -2,6 +2,7 @@ define(function(require) {
 	var monster = require('monster'),
 		_ = require('lodash'),
 		$ = require('jquery'),
+		moment = require('moment'),
 		Papa = require('papaparse'),
 		timezone = require('monster-timezone');
 
@@ -170,10 +171,9 @@ define(function(require) {
 					_.toLower
 				),
 				parseTime = function(time) {
-					return time <= 24 ? time * meta.unit : time;
+					return moment.duration(time).asSeconds();
 				},
 				sanitizeTime = _.flow(
-					_.toNumber,
 					parseTime,
 					_.floor
 				),
@@ -197,9 +197,12 @@ define(function(require) {
 				event.preventDefault();
 
 				monster.pub('voip.strategy.addOfficeHours', {
-					existing: self.strategyHoursGetDaysIntervalsFromTemplate(parent),
-					callback: function(err, existing) {
-						self.strategyHoursListingRender(parent, existing);
+					callback: function(err, selected) {
+						var existing = self.strategyHoursGetDaysIntervalsFromTemplate(parent),
+							merged = _.zipWith(existing, selected, _.concat),
+							normalized = self.strategyHoursNormalizeDaysIntervals(merged);
+
+						self.strategyHoursListingRender(parent, normalized);
 					}
 				});
 			});
