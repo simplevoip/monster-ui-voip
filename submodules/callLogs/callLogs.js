@@ -340,6 +340,37 @@ define(function(require) {
 				self.callLogsShowDetailsPopup(cdrId);
 			});
 
+			template.on('click', '.grid-cell.actions .play-cdr-recording', function(e) {
+				e.stopPropagation();
+				var $this = $(this),
+					callId = $(this).data('callid'),
+					gridRow = $this.parents('.grid-row-group'),
+					recordingRow = gridRow.find('.recording-row');
+
+				if (gridRow.hasClass('playing')) {
+					gridRow.removeClass('playing');
+					recordingRow.slideUp();
+				} else {
+					template.find('.grid-row-group').removeClass('playing');
+					template.find('.recording-row').slideUp();
+
+					gridRow.addClass('playing');
+					recordingRow.slideDown();
+
+					if (!recordingRow.hasClass('data-loaded')) {
+						var base_url = monster.config.api.sv_ajax,
+							url = `${base_url}recording/${self.accountId}/${callId}`;
+
+						gridRow.find('.recording-row')
+							.empty()
+							.addClass('data-loaded')
+							.append(
+								`<audio controls autoplay><source src='${url}' type='audio/mpeg'></audio>`
+							);
+					}
+				}
+			});
+
 			template.on('click', '.grid-cell.report a', function(e) {
 				e.stopPropagation();
 			});
@@ -522,6 +553,7 @@ define(function(require) {
 						toName: cdr.callee_id_name,
 						toNumber: toNumber,
 						duration: durationMin + ':' + durationSec,
+						hasRecording: _.get(cdr, 'media_recordings') ? _.get(cdr, 'media_recordings').length : false,
 						hangupCause: _
 							.chain(hangupI18n)
 							.get([cdr.hangup_cause, 'label'], cdr.hangup_cause)

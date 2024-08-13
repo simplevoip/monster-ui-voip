@@ -874,7 +874,7 @@ define(function(require) {
 							}
 						};
 
-					monster.pub('common.numberFeaturesMenu.render', args);
+					monster.pub('voip.numberFeaturesMenu.render', args);
 				});
 
 				monster.ui.tooltips(template);
@@ -1222,7 +1222,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('common.numbers.dialogSpare', args);
+				monster.pub('voip.numbers.dialogSpare', args);
 			});
 
 			container.on('click', '.action-links .buy-link', function(e) {
@@ -1272,8 +1272,8 @@ define(function(require) {
 									function(callback) {
 										strategyData.callflows.MainCallflow.numbers.splice(indexToRemove, 1);
 
-										// We don't want the '0' to stay in the routing system if they're no longer using SmartPBX.
-										// If they remove their last main number, we consider they don't use SmartPBX, so we reset the "0" to be the "undefinedMainNumber"
+										// We don't want the '0' to stay in the routing system if they're no longer using SimplePBX.
+										// If they remove their last main number, we consider they don't use SimplePBX, so we reset the "0" to be the "undefinedMainNumber"
 										if (strategyData.callflows.MainCallflow.numbers.length === 1 && strategyData.callflows.MainCallflow.numbers[0] === '0') {
 											strategyData.callflows.MainCallflow.numbers[0] = 'undefinedMainNumber';
 										}
@@ -1418,7 +1418,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('common.numbers.dialogSpare', args);
+				monster.pub('voip.numbers.dialogSpare', args);
 			});
 
 			container.on('click', '.action-links .greeting-link', _.bind(self.strategyConfGreetingRender, self, strategyData));
@@ -1673,7 +1673,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('common.numbers.dialogSpare', args);
+				monster.pub('voip.numbers.dialogSpare', args);
 			});
 
 			container.on('click', '.action-links .edit-email', function(e) {
@@ -2188,31 +2188,31 @@ define(function(require) {
 											},
 											submodule: 'strategy'
 										})));
-									} else {
-										var $disabled_template = $(self.getTemplate({ // NOTE: temporary fix; creates a disabled menu line item and hides the delete button
-												name: 'menuLine',
-												data: {
-													number: key,
-													callEntities: [{
-														groupName: "unknown",
-														groupType: "directory",
-														groupIcon: "fa fa-book",
-														entities: [{
-															id: "-1",
-															name: val.module.toUpperCase(),
-															module: val.module
-														}]
+								} else {
+									var $disabled_template = $(self.getTemplate({ // NOTE: temporary fix; creates a disabled menu line item and hides the delete button
+											name: 'menuLine',
+											data: {
+												number: key,
+												callEntities: [{
+													groupName: "unknown",
+													groupType: "directory",
+													groupIcon: "fa fa-book",
+													entities: [{
+														id: "-1",
+														name: val.module.toUpperCase(),
+														module: val.module
 													}]
-												},
-												submodule: 'strategy'
-											}));
-											$disabled_template.find('select').prop('disabled', true);
-											$disabled_template.find('.remove-btn').addClass('hidden');
-											
-											$('<div class="text-error">This call flow cannot be modified within SmartPBX, and must be edited within the Callflows app.</div>').insertBefore('#strategy_menu_popup .action-block .save-button');
-											$('#strategy_menu_popup .save-button').prop('disabled', true);
-										menuLineContainer
-											.append($disabled_template);
+												}]
+											},
+											submodule: 'strategy'
+										}));
+										$disabled_template.find('select').prop('disabled', true);
+										$disabled_template.find('.remove-btn').addClass('hidden');
+										
+										$('<div class="text-error">This call flow cannot be modified within SimplePBX, and must be edited within the Callflows app.</div>').insertBefore('#strategy_menu_popup .action-block .save-button');
+										$('#strategy_menu_popup .save-button').prop('disabled', true);
+									menuLineContainer
+										.append($disabled_template);
 								}
 							});
 

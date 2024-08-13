@@ -461,7 +461,7 @@ define(function(require) {
 						required: true
 					},
 					'mac_address': {
-						required: true,
+						required: false,
 						mac: true
 					},
 					'mobile.mdn': {
@@ -1221,6 +1221,9 @@ define(function(require) {
 				},
 				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice;
+				registeredDevices = _.filter(data.status, (device) => device.registered);
+				registeredDevicesById = _.map(registeredDevices, 'device_id'),
+				filteredAddableDeviceTypes = monster.util.isSuperDuper() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
 
 			return {
 				countDevices: _.size(data.devices),
@@ -1289,7 +1292,7 @@ define(function(require) {
 						}
 					})
 					.value(),
-				deviceTypesToAdd: _.map(self.appFlags.devices.addableDeviceTypes, function(type) {
+				deviceTypesToAdd: _.map(filteredAddableDeviceTypes, function(type) {
 					return {
 						type: type,
 						icon: _.get(self.appFlags.devices.iconClassesByDeviceTypes, type)

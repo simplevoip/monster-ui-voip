@@ -126,7 +126,7 @@ define(function(require) {
 			return {
 				groups: _
 					.chain(mapGroups)
-					// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
+					// Only list groups created with SimplePBX (e.g. with an associated baseGroup callflow)
 					.reject(function(group) {
 						return !_.has(group, 'extra.baseCallflowId');
 					})
@@ -479,7 +479,7 @@ define(function(require) {
 								}
 							};
 
-						monster.pub('common.numberFeaturesMenu.render', argsFeatures);
+						monster.pub('voip.numberFeaturesMenu.render', argsFeatures);
 					});
 
 					self.groupsBindNumbers(template, data);
@@ -1260,7 +1260,7 @@ define(function(require) {
 									}
 								};
 
-							monster.pub('common.numberFeaturesMenu.render', args);
+							monster.pub('voip.numberFeaturesMenu.render', args);
 
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
@@ -1273,7 +1273,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('common.numbers.dialogSpare', args);
+				monster.pub('voip.numbers.dialogSpare', args);
 			});
 
 			template.on('click', '.actions .buy-link', function(e) {
@@ -1301,7 +1301,7 @@ define(function(require) {
 										}
 									};
 
-								monster.pub('common.numberFeaturesMenu.render', argsFeatures);
+								monster.pub('voip.numberFeaturesMenu.render', argsFeatures);
 
 								monster.ui.tooltips(rowTemplate);
 

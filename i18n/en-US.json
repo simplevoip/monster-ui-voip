@@ -1,7 +1,227 @@
 {
-	"callerId": "Caller-ID",
-	"e911": "E911",
 	"failover": "Failover",
+
+	"numbers": {
+		"mainNumber": "Office Number",
+		"conferenceNumber": "Main Conference Number",
+		"dialogSpare": {
+			"title": "List of Spare Numbers",
+			"headline": "Spare Numbers of",
+			"headlineNoAccount": "Select numbers",
+			"noMatchingNumbers": "No numbers matched your search.",
+			"noNumberSelected": "You didn't select any number. You need to select at least one number by clicking on a number in the list.",
+			"proceed": "Add selected numbers"
+		},
+		"bulkActions": "Bulk Actions",
+		"buy": "Buy",
+		"buyNumberLinks" : {
+			"regular": "Local",
+			"tollfree": "Toll-free",
+			"vanity": "Vanity"
+		},
+		"port": "Port",
+		"assignTo": "Assign To",
+		"confirmDelete": "Are you sure you want to delete the selected numbers from your account?",
+		"delete": "Delete",
+		"deleteE911Error": {
+			"message": "The following numbers can not be delete as they are the only numbers with e911 set up for their respective accounts. You need at least one number with e911 set up on an account.",
+			"account": "Account:",
+			"numbers": "Numbers:"
+		},
+		"numbers": "Numbers",
+		"addNumbers": "Add Numbers",
+		"moveNumbers": "Move To",
+		"searchNumbers": "Search a number...",
+		"go": "Go",
+		"verify": "Verify",
+		"verified": "Verified",
+		"forceVerify": "Force Verify",
+		"deleteNumbers": "Delete",
+		"successDelete": "You successfully deleted {{count}} phone number(s) from your account(s)",
+		"successMove": "You successfully moved {{count}} phone number(s) to the following account: {{ accountName }}",
+		"noSpareNumber": "There are no spare numbers in this account.",
+		"noExternalNumber": "There are no caller ID numbers in this account.",
+		"noUsedNumber": "There are no numbers used in any application for this account.",
+		"spareNumbers": "Spare Numbers",
+		"externalNumbers": "Caller ID Numbers",
+		"usedNumbers": "Numbers in use",
+		"helpSpareNumbers": "This shows the list of numbers not used anywhere in this account. You can assign those numbers to your sub-accounts or delete these numbers from your account.",
+		"helpUsedNumbers": "This list displays where your numbers are used. You can also see the list of numbers used by your sub-accounts.",
+		"helpExternalNumbers": "In order to use a number outside of this PBX for caller ID, it must first be added as a verified number.",
+		"callflow": "Simple PBX",
+		"trunkstore": "Trunking",
+		"notUsedNumber": "{{number}}: This number is not used but belongs to {{accountName}}. (Switch to Spare Numbers view to see this number)",
+		"notSpareNumber": "{{number}}: This number is not a spare number but is used by {{accountName}}. (Switch to the Numbers in Use view to see this number)",
+		"numberNotFound": "The number you searched was not found! Make sure to enter the full number as we don't allow partial searches (but the formatting doesn't matter).",
+		"dialogConfirm": {
+			"from": "From ",
+			"cancel": "Cancel",
+			"delete": {
+				"title": "Delete Numbers - Confirmation",
+				"questionPartOne": "Are you sure you want to delete ",
+				"questionPartTwo": " number(s)?",
+				"button": "Delete number(s)"
+			},
+			"move": {
+				"title": "Move Numbers - Confirmation",
+				"questionPartOne": "Are you sure you want to move ",
+				"questionPartTwo": " number(s) to ",
+				"questionPartThree": "?",
+				"button": "move number(s)"
+			}
+		},
+		"dialogAlertNowAllowed": {
+			"info": "The number you searched for exists, but you are not allowed to manage it"
+		},
+		"__comment": "UI-1219: Adding the prepend feature to numbers",
+		"__version": "v3.20_s1",
+		"prependIconHelp": "This icon means that this number will show up with a custom prepended text on your phone",
+
+		"__comment": "UI-1285: Adding the Sync Action to the Number Manager",
+		"__version": "3.19",
+		"sync": {
+			"label": "Sync",
+			"success": "You successfully re-synced the numbers with the database",
+			"help": "If you think some of the numbers are not displayed in the right category (Spare/In Use), you can use this feature to re-synchronize your numbers with the database."
+		},
+
+		"__comment": "UI-901: Delete recap popup",
+		"__version": "3.20",
+		"deleteRecapDialog": {
+			"headline": "Find below the summary of which numbers have been successfully deleted and the ones which haven't. Click on Continue to go back to the Numbers inventory.",
+			"title": "Recap of the Delete operation",
+			"continue": "Continue"
+		},
+
+		"__comment": "UI-1888: List MDNs in Numbers Manager without the ability to configure features (e911, cnam, prepend)",
+		"__version": "3.22",
+		"mobile": "Mobile Manager",
+		"mobileIconHelp": "This number is linked to a Mobile device and therefore, the only way to move it around, is by managing the corresponding device",
+
+		"__comment": "UI-1285: Adding the Add External Action to the Number Manager",
+		"__version": "3.22",
+		"addExternal": {
+			"label": "Add",
+			"help": "Add numbers to the selected account (You have access to this option because you're logged in with an account that has the wnm_allow_additions flag set to true).",
+			"dialog": {
+				"title": "Add your phone numbers to the platform",
+				"fieldText": "Input numbers to be imported",
+				"beginImport": "Begin Import",
+				"help1": "Format Example: +14157775555 (+[country code][phone number])",
+				"help2": "** If importing multiple numbers, each number must be separated by a space.",
+				"invalidNumbers": "We couldn't find any valid phone number to add to the system in the list of numbers you submitted.",
+				"forceActivate": {
+					"text": "Add and assign to account",
+					"help": "Unchecking this will only add the numbers to the numbers pool, so they can be purchased via the Number Search tool. Checking the box will add the numbers and purchase them immediately."
+				}
+			},
+			"__comment": "UI-2651: adding carrier selection to add numbers",
+			"__version": "4.1",
+			"renameCarrier": {
+				"label": "Carrier Module",
+				"customCarrierName": "Custom Carrier Module Name"
+			},
+
+			"__comment": "UI-2448: Delete recap popup",
+			"__version": "4.1",
+			"successAdd": "You successfully added phone numbers to the system!",
+			"resultsDialog": {
+				"headline": "Some of the numbers could not be added to the system. Here is the recap of which numbers were successfully added and those that weren't.",
+				"title": "Recap of the Add Number operation",
+				"continue": "Continue"
+			},
+
+			"__comment": "UI-2715: adding states to add external numbers dialog",
+			"__version": "4.1",
+			"numberState": {
+				"label": "State",
+				"default": "Default",
+				"defaultHelp": "By letting this option to default, it will create numbers with the default state used by the back-end."
+			}
+		},
+
+		"__comment": "UI-1935: Properly display a description next to a used number",
+		"__version": "3.22",
+		"unassigned": "Unassigned",
+		"callflows": "Callflows",
+
+		"__comment": "UI-: Added help for port icon",
+		"__version": "3.22",
+		"portFeatureIconHelp": "This icon means that the number is being ported to the system.",
+		"portIconHelp": "This number is in the process of being ported and will be deleted if the port fails. It only appears for setting up purposes and is not configured to handle calls",
+		"failoverIconHelp": "This icon means that you set up a failover number for this phone number",
+		"cnamOutboundIconHelp": "This icon means that you set up the Outbound Caller-ID for this phone number",
+		"cnamInboundIconHelp": "This icon means that you set up the Inbound Caller-ID for this phone number",
+		"e911IconHelp": "This icon means that you set up e911 for this phone number",
+		"localIconHelp": "This icon means that this number is a local number",
+		"notInService": "This number ({{variable}}) has not been fully activated and is not in service. You need to wait for this number to be in service to set features on it.",
+		"errorFetchingNumber": "We were unable to get information for this number ({{variable}}). Please try again later!",
+
+		"__comment": "UI-2346: add bulk api to add numbers",
+		"__version": "4.0",
+		"noRightsAddNumber": "You do not have the rights to add numbers to this account.",
+
+		"__comment": "OOB: Add title of Move Numbers popup to I18n",
+		"__version": "4.0",
+		"moveNumbersConfirmationTitle": "Move Numbers - Confirmation",
+
+		"__comment": "OOB: when group no longer exist but it's still assigned to a callflow, we need to show unknown group",
+		"__version": "4.0",
+		"unknownGroup": "Deleted Group",
+
+		"__comment": "UI-2651: Let users select carrier module when adding bulk numbers. Moving carrier modules into its own function so it can be reused by various components",
+		"__version": "4.1",
+		"numbersCarrierModule": {
+			"custom": "Custom"
+		}
+	},
+
+	"callerId": {
+		"callerIdName": "Caller ID Name",
+		"callerIdPlaceholder": "John Doe",
+		"dialogTitle": "Caller ID Name Selection",
+		"errorUpdate": "Failed to update the Caller ID for this phone number",
+		"help": {
+			"outbound": "This name will appear as your Caller ID when you make outbound calls (15 char. maximum). This request may take up to 72 hours to process.",
+			"inbound": "If you turn on this feature, the Caller's Name will appear in your Caller ID when you receive incoming calls."
+		},
+		"label": "Caller-ID",
+		"successCnam": "You successfully updated the Caller-ID of {{phoneNumber}}",
+		"successRemoveCnam": "You successfully removed the Caller-ID of {{phoneNumber}}",
+		"noCallerId": "There is no Caller-ID for the phone number {{phoneNumber}}",
+		"inboundTitle": "Inbound Caller ID Name",
+		"outboundTitle": "Outbound Caller ID Name"
+	},
+
+	"e911": {
+		"email": {
+			"label": "Email Address(es)",
+			"placeholder": "Space separated"
+		},
+		"addressLine1": "Address Line 1",
+		"addressLine2": "Address Line 2",
+		"city": "City",
+		"dialogTitle": "Edit 911 Location",
+		"gmapPinLabel": "Your+E911+Location",
+		"infoBox": "This information will show up to 911 emergency services when you dial it from your number.",
+		"label": "e911",
+		"lastE911Error": "You must have e911 set up on at least one number in your account. Please set it up on another number before removing it from this one.",
+		"postalCode": "Zip Code",
+		"rotatedText": "For emergency services",
+		"state": "State",
+		"successE911": "You successfully updated the e911 information of <br> {{phoneNumber}}",
+		"title": "E911 Information",
+		"verifyLocation": "Verify Location",
+		"__comment": "UI-1355: Add USPS format to addresses",
+		"__version": "v3.20_s4",
+		"invalidAddress": "Unfortunately, the address you specified wasn't found. Please double-check it and try again.",
+		"chooseAddressPopup": {
+			"title": "Choose correct address",
+			"youEntered": "You entered:",
+			"choicesAvailable": "Choices available:",
+			"content": "Several addresses matched the information you provided. Perhaps you didn't enter a street number or the building has multiple units."
+		}
+	},
 
 	"menuTitles": {
 		"myOffice": "Dashboard",
@@ -250,14 +470,14 @@
 					"label": "Notify when unregistered",
 					"help": "Do you want to notify the administrator each time this device unregisters?"
 				},
-				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
+				"__comment": "UI-1917: Add button to unlock device on SimplePBX app",
 				"__version": "3.22",
 				"unlock": {
 					"label": "Allow Reprovision",
 					"button": "Unlock",
 					"success": "This device is unlocked for the next 24 hours"
 				},
-				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
+				"__comment": "UI-1917: Add button to unlock device on SimplePBX app",
 				"__version": "3.22",
 				"mediaWebrtc": {
 					"help": "If checked, forces a WebRTC compatible SDP on the INVITE.",
@@ -294,7 +514,7 @@
 					"H261": "H261"
 				}
 			},
-			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
+			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SimplePBX",
 			"__version": "v3.20_s4",
 			"keys": {
 				"alert": {
@@ -605,7 +825,7 @@
 			"instructionsSent": "An e-mail has been sent to {{ email }} with all the user Instructions on how to get started with the UI!",
 			"numbersUpdated": "You successfully updated the phone numbers of {{ name }}.",
 			"passwordReseted": "The password has been reset, an e-mail has been sent to {{ email }} with instructions on how to create a new password.",
-			"userDelete": "You successfully deleted {{ name }} from the Smart PBX!",
+			"userDelete": "You successfully deleted {{ name }} from the Simple PBX!",
 			"userUpdated": "You successfully updated {{ name }} settings.",
 			"pinUpdated": "You successfully updated the PIN of {{ name }}.",
 			"__comment": "UI-1033: Now properly remove the Caller-ID Feature if we remove a number that was set as that Caller-ID Number",
@@ -670,7 +890,7 @@
 			"pinLabel": "Personal Conference Room number",
 			"number": "Conferencing Phone Number(s)",
 			"help": "You can create a conference call by providing a conferencing phone number and your personal room number to the participants",
-			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges",
+			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SimplePBX) in order to enable the Personnals Conference Bridges",
 			"enableVideoConferencing": "Enable Video Conferencing"
 		},
 		"do_not_disturb": {
@@ -701,6 +921,7 @@
 				"text2": " with a PDF (or TIFF) attachment will fax the attachment to ",
 				"text3": "The email must come from ",
 				"default": "{ destination number }",
+				"domain": "svefax.com",
 				"help": {
 					"showHelp": "Show help",
 					"hideHelp": "Hide help",
@@ -771,10 +992,42 @@
 			"headline": "User Hot-Desking Settings",
 			"help": "The Hot-Desking ID is automatically set as the user's extensions number."
 		},
+		"sms": {
+			"title": "SMS",
+			"headline": "User SMS Settings",
+			"didLabel": "Add Service to Number",
+			"emailLabel": "Notify Email",
+			"receiveURLLabel": "Receive URL",
+			"sendURLLabel": "Send URL",
+			"sameAsReceivedURLLabel": "Send URL same as Received URL",
+			"webhookLabel": "Notify URL",
+			"webhookHelpLabel": "The URL options are for advanced users and will deliver incoming and outgoing SMS messages to a webhook.",
+			"appLabel": "Deliver to Softphone"
+		},
+		"mobile_app": {
+			"title": "SV Mobile App",
+			"headline": "SimpleVoIP App Credentials for",
+			"mobileLabel": "iOS or Android App",
+			"desktopLabel": "Desktop App",
+			"usernameLabel": "Username",
+			"passwordLabel": "Password",
+			"sendEmailLabel": "Send Email",
+			"sendEmailHelpLabel": "Send credential reminder email to",
+			"provisionHelpLabel": "In order to use the SimpleVoIP apps, you must have a softphone device.",
+			"provisionLabel": "Add Softphone Device",
+			"provisionHeadline": "Setup Softphone for",
+			"createADevice": "We didn't find any Softphone associated with your user, would you like to create one now?",
+			"deviceName": "Mobile App",
+			"createDeviceError": "Unable to create softphone device.",
+			"noNumberError": "Mobile app requires either a phone number or extension.",
+			"qrCodeHelp": "Once the app is downloaded, scan the QR code to log in.",
+			"wikiMobileHelp": "Click here for more detailed instructions for our Mobile apps",
+			"wikiDesktopHelp": "Click here for instructions for our Desktop app"
+		},
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {
-			"confirmMigration": "We found an existing callflow with the number you're trying to add, it appears we can migrate this callflow to the SmartPBX. Before we proceed, we want to make sure you understand that you won't be allowed to update this Callflow in Kazoo-UI or in the Monster-UI Callflows app after this change. Do you want to continue?",
+			"confirmMigration": "We found an existing callflow with the number you're trying to add, it appears we can migrate this callflow to the SimplePBX. Before we proceed, we want to make sure you understand that you won't be allowed to update this Callflow in Kazoo-UI or in the Monster-UI Callflows app after this change. Do you want to continue?",
 			"tooManyCallflows": "It appears the numbers you're trying to add belong to multiple Kazoo-UI Callflows. There is no way to properly migrate these callflows in Monster-UI please contact your support to fix it."
 		},
 		"__commment": "UI-1109: Adding popup for Presence ID change",
@@ -1120,7 +1373,7 @@
 		"walkthrough": {
 			"first": {
 				"steps": {
-					"1": "Setup your main company number within SmartPBX by purchasing or porting a number. This is different than User Phone Numbers because it represents the main phone number for the entire company."
+					"1": "Setup your main company number within SimplePBX by purchasing or porting a number. This is different than User Phone Numbers because it represents the main phone number for the entire company."
 				}
 			},
 			"second": {
@@ -1243,7 +1496,8 @@
 		"loading": "Loading additional information...",
 		"actions": {
 			"report": "Copy details",
-			"details": "Technical Details"
+			"details": "Technical Details",
+			"playRecording": "Play Recording"
 		},
 		"diagnosticCallData": {
 			"accountId": "Account ID: {{variable}}",
@@ -1271,7 +1525,8 @@
 			"callerID": "Caller ID",
 			"musicOnHold": "Hold Music",
 			"callRecording": "Recording",
-			"hours": "Hours"
+			"hours": "Hours",
+			"curbside": "Curbside"
 		},
 		"musicOnHold": {
 			"title": "Music-On-Hold",
@@ -1289,9 +1544,9 @@
 			"title": "Company Caller ID",
 			"headline": "Select a Caller ID Number for the Account",
 			"numberLabel": "Company Caller ID number",
-			"numberHelp": "This number will appear as your Caller ID when you make outbound calls. Needs to be shorter than 15 characters (including spaces).",
+			"numberHelp": "This number will appear as your Caller ID when you make outbound calls.",
 			"nameLabel": "Company Caller ID name",
-			"nameHelp": "This name will appear as your Caller ID when you make outbound calls.",
+			"nameHelp": "This name will appear as your Caller ID when you make outbound calls. Needs to be shorter than 15 characters (including spaces).",
 			"emergencyLabel": "Company Emergency (E911) Information",
 			"emergencyZipcode": "Zip Code",
 			"emergencyAddress1": "Address Line 1",
@@ -1302,10 +1557,33 @@
 			"emergencyEmailError": "Invalid space separated address(es)",
 			"emergencyHelp1": "This information will appear as your Caller ID information when you make outbound emergency call to a government agency (e.g. 911 in the US).",
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
-			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number."
+			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number.",
+			"invalidCNAMAlert": "Caller ID Name must be no more than 15 characters and can only include letters, numbers, and spaces."
+		},
+		"curbside": {
+			"title": "Curbside",
+			"numberLabel": "Phone Number",
+			"autoResponseLabel": "Auto-Response",
+			"autoResponseHelp": "This response will be sent automatically upon receipt of an SMS from the customer.",
+			"enabledLabel": "Enable Curbside",
+			"enabled": "Enabled",
+			"disabled": "Disabled",
+			"replies": {
+				"sectionTitle": "Replies",
+				"helpLabel": "These replies will available for you to respond to the customer.",
+				"createLabel": "Add new reply"
+			},
+			"urlSectionTitle": "Curbside URL",
+			"urlHelpLabel": "Use this URL to manage curbside requests and responses.",
+			"url": "https://curbside.simplevoip.us",
+			"securitySectionTitle": "Security",
+			"securityHelpLabel": "Only use these fields if newly enabling curbside, or if you need to update your password. Otherwise, leave them blank.",
+			"passwordLabel": "Password",
+			"passwordConfirmLabel": "Confirm Password"
 		},
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",
+		"missingMainNumberForCurbside": "You need to add a main number to your office before configuring Curbside!",
 		"missingMainNumberMessage": "Please add a Main Number to your account.",
 		"totalUsers": "Total Users",
 		"totalDevices": "Total Devices",
@@ -1326,7 +1604,7 @@
 			"international": "International Numbers",
 			"noNumber": "No number available"
 		},
-		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SimplePBX if they don't have one",
 		"__version": "3.19",
 		"mainVMBoxName": "Main Voicemail Box",
 		"__comment": "UI-1210: Display the Main Faxbox number on the dashboard",
@@ -1340,24 +1618,24 @@
 		"__version": "3.23",
 		"walkthrough": {
 			"steps": {
-				"1": "Welcome to SmartPBX, the easiest way to set up your office phone system! This is the main dashboard. From here you can see your users, devices, numbers all in one place!",
-				"2": "Setting up Users is a breeze in SmartPBX. Create and manage most of your services in the Users tab. Create new users, assign numbers, add devices, and manage User Features.",
+				"1": "Welcome to SimplePBX, the easiest way to set up your office phone system! This is the main dashboard. From here you can see your users, devices, numbers all in one place!",
+				"2": "Setting up Users is a breeze in SimplePBX. Create and manage most of your services in the Users tab. Create new users, assign numbers, add devices, and manage User Features.",
 				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
 				"4": "Main Number services are highly important for your business! Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays."
 			}
 		},
 		"__comment": "UI-1856: On the dashboard, hide cnam related actions when the feature is disabled on the account",
 		"__version": "3.23",
-		"missingCnamE911Message": "Please setup your Company Caller ID and e911 on a Main Number.",
+		"missingCnamE911Message": "Please setup your Company Caller ID and contact support to setup your e911 on a Main Number.",
 		"missingCnamMessage": "Please setup your Company Caller ID on a Main Number.",
-		"missingE911Message": "Please setup your e911 on a Main Number.",
+		"missingE911Message": "Please contact support to setup your e911 on a Main Number.",
 
 		"userChartLegend": {
 			"none": "No Role"
 		}
 	},
 
-	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SimplePBX.",
 	"featureCodes": {
 		"title": "Available Feature Codes",
 		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
@@ -1417,7 +1695,7 @@
 			},
 			"hotdesk[action=login]": {
 				"label": "Enable Hot Desking",
-				"tooltip": "(Dial *11 + Hotdesk ID) Hotdesk ID can be configured in SmartPBX under User. All calls will be sent to this device."
+				"tooltip": "(Dial *11 + Hotdesk ID) Hotdesk ID can be configured in SimplePBX under User. All calls will be sent to this device."
 			},
 			"hotdesk[action=logout]": {
 				"label": "Disable Hot Desking",

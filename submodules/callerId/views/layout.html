@@ -1,0 +1,26 @@
+<div class="trunkstore_popup cnam clearfix">
+	<form id="cnam">
+		<div class="popup-content">
+			<label class="popup-label" for="outbound_caller_id">{{ i18n.callerId.outboundTitle }}</label>
+			<input type="text" id="outbound_caller_id" name="display_name" value="{{display_name}}" placeholder="{{ i18n.callerId.callerIdPlaceholder }}"/>
+
+			{{#monsterText}}
+				{{i18n.callerId.help.outbound}}
+			{{/monsterText}}
+		</div>
+		<div class="popup-content">
+			<label class="popup-label" for="inbound_caller_id">{{ i18n.callerId.inboundTitle }}</label>
+			{{#monsterSwitch}}<input type="checkbox" id="inbound_caller_id" name="inbound_lookup"{{#if inbound_lookup}} checked="checked"{{/if}}>{{/monsterSwitch}}
+
+			{{#monsterText}}
+				{{i18n.callerId.help.inbound}}
+			{{/monsterText}}
+		</div>
+		<div class="popup-content popup-actions clearfix">
+			<div class="pull-right">
+				<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+				<button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+			</div>
+		</div>
+	</form>
+</div>

@@ -38,6 +38,8 @@ define(function(require) {
 			'#6F7C7D' // Grey
 		],
 
+		staticNonNumbers: ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
+
 		/* My Office */
 		myOfficeRender: function(args) {
 			var self = this,
@@ -301,7 +303,7 @@ define(function(require) {
 						},
 						success: function(data, status) {
 							var mainDirectory = _.find(data.data, function(val) {
-								return val.name === 'SmartPBX Directory';
+								return val.name === 'SimplePBX Directory';
 							});
 							if (mainDirectory) {
 								self.callApi({
@@ -356,7 +358,7 @@ define(function(require) {
 				}),
 				staticNumberStatuses = ['assigned', 'spare'],
 				showUserTypes = self.appFlags.global.showUserTypes,
-				staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
+				// staticNonNumbers = ['0', 'undefined', 'undefinedconf', 'undefinedfaxing', 'undefinedMainNumber'],
 				specialNumberMatchers = {
 					mainNumbers: { type: 'main', name: 'MainCallflow' },
 					confNumbers: { type: 'conference', name: 'MainConference' },
@@ -403,7 +405,7 @@ define(function(require) {
 							return _
 								.chain(callflow.numbers)
 								.reject(function(number) {
-									return _.includes(staticNonNumbers, number);
+									return _.includes(self.staticNonNumbers, number);
 								})
 								.map(function(number) {
 									return _.merge({
@@ -425,13 +427,11 @@ define(function(require) {
 						hasValidCallerId = shouldBypassCnam || isExternalNumberSet,
 						shouldBypassE911 = !monster.util.isNumberFeatureEnabled('e911'),
 						callerIdEmergencyNumber = _.get(account, 'caller_id.emergency.number'),
-						isEmergencyNumberSet = _
-							.chain(numbers)
-							.get([callerIdEmergencyNumber, 'features'])
-							.includes('e911')
-							.value(),
+						isEmergencyNumberSet = !!callerIdEmergencyNumber,
 						hasValidE911 = shouldBypassE911 || isEmergencyNumberSet,
-						messageKey;
+						messageKey,
+						category = 'myOffice',
+						subcategory = 'callerIdDialog';
 
 					if (!hasValidCallerId && !hasValidE911) {
 						messageKey = 'missingCnamE911Message';
@@ -439,16 +439,20 @@ define(function(require) {
 						messageKey = 'missingCnamMessage';
 					} else if (!hasValidE911) {
 						messageKey = 'missingE911Message';
+						category = 'strategy';
+						subcategory = 'main-number';
 					}
 					return !_.isEmpty(mainNumbers) && messageKey
 						? {
 							cssClass: 'btn-danger',
 							message: _.get(self.i18n.active().myOffice, messageKey),
-							category: 'myOffice',
-							subcategory: 'callerIdDialog'
+							category,
+							subcategory,
 						}
 						: undefined;
 				}(specialNumbers.mainNumbers, data.account, data.numbers));
+				registeredDevices = _.filter(data.devicesStatus, (device) => device.registered),
+				registeredDevicesById = _.map(registeredDevices, 'device_id');
 
 			return _.merge({
 				assignedNumbersData: _
@@ -537,7 +541,7 @@ define(function(require) {
 					.chain(data.devices)
 					.filter(function(device) {
 						var type = _.get(device, 'device_type'),
-							isDeviceRegistered = device.registrable ? device.registered : true,
+							isDeviceRegistered = _.includes(registeredDevicesById, device.id),
 							isDeviceTypeKnown = _.includes(knownDeviceTypes, type),
 							isDeviceDisabled = !_.get(device, 'enabled', false),
 							isDeviceOffline = isDeviceDisabled || !isDeviceRegistered;
@@ -618,7 +622,7 @@ define(function(require) {
 				});
 			});
 
-			if (monster.util.isNumberFeatureEnabled('cnam')) {
+			// if (monster.util.isNumberFeatureEnabled('cnam')) {
 				template.find('.header-link.caller-id:not(.disabled)').on('click', function(e) {
 					e.preventDefault();
 					self.myOfficeRenderCallerIdPopup({
@@ -626,10 +630,22 @@ define(function(require) {
 						myOfficeData: myOfficeData
 					});
 				});
-			}
+			// }
 
 			template.find('.header-link.caller-id.disabled').on('click', function(e) {
 				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
+			});
+
+			template.find('.header-link.curbside:not(.disabled)').on('click', function(e) {
+				e.preventDefault();
+				self.myOfficeRenderCurbsideEdit({
+					accountId: self.accountId,
+					myOfficeData: myOfficeData
+				});
+			});
+
+			template.find('.header-link.curbside.disabled').on('click', function(e) {
+				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCurbside);
 			});
 
 			monster.ui.tooltips(template);
@@ -806,14 +822,200 @@ define(function(require) {
 			});
 		},
 
+		myOfficeRenderCurbsideEdit: function(args) {
+			var self = this,
+				accountId = args.accountId,
+				myOfficeData = args.myOfficeData,
+				mainNumbers = myOfficeData.mainNumbers;
+
+			self.myOfficeGetCurbside(_.map(mainNumbers, 'number'), function(curbsideData) {
+				var filtered_mainNumbers = self.removeTollFreeNumbers(_.map(mainNumbers, 'number'));
+
+				curbsideData = _.merge({}, curbsideData, {
+					mainNumbers: filtered_mainNumbers
+				});
+
+				self.myOfficeRenderCurbsidePopup(curbsideData);
+			});
+		},
+
+		myOfficeRenderCurbsidePopup: function(curbsideData) {
+			var self = this,
+				popupTemplate = $(self.getTemplate({
+					name: 'curbsidePopup',
+					data: curbsideData,
+					submodule: 'myOffice'
+				})),
+				popup = monster.ui.dialog(popupTemplate, {
+					autoScroll: false,
+					title: self.i18n.active().myOffice.curbside.title,
+					position: ['center', 20]
+				});
+
+			self.myOfficeCurbsidePopupBindEvents({
+				popupTemplate: popupTemplate,
+				popup: popup,
+				data: curbsideData
+			});
+		},
+
+		myOfficeCurbsidePopupBindEvents: function(args) {
+			var self = this,
+				popupTemplate = args.popupTemplate,
+				popup = args.popup,
+				data = args.data,
+				curbsideForm = popupTemplate.find('#form_curbside'),
+				loadCurbsideSection = function() {
+					var $curbside = popupTemplate.find('.number-feature[data-feature="curbside"]'),
+						$enabled = popupTemplate.find('[name="curbside_enabled"]'),
+						action = $enabled.is(':checked') ? 'slideDown' : 'slideUp';
+
+					$curbside[action]();
+				};
+				// loadCurbsideSection();
+
+			monster.ui.validate(curbsideForm, {
+				rules: {
+					'did': {
+						required: true
+					},
+					'curbside_settings.curbside_password': {
+						maxlength: 70,
+						required: true
+					},
+					'curbside_settings.confirm_password': {
+						maxlength: 70,
+						equalTo: '#password',
+						required: true
+					}
+				}
+			});
+
+			if (data.curbside_enabled) {
+				$('[name="curbside_settings.curbside_password"]').rules('remove', 'required');
+				$('[name="curbside_settings.confirm_password"]').rules('remove', 'required');
+			}
+
+			popupTemplate.find('[name="curbside_enabled"]').on('click', function(evt) {
+				loadCurbsideSection();
+			});
+
+			popupTemplate.find('.cancel-link').on('click', function() {
+				popup.dialog('close').remove();
+			});
+
+			popupTemplate.find('.save').on('click', function() {
+				if (monster.ui.valid(curbsideForm)) {
+					var dataToSave = self.myOfficeCurbsideMergeData(data, popupTemplate);
+
+					if (dataToSave.curbside_settings.curbside_password.length === 0) {
+						delete dataToSave.curbside_settings.curbside_password;
+					}
+					delete dataToSave.curbside_settings.confirm_password;
+
+					self.myOfficeSaveCurbside(data, dataToSave, function(data) {
+						popup.dialog('close').remove();
+					});
+
+					$('[name="curbside_settings.curbside_password"]').rules('remove', 'required');
+					$('[name="curbside_settings.confirm_password"]').rules('remove', 'required');
+				}
+			});
+
+
+			// Replies stuff
+			var addEntity = function(event) {
+				event.preventDefault();
+
+				var inputName = popupTemplate.find('#entity_name'),
+					reply = inputName.val(),
+					templateFlag = $(self.getTemplate({
+						name: 'replyRow',
+						data: {
+							reply: reply
+						},
+						submodule: 'myOffice'
+					}));
+
+				popupTemplate.find('.saved-entities').prepend(templateFlag);
+
+				inputName
+					.val('')
+					.focus();
+			};
+
+			popupTemplate.find('.entity-wrapper.placeholder:not(.active)').on('click', function() {
+				$(this).addClass('active');
+				popupTemplate.find('#entity_name').focus();
+			});
+
+			popupTemplate.find('#cancel_entity').on('click', function(e) {
+				e.stopPropagation();
+
+				$(this).siblings('input').val('');
+
+				popupTemplate.find('.entity-wrapper.placeholder')
+						.removeClass('active');
+			});
+
+			popupTemplate.find('#add_entity').on('click', function(e) {
+				addEntity(e);
+			});
+
+			popupTemplate.find('#entity_name').on('keypress', function(e) {
+				var code = e.keyCode || e.which;
+
+				if (code === 13) {
+					addEntity(e);
+				}
+			});
+
+			popupTemplate.find('.saved-entities').on('click', '.delete-entity', function() {
+				$(this).parents('.entity-wrapper').remove();
+			});
+		},
+
+		myOfficeCurbsideMergeData: function(originalData, template) {
+			var self = this,
+				formData = monster.ui.getFormData('form_curbside'),
+				mergedData = $.extend(true, {}, originalData, formData);
+
+			// Rebuild list of replies from UI
+			mergedData.curbside_settings.replies = [];
+			template.find('.saved-entities .entity-wrapper').each(function() {
+				mergedData.curbside_settings.replies.push($(this).data('reply'));
+			});
+
+			// set Kazoo Account ID
+			mergedData.kazoo_account_id = self.accountId;
+
+			delete mergedData.mainNumbers;
+			delete mergedData.extra;
+
+			return mergedData;
+		},
+
+		myOfficeSaveCurbside: function(origData, curbsideData, callback) {
+			var self = this;
+
+			if (!origData.curbside_enabled) {
+				self.myOfficeCreateCurbside(curbsideData, callback);
+			} else {
+				self.myOfficeUpdateCurbside(curbsideData, callback);
+			}
+		},
+
 		myOfficeRenderCallerIdPopup: function(args) {
 			var self = this,
 				parent = args.parent,
 				myOfficeData = args.myOfficeData,
+				currentApp = monster.apps.getActiveApp(),
 				templateData = {
-					isE911Enabled: monster.util.isNumberFeatureEnabled('e911'),
 					mainNumbers: myOfficeData.mainNumbers,
-					selectedMainNumber: 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none'
+					selectedMainNumber: 'caller_id' in myOfficeData.account && 'external' in myOfficeData.account.caller_id ? myOfficeData.account.caller_id.external.number || 'none' : 'none',
+					readonly_attr: monster.apps[currentApp].e911_readonly
+						? 'disabled'
+						: ''
 				},
 				popupTemplate = $(self.getTemplate({
 					name: 'callerIdPopup',
@@ -825,37 +1027,6 @@ define(function(require) {
 					title: self.i18n.active().myOffice.callerId.title,
 					position: ['center', 20]
 				});
-
-			if (monster.util.isNumberFeatureEnabled('e911')) {
-				var e911Form = popupTemplate.find('#emergency_form');
-
-				monster.ui.validate(e911Form, {
-					rules: {
-						notification_contact_emails: {
-							listOf: 'email'
-						}
-					},
-					messages: {
-						'postal_code': {
-							required: '*'
-						},
-						'street_address': {
-							required: '*'
-						},
-						'locality': {
-							required: '*'
-						},
-						'region': {
-							required: '*'
-						},
-						notification_contact_emails: {
-							regex: self.i18n.active().myOffice.callerId.emergencyEmailError
-						}
-					}
-				});
-
-				monster.ui.valid(e911Form);
-			}
 
 			self.myOfficeCallerIdPopupBindEvents({
 				parent: parent,
@@ -873,12 +1044,6 @@ define(function(require) {
 				account = args.account,
 				callerIdNumberSelect = popupTemplate.find('.caller-id-select'),
 				callerIdNameInput = popupTemplate.find('.caller-id-name'),
-				emergencyZipcodeInput = popupTemplate.find('.caller-id-emergency-zipcode'),
-				emergencyAddress1Input = popupTemplate.find('.caller-id-emergency-address1'),
-				emergencyAddress2Input = popupTemplate.find('.caller-id-emergency-address2'),
-				emergencyCityInput = popupTemplate.find('.caller-id-emergency-city'),
-				emergencyStateInput = popupTemplate.find('.caller-id-emergency-state'),
-				emergencyEmailInput = popupTemplate.find('.caller-id-emergency-email'),
 				editableFeatures = [ 'e911', 'cnam' ],
 				loadNumberDetails = function(number, popupTemplate) {
 					monster.waterfall([
@@ -906,32 +1071,7 @@ define(function(require) {
 								return waterfallCallback(null, allowedFeatures);
 							}
 
-							var hasE911 = _.includes(allowedFeatures, 'e911'),
-								hasCNAM = _.includes(allowedFeatures, 'cnam'),
-								isE911Enabled = monster.util.isNumberFeatureEnabled('e911');
-
-							if (hasE911 && isE911Enabled) {
-								if (_.has(numberData, 'e911')) {
-									emergencyZipcodeInput.val(numberData.e911.postal_code);
-									emergencyAddress1Input.val(numberData.e911.street_address);
-									emergencyAddress2Input.val(numberData.e911.extended_address);
-									emergencyCityInput.val(numberData.e911.locality);
-									emergencyStateInput.val(numberData.e911.region);
-									emergencyEmailInput.val(_
-										.chain(numberData.e911)
-										.get('notification_contact_emails', [])
-										.join(' ')
-										.value()
-									);
-								} else {
-									emergencyZipcodeInput.val('');
-									emergencyAddress1Input.val('');
-									emergencyAddress2Input.val('');
-									emergencyCityInput.val('');
-									emergencyStateInput.val('');
-									emergencyEmailInput.val('');
-								}
-							}
+							var hasCNAM = _.includes(allowedFeatures, 'cnam');
 
 							if (hasCNAM) {
 								if (_.has(numberData, 'cnam')) {
@@ -962,25 +1102,6 @@ define(function(require) {
 				loadNumberDetails($(this).val(), popupTemplate);
 			});
 
-			emergencyZipcodeInput.on('blur', function() {
-				var zipCode = $(this).val();
-
-				if (zipCode) {
-					self.myOfficeGetAddessFromZipCode({
-						data: {
-							zipCode: zipCode
-						},
-						success: function(results) {
-							if (!_.isEmpty(results)) {
-								var length = results[0].address_components.length;
-								emergencyCityInput.val(results[0].address_components[1].long_name);
-								emergencyStateInput.val(results[0].address_components[length - 2].short_name);
-							}
-						}
-					});
-				}
-			});
-
 			popupTemplate.find('.save').on('click', function() {
 				var callerIdNumber = callerIdNumberSelect.val(),
 					updateAccount = function() {
@@ -991,18 +1112,14 @@ define(function(require) {
 							});
 						});
 					},
-					setNumberData = function(e911Data) {
+					setNumberData = function() {
 						var callerIdName = callerIdNameInput.val(),
-							setCNAM = popupTemplate.find('.number-feature[data-feature="cnam"]').is(':visible'),
-							setE911 = popupTemplate.find('.number-feature[data-feature="e911"]').is(':visible');
+							setCNAM = popupTemplate.find('.number-feature[data-feature="cnam"]').is(':visible');
 
 						account.caller_id = $.extend(true, {}, account.caller_id, {
 							external: {
 								number: callerIdNumber
 							},
-							emergency: {
-								number: callerIdNumber
-							}
 						});
 
 						if (setCNAM) {
@@ -1020,50 +1137,26 @@ define(function(require) {
 								delete numberData.cnam;
 							}
 
-							if (setE911) {
-								_.assign(numberData, {
-									e911: _.assign({}, e911Data, {
-										notification_contact_emails: _
-											.chain(e911Data)
-											.get('notification_contact_emails', '')
-											.trim()
-											.toLower()
-											.split(' ')
-											.reject(_.isEmpty)
-											.uniq()
-											.value()
-									})
-								});
-							} else {
-								delete numberData.e911;
-							}
-
 							self.myOfficeUpdateNumber(numberData, function(data) {
 								updateAccount();
 							});
 						});
-					},
-					e911Form;
-
-				if (monster.util.isNumberFeatureEnabled('e911')) {
-					e911Form = popupTemplate.find('#emergency_form');
-				}
+					};
 
 				if (callerIdNumber) {
-					if (monster.util.isNumberFeatureEnabled('e911')) {
-						if (monster.ui.valid(e911Form)) {
-							var e911Data = monster.ui.getFormData(e911Form[0]);
+					var cnam = callerIdNameInput.val();
+					if (cnam.length) {
+						var regex = /[^a-zA-Z0-9\s]/,
+							matches = regex.exec(cnam);
 
-							setNumberData(e911Data);
+						if (matches !== null || cnam.length > 15) {
+							monster.ui.alert(self.i18n.active().myOffice.callerId.invalidCNAMAlert);
 						} else {
-							monster.ui.alert(self.i18n.active().myOffice.callerId.mandatoryE911Alert);
+							setNumberData();
 						}
-					} else {
-						setNumberData();
 					}
 				} else {
 					delete account.caller_id.external;
-					delete account.caller_id.emergency;
 					updateAccount();
 				}
 			});
@@ -1139,8 +1232,8 @@ define(function(require) {
 		myOfficeGetNumber: function(number, success, error) {
 			var self = this;
 
-			self.callApi({
-				resource: 'numbers.get',
+			monster.request({
+				resource: 'sv.numbers.get',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: number
@@ -1160,8 +1253,8 @@ define(function(require) {
 			var self = this;
 
 			delete numberData.metadata;
-			self.callApi({
-				resource: 'numbers.update',
+			monster.request({
+				resource: 'sv.numbers.create',
 				data: {
 					accountId: self.accountId,
 					phoneNumber: numberData.id,
@@ -1169,6 +1262,54 @@ define(function(require) {
 				},
 				success: function(data, status) {
 					success && success(data.data);
+				},
+				error: function(data, status) {
+					error && error(data);
+				}
+			});
+		},
+
+		myOfficeUpdateCurbside: function(curbsideData, callbackSuccess, callbackError) {
+			var self = this;
+
+			monster.request({
+				resource: 'sv.sms.update',
+				data: {
+					data: curbsideData
+				},
+				success: function(data) {
+					callbackSuccess && callbackSuccess(data.data);
+				},
+				error: function(data) {
+					callbackError && callbackError(data);
+				}
+			});
+		},
+
+		myOfficeCreateCurbside: function(curbsideData, callback) {
+			var self = this;
+
+			monster.request({
+				resource: 'sv.sms.create',
+				data: {
+					data: curbsideData
+				},
+				success: function(data) {
+					callback(data.data);
+				}
+			});
+		},
+
+		myOfficeGetCurbside: function(dids, success, error) {
+			var self = this;
+
+			monster.request({
+				resource: 'sv.curbside.get',
+				data: {
+					dids: dids.join(",")
+				},
+				success: function(data, status) {
+					success && success(data);
 				},
 				error: function(data, status) {
 					error && error(data);

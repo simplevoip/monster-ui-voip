@@ -1068,3 +1068,56 @@
 		}
 	}
 }
+
+.monster-feature-popup-container #sms_form {
+    margin-bottom: 0;
+}
+
+.monster-feature-popup-container .helper i {
+    margin-right: 5px;
+}
+
+.monster-feature-popup-container .content .title {
+    color: #22a5ff;
+    font-size: 20px;
+    margin-bottom: 10px;
+    margin-left: 0;
+    text-shadow: 1px 0 1px #CCCCCC;
+}
+
+.monster-feature-popup-container textarea {
+    width: 97%;
+    margin: 15px 0;
+}
+
+.monster-feature-popup-container label.monster-invalid {
+    position: relative;
+}
+
+.monster-feature-popup-container[data-feature="mobile_app"] {
+    width: 600px;
+}
+
+.monster-feature-popup-container a {
+    color: #2297ff;
+}
+
+.mobile-app-mobile {
+    display: flex;
+    justify-content: center;
+
+    > div {
+        flex: 0 0 40%;
+        text-align: center;
+    }
+}
+
+.mobile-app-badges {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    img {
+        max-width: 150px;
+    }
+}

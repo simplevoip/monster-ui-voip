@@ -4,15 +4,13 @@
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.nameHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-user"></i></div>
-				<input {{#isFeatureAvailable "smartpbx.users.settings.fullName.edit"}}{{else}}disabled{{/isFeatureAvailable}} required type="text" class="input-small" name="first_name" value="{{first_name}}" placeholder="{{i18n.users.editionForm.firstName}}"></input><input {{#isFeatureAvailable "smartpbx.users.settings.fullName.edit"}}{{else}}disabled{{/isFeatureAvailable}} required class="input-small fix-left" type="text" name="last_name" value="{{last_name}}" placeholder="{{i18n.users.editionForm.lastName}}"></input>
+				<input required type="text" class="input-small" name="first_name" value="{{first_name}}" placeholder="{{i18n.users.editionForm.firstName}}"></input><input required class="input-small fix-left" type="text" name="last_name" value="{{last_name}}" placeholder="{{i18n.users.editionForm.lastName}}"></input>
 			</div>
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.loginHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-key"></i></div>
 				<span id="username">{{username}}</span>
-				{{#isFeatureAvailable "smartpbx.users.settings.credentials.edit"}}
-					<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
-				{{/isFeatureAvailable}}
+				<a href="javascript:void(0);" id="change_username" class="monster-link blue">{{i18n.users.editionForm.changeUsername}}</a>
 			</div>
 
 			{{#if extra.vmbox.id}}
@@ -54,8 +52,7 @@
 		<div class="basic-fields span6">
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.roleHelp}}" data-placement="top" data-toggle="tooltip"><i class="icon-telicon-moderator"></i></div>
-				<select id="priv_level" name="priv_level"{{#isFeatureAvailable "smartpbx.users.settings.allowUserPrivLevel"}}{{else}} disabled{{/isFeatureAvailable}}>
-				{{#isFeatureAvailable "smartpbx.users.settings.allowUserPrivLevel"}}
+				<select id="priv_level" name="priv_level">
 					{{#compare priv_level '===' 'admin'}}
 						<option value="admin" selected>{{ i18n.users.admin }}</option>
 						<option value="user">{{ i18n.users.user }}</option>
@@ -63,15 +60,12 @@
 						<option value="admin">{{ i18n.users.admin }}</option>
 						<option value="user" selected>{{ i18n.users.user }}</option>
 					{{/compare}}
-				{{else}}
-					<option value="admin" selected>{{ i18n.users.admin }}</option>
-				{{/isFeatureAvailable}}
 				</select>
 			</div>
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-original-title="{{i18n.users.editionForm.timezoneHelp}}" data-placement="top" data-toggle="tooltip"><i class="fa fa-clock-o"></i></div>
-				<select id="user_timezone" name="timezone" data-original_value="{{timezone}}"{{#isFeatureAvailable "smartpbx.users.timezone.edit"}}{{else}} disabled{{/isFeatureAvailable}}></select>
+				<select id="user_timezone" name="timezone" data-original_value="{{timezone}}"></select>
 			</div>
 
 			<div class="row-fields">
@@ -115,7 +109,6 @@
 				{{/if}}
 			</div>
 
-		{{#isFeatureAvailable "smartpbx.users.settings.mainExtensionNumber.manage"}}
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-toggle="tooltip" title="{{i18n.users.editionForm.mainExtensionHelp}}" data-placement="top">
 					<i class="icon-telicon-extensions"></i>
@@ -135,7 +128,6 @@
 					</select>
 				</div>
 			</div>
-		{{/isFeatureAvailable}}
 
 			<div class="row-fields">
 				<div class="fa fa-wrapper" data-toggle="tooltip" title="{{i18n.commonMisc.outboundPrivacy.tooltip}}" data-placement="top">
@@ -163,12 +155,10 @@
 		</div>-->
 	</form>
 	<div class="actions">
-	{{#isFeatureAvailable "smartpbx.users.settings.delete"}}
 		<!-- We forbid users to delete their own user -->
 		{{#compare id "!==" extra.adminId}}
 			<a id="delete_user" class="monster-link" href="javascript:void(0);"><i class="fa fa-trash-o monster-red"></i>{{ i18n.users.delete }}</a>
 		{{/compare}}
-	{{/isFeatureAvailable}}
 
 		{{#if extra.canImpersonate}}
 			<a id="impersonate_user" class="monster-link" href="javascript:void(0);"><i class="fa fa-user monster-blue"></i>{{ i18n.users.impersonate }}</a>

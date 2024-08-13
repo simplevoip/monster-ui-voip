@@ -4,7 +4,7 @@
 		"de-DE": {
 			"label": "Einstellungen",
 			"description": "Eine gehostete Telefonanlage (PBX) gibt Ihnen die volle Kontrolle beim Einrichten und Verwalten einer TK-Anlage für Ihr Büro.",
-			"extended_description": "Die SmartPBX-App kombiniert die gängigsten PBX-Funktionen mit einer übersichtlichen und intuitiven Benutzeroberfläche. Die App enthält eine erweiterte Auswahl an Funktionen (wie individuelle Fax-zu-E-Mail-Boxen, Anrufweiterleitung und Hotdesking), die leicht zu verstehen und zu bedienen sind. Ein einfaches Dashboard bietet einen übersichtlichen und umfassenden Überblick über Systemkonfiguration und -status. In diesem Dashboard können Sie alle Benutzer und Geräte überprüfen sowie Konferenzbrücken und Telefonnummern zuweisen. Mit maßgeschneiderten Ansagen und Anrufumleitungen verleihen Sie Ihrem Unternehmen ein professionelles Image. Legen Sie Funktionen mithilfe einer übersichtlichen und intuitiven Benutzeroberfläche fest. Richten Sie eine geschäftliche Hauptnummer ein und nutzen Sie den vorgefertigten Virtual Receptionist, um eingehende Anrufe zu managen.",
+			"extended_description": "Die SimplePBX-App kombiniert die gängigsten PBX-Funktionen mit einer übersichtlichen und intuitiven Benutzeroberfläche. Die App enthält eine erweiterte Auswahl an Funktionen (wie individuelle Fax-zu-E-Mail-Boxen, Anrufweiterleitung und Hotdesking), die leicht zu verstehen und zu bedienen sind. Ein einfaches Dashboard bietet einen übersichtlichen und umfassenden Überblick über Systemkonfiguration und -status. In diesem Dashboard können Sie alle Benutzer und Geräte überprüfen sowie Konferenzbrücken und Telefonnummern zuweisen. Mit maßgeschneiderten Ansagen und Anrufumleitungen verleihen Sie Ihrem Unternehmen ein professionelles Image. Legen Sie Funktionen mithilfe einer übersichtlichen und intuitiven Benutzeroberfläche fest. Richten Sie eine geschäftliche Hauptnummer ein und nutzen Sie den vorgefertigten Virtual Receptionist, um eingehende Anrufe zu managen.",
 			"features": [
 				"Callflows",
 				"Uneingeschränkt viele Nebenstellen",
@@ -20,9 +20,9 @@
 			]
 		},
 		"en-US": {
-			"label": "SmartPBX",
+			"label": "SimplePBX",
 			"description": "Hosted PBX gives you full control to set up and manage office phone system.",
-			"extended_description": "The SmartPBX app combines the most common PBX functionality with a beautiful user interface and an intuitive experience. An advanced set of features such as individual fax-to-email boxes, call forwarding and hot desking are easy to understand and utilize. A simple dashboard provides a quick but comprehensive overview of system configuration and status. Within this dashboard, review total users and devices, assign conference bridges and phone numbers. Create customized greetings and call routes to give businesses that professional touch. Set functionality with a beautiful user interface and an intuitive experience. Set up a main business phone number and utilize the pre-built Virtual Receptionist to handle inbound calls.",
+			"extended_description": "The SimplePBX app combines the most common PBX functionality with a beautiful user interface and an intuitive experience. An advanced set of features such as individual fax-to-email boxes, call forwarding and hot desking are easy to understand and utilize. A simple dashboard provides a quick but comprehensive overview of system configuration and status. Within this dashboard, review total users and devices, assign conference bridges and phone numbers. Create customized greetings and call routes to give businesses that professional touch. Set functionality with a beautiful user interface and an intuitive experience. Set up a main business phone number and utilize the pre-built Virtual Receptionist to handle inbound calls.",
 			"features": [
 				"Call flows",
 				"Unlimited extensions",
@@ -59,7 +59,7 @@
 	"tags": [
 		"admin"
 	],
-	"icon": "SmartPBX_app.png",
+	"icon": "SimplePBX_app.png",
 	"api_url": "http://10.26.0.41:8000/v2",
 	"author": "2600Hz",
 	"version": "1.0",

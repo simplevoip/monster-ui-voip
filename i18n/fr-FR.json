@@ -579,7 +579,7 @@
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {
-			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SmartPBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
+			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SimplePBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
 			"tooManyCallflows": "Vous essayez de rajouter des numéros existant déjà sur plusieurs callflows, nous ne pouvons continuer notre opération automatique de migration. Veuillez contacter votre support pour résoudre ce problème."
 		},
 		"__commment": "UI-1109: Adding popup for Presence ID change",
@@ -834,7 +834,8 @@
 			"callerID": "Caller ID",
 			"musicOnHold": "Musique d'attente",
 			"callRecording": "Enregistrement",
-			"hours": "Heures"
+			"hours": "Heures",
+			"curbside": "Bordure"
 		},
 		"musicOnHold": {
 			"title": "Musique d'attente",
@@ -860,7 +861,8 @@
 			"emergencyState": "État",
 			"emergencyHelp1": "Cette adresse apparaitra lorsque vous appelerez un numéro d'urgence (911 aux Etats-Unis).",
 			"emergencyHelp2": "Note: Vous pouvez ajouter cette fonctionnalité sur chaque utilisateur si cette adresse ne leur correspond pas.",
-			"mandatoryE911Alert": "Vous devez spécifier les infos E911 pour le Caller-ID de ce numéro d'entreprise."
+			"mandatoryE911Alert": "Vous devez spécifier les infos E911 pour le Caller-ID de ce numéro d'entreprise.",
+			"invalidCNAMAlert": "Le nom d'identification de l'appelant ne doit pas comporter plus de 15 caractères et ne peut inclure que des lettres, des chiffres et des espaces."
 		},
 		"missingMainNumberForCallerId": "Veuillez ajouter un Numéro principal à votre compte avant de configurer le Caller-ID de votre compte!",
 		"missingCnamE911Message": "Veuillez configurer le Caller-ID et l'E911 sur un de vos numéros principaux.",
@@ -886,7 +888,7 @@
 			"international": "Numéros internationaux",
 			"noNumber": "Aucun numéro disponible"
 		},
-		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SimplePBX if they don't have one",
 		"__version": "3.19",
 		"mainVMBoxName": "Répondeur Principal",
 
@@ -903,7 +905,7 @@
 		"faxingNumberLabel": "Numéro de Fax"
 	},
 
-	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SimplePBX.",
 	"featureCodes": {
 		"title": "Codes d'appel disponibles",
 		"noFeatureCodeMessage": "Aucun code d'appel n'est actuellement disponible sur votre compte. Les codes d'appel sont crées automatiquement lorsque vous chargez la page \"Numéro principal\".",

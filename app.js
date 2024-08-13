@@ -1,23 +1,195 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		monster = require('monster');
+		monster = require('monster'),
+		sv_config = require('./config.js'),
+		env = sv_config.env,
+		sv_api = sv_config.api;
 
 	var app = {
-		name: 'voip',
+		name: 'simplevoip',
 
 		css: [ 'app' ],
 
 		i18n: {
-			'de-DE': { customCss: false },
+			// 'de-DE': { customCss: false },
 			'en-US': { customCss: false },
-			'fr-FR': { customCss: false },
-			'ru-RU': { customCss: false },
+			// 'fr-FR': { customCss: false },
+			// 'ru-RU': { customCss: false },
 			'es-ES': { customCss: false },
 			'fr-CA': { customCss: false }
 		},
 
-		requests: {},
+		requests: {
+			'sv.numbers.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.numbers.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.numbers.create': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.callerid.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=callerid&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.curbside.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=curbside&dids={dids}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms&did={did}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.create': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.delete': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms',
+				verb: 'DELETE',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.list': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=users&accountId={accountId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.device.create': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=device&accountId={accountId}',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.device.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
+				verb: 'PATCH',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.credentials.send': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=credentials&userId={userId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.orders.list': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=orders&accountId={accountId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.order.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=order&orderId={orderId}',
+				verb: 'PATCH',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.order.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=order&orderId={orderId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.quote.approve': {
+				apiRoot: sv_api[env],
+				url: 'quote_pdf_s3.php?orderID={orderId}&name={name}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.quote.update.duedate': {
+				apiRoot: sv_api[env],
+				url: 'ajax_functions.php?fn=quote_update&orderID={orderId}&duedate={dueDate}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.quote.toggle.rental': {
+				apiRoot: sv_api[env],
+				url: 'ajax_functions.php?fn=quote_toggle_rental&orderID={orderId}&toggle={toggle}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.sync': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			}
+		},
 		subscribe: {
 			'core.crossSiteMessage.voip': 'crossSiteMessageHandler'
 		},
@@ -74,12 +246,40 @@ define(function(require) {
 			'vmboxes'
 		],
 
+		e911_readonly: true,
+
+		// method required by MonsterUI
+		load: function(callback) {
+			var self = this;
+		
+			self.initAuth(function() {
+			  callback && callback(self);
+			});
+		},
+		
+		// method required by MonsterUI
+		initApp: function(callback) {
+			var self = this;
+		
+			monster.pub('auth.initApp', {
+				app: self,
+				callback: callback
+			});
+		},
+
+		// method required by MonsterUI
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
+				// show_accountManagement = !monster.util.isSuperDuper() && monster.util.isAdmin();
 				template = $(self.getTemplate({
-					name: 'app'
+					name: 'app',
+					// data: {
+					// 	show_accountManagement: show_accountManagement,
+					// },
 				}));
+
+			self.registerHandlebarHelpers();
 
 			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
 
@@ -409,7 +609,33 @@ define(function(require) {
 				maybeGetMainVMBox,
 				maybeCreateMainVMBox
 			], callback);
-		}
+		},
+
+		/**
+		 * filter out toll free number ranges from array of numbers
+		 * @param  {Array} numbers
+		 * @return {Array}
+		 */
+		removeTollFreeNumbers: function(numbers) {
+			return numbers.filter(function(number) {
+				var m = /^(?:\+?1)?(?:8(?:00|88|66|77|55|44|33)[2-9]\d{6})$/gm.exec(number);
+				return m === null || !m.length;
+			});
+		},
+
+		registerHandlebarHelpers: function() {
+			Handlebars.registerHelper({
+				foreach: function(arr, options) {
+					if(options.inverse && !arr.length)
+						return options.inverse(this);
+
+					return arr.map(function(item, index) {
+					  	item.$prev = arr[index - 1];
+						return options.fn(item);
+					}).join('');
+				},
+			});
+		},
 	};
 
 	return app;

@@ -1,0 +1,52 @@
+<div id="numbers_add_external">
+	<form id="form_add_numbers">
+		<div class="control-group">
+			<label class="control-label" for="list-numbers">
+				{{ i18n.numbers.addExternal.dialog.fieldText }}
+				<div class="help-text">
+					{{ i18n.numbers.addExternal.dialog.help1 }}
+				</div>
+			</label>
+
+			<div class="controls">
+				<textarea name="numbers" class="list-numbers"></textarea>
+				<div class="help-text">
+					{{ i18n.numbers.addExternal.dialog.help2 }}
+				</div>
+			</div>
+
+			<div class="customize-number-field{{#unless isAllowedToPickState}} disabled{{/unless}}">
+				<label class="popup-label" for="number_state">{{i18n.numbers.addExternal.numberState.label}}<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.numbers.addExternal.numberState.defaultHelp}}" data-placement="right" data-toggle="tooltip"></i></label>
+				<select class="select-state input-medium" id="number_state" name="number-state">
+					<option value="_uiDefaultState">{{i18n.numbers.addExternal.numberState.default }}</option>
+					{{#each @root.states}}
+						<option value="{{this}}">{{this}}</option>
+					{{/each}}
+				</select>
+			</div>
+
+			{{#if isAllowedToPickCarrier}}
+				<div class="customize-number-field">
+					<label class="popup-label" for="carrier_module">{{i18n.numbers.addExternal.renameCarrier.label}}</label>
+					<select class="select-module input-medium" id="carrier_module" name="carrier-module">
+						{{#select @root.selectedCarrier}}
+							{{#each @root.carriers}}
+								<option value="{{this.key}}">{{this.friendlyValue}}</option>
+							{{/each}}
+						{{/select}}
+					</select>
+
+					<div class="custom-carrier-block{{#compare selectedCarrier "===" "_uiCustomChoice"}} active{{/compare}}">
+						<label class="popup-label" for="custom_carrier_value">{{i18n.numbers.addExternal.renameCarrier.customCarrierName}}</label>
+						<input type="text" id="custom_carrier_value"/>
+					</div>
+				</div>
+			{{/if}}
+		</div>
+	</form>
+
+	<div class="dialog-buttons-wrapper">
+		<a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.cancel }}</a>
+		<button id="add_numbers" class="monster-button monster-button-success">{{ i18n.numbers.addExternal.dialog.beginImport }}</button>
+	</div>
+</div>

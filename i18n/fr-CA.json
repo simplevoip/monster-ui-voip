@@ -579,7 +579,7 @@
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {
-			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SmartPBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
+			"confirmMigration": "Un des numéros que vous souhaitez rajouter existe déjà dans Kazoo-UI, nous pouvons migrer le callflow vers SimplePBX pour vous permettre de l'utiliser. Vous ne pourrez plus modifier ce callflow dans Kazoo-UI ou dans l'application Callflows de Monster-UI. Continuez quand même?",
 			"tooManyCallflows": "Vous essayez de rajouter des numéros existant déjà sur plusieurs callflows, nous ne pouvons continuer notre opération automatique de migration. Veuillez contacter votre support pour résoudre ce problème."
 		},
 		"__commment": "UI-1109: Adding popup for Presence ID change",
@@ -886,7 +886,7 @@
 			"international": "Numéros internationaux",
 			"noNumber": "Aucun numéro disponible"
 		},
-		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SimplePBX if they don't have one",
 		"__version": "3.19",
 		"mainVMBoxName": "Répondeur Principal",
 
@@ -903,7 +903,7 @@
 		"faxingNumberLabel": "Numéro de Fax"
 	},
 
-	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SimplePBX.",
 	"featureCodes": {
 		"title": "Codes d'appel disponibles",
 		"noFeatureCodeMessage": "Aucun code d'appel n'est actuellement disponible sur votre compte. Les codes d'appel sont crées automatiquement lorsque vous chargez la page \"Numéro principal\".",

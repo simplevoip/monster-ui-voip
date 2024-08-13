@@ -243,14 +243,14 @@
 					"label": "Bei Abmeldung benachrichtigen",
 					"help": "Möchten Sie den Administrator bei jeder Abmeldung dieses Geräts benachrichtigen?"
 				},
-				"__comment": "UI-1917: Schaltfläche für Entsperrung von Geräten in der SmartPBX-App hinzugefügt",
+				"__comment": "UI-1917: Schaltfläche für Entsperrung von Geräten in der SimplePBX-App hinzugefügt",
 				"__version": "3.22",
 				"unlock": {
 					"label": "Neubereitstellung ermöglichen",
 					"button": "Entsperren",
 					"success": "Dieses Gerät ist für die nächsten 24 Stunden entsperrt."
 				},
-				"__comment": "UI-1917: Schaltfläche für Entsperrung von Geräten in der SmartPBX-App hinzugefügt",
+				"__comment": "UI-1917: Schaltfläche für Entsperrung von Geräten in der SimplePBX-App hinzugefügt",
 				"__version": "3.22",
 				"mediaWebrtc": {
 					"help": "Wenn aktiviert, wird ein WebRTC-kompatibler SDP in der EINLADUNG erzwungen.",
@@ -287,7 +287,7 @@
 					"H261": "H261"
 				}
 			},
-			"__comment": "UI-1351: Möglichkeit zur Konfiguration von Funktionstasten für SIP-Geräte in SmartPBX hinzugefügt",
+			"__comment": "UI-1351: Möglichkeit zur Konfiguration von Funktionstasten für SIP-Geräte in SimplePBX hinzugefügt",
 			"__version": "v3.20_s4",
 			"keys": {
 				"alert": {
@@ -597,7 +597,7 @@
 			"instructionsSent": "An {{ email }} wurde eine E-Mail gesendet, in der alle Benutzeranweisungen für die ersten Schritte mit der UI stehen!",
 			"numbersUpdated": "Die Telefonnummern von {{ name }} wurden erfolgreich aktualisiert.",
 			"passwordReseted": "Das Kennwort wurde zurückgesetzt und an {{ email }} wurde eine E-Mail gesendet, die Anweisungen zur Erstellung eines neuen Kennworts enthält.",
-			"userDelete": "{{ name }} wurde in Smart PBX erfolgreich gelöscht!",
+			"userDelete": "{{ name }} wurde in Simple PBX erfolgreich gelöscht!",
 			"userUpdated": "{{ name }}s Einstellungen wurden erfolgreich aktualisiert.",
 			"pinUpdated": "Die PIN von {{ name }} wurde erfolgreich aktualisiert.",
 			"__comment": "UI-1033: Die Anrufer-ID-Funktion wird jetzt korrekt entfernt, wenn wir eine Nummer entfernen, die als diese Anrufer-ID-Nummer festgelegt war",
@@ -632,7 +632,7 @@
 			"urlPlaceholder": "http://your.server.com/place/to/store/recordings",
 			"timeLimitLabel": "Zeitlimit (Sek.):",
 			"noNumber": "Bevor Sie die Funktion „Angepasste Anrufaufzeichnung“ für diesen Benutzer konfigurieren, müssen Sie ihm eine Nummer oder eine Nebenstelle zuweisen",
-			"__comment": "UI-2578: Ein-/Ausschalter für Anrufaufzeichnung in Smart PBX hinzugefügt",
+			"__comment": "UI-2578: Ein-/Ausschalter für Anrufaufzeichnung in Simple PBX hinzugefügt",
 			"__version": "4.1",
 			"toggleValues": {
 				"inboundOnnet": {
@@ -662,7 +662,7 @@
 			"pinLabel": "Nummer des persönlichen Konferenzraums",
 			"number": "Konferenztelefonnummer(n)",
 			"help": "Sie können einen Konferenzanruf erstellen, indem Sie den Teilnehmern eine Konferenztelefonnummer und Ihre persönliche Zimmernummer bereitstellen",
-			"noConfNumbers": "Sie müssen eine Haupt-Konferenznummer (Im Abschnitt „Hauptrufnummer“ auf der linken Seite des SmartPBX) hinzufügen, um die persönlichen Konferenzbrücken zu aktivieren"
+			"noConfNumbers": "Sie müssen eine Haupt-Konferenznummer (Im Abschnitt „Hauptrufnummer“ auf der linken Seite des SimplePBX) hinzufügen, um die persönlichen Konferenzbrücken zu aktivieren"
 		},
 		"do_not_disturb": {
 			"headline": "Benutzereinstellungen für „Bitte nicht stören“",
@@ -761,7 +761,7 @@
 		"__comment": "UI-1129: Migrationstool von Kazoo-UI nach Monster-UI",
 		"__version": "3.19",
 		"migration": {
-			"confirmMigration": "Für die Nummer, die Sie hinzufügen möchten, wurde ein Callflow gefunden. Offenbar können wir diesen Callflow nach SmartPBX migrieren. Bevor wir damit fortfahren, sollte Ihnen bewusst sein, dass Sie diesen Callflow nach dieser Änderung nicht mehr in der Kazoo-UI oder in der Monster-UI-Callflows-App aktualisieren können. Möchten Sie den Vorgang fortsetzen?",
+			"confirmMigration": "Für die Nummer, die Sie hinzufügen möchten, wurde ein Callflow gefunden. Offenbar können wir diesen Callflow nach SimplePBX migrieren. Bevor wir damit fortfahren, sollte Ihnen bewusst sein, dass Sie diesen Callflow nach dieser Änderung nicht mehr in der Kazoo-UI oder in der Monster-UI-Callflows-App aktualisieren können. Möchten Sie den Vorgang fortsetzen?",
 			"tooManyCallflows": "Offenbar gehören die Rufnummern, die Sie hinzufügen möchten, zu mehreren Kazoo-UI-Callflows. Diese Callflows können nicht ordnungsgemäß in die Monster-UI migriert werden. Bitte wenden Sie sich für Hilfe an den Support."
 		},
 		"__commment": "UI-1109: Pop-up für Änderung der Anwesenheits-ID hinzugefügt",
@@ -991,7 +991,7 @@
 		"walkthrough": {
 			"first": {
 				"steps": {
-					"1": "Richten Sie Ihre Haupt-Unternehmensnummer in SmartPBX ein, indem Sie eine Nummer kaufen oder portieren. Diese Nummer unterscheidet sich von Benutzer-Telefonnummern, da sie die Haupt-Telefonnummer des gesamten Unternehmens repräsentiert."
+					"1": "Richten Sie Ihre Haupt-Unternehmensnummer in SimplePBX ein, indem Sie eine Nummer kaufen oder portieren. Diese Nummer unterscheidet sich von Benutzer-Telefonnummern, da sie die Haupt-Telefonnummer des gesamten Unternehmens repräsentiert."
 				}
 			},
 			"second": {
@@ -1113,7 +1113,8 @@
 			"callerID": "Anrufer-ID",
 			"musicOnHold": "Warteschleifenmusik",
 			"callRecording": "Aufnehmen",
-			"hours": "Stunden"
+			"hours": "Stunden",
+			"curbside": "Bordsteinkante"
 		},
 		"musicOnHold": {
 			"title": "Warteschleifenmusik",
@@ -1142,7 +1143,8 @@
 			"emergencyState": "Bundesland/Kanton",
 			"emergencyHelp1": "Diese Adresse wird als Ihre Anrufer-ID-Adresse angezeigt, wenn Sie einen ausgehenden Notruf an eine Behörde tätigen (z. B. 911 in den USA).",
 			"emergencyHelp2": "Hinweis: Sie können diese Funktion auch für Rufnummern von Benutzern festlegen, wenn sich diese an einem anderen Standort als oben angegeben befinden.",
-			"mandatoryE911Alert": "Sie müssen für Ihre Unternehmens-Anrufer-ID-Nummer e911-Informationen angeben."
+			"mandatoryE911Alert": "Sie müssen für Ihre Unternehmens-Anrufer-ID-Nummer e911-Informationen angeben.",
+			"invalidCNAMAlert": "Der Anrufer-ID-Name darf nicht länger als 15 Zeichen sein und darf nur Buchstaben, Zahlen und Leerzeichen enthalten."
 		},
 		"missingMainNumberForCallerId": "Bevor Sie die Anrufer-ID konfigurieren können, müssen Sie eine Hauptrufnummer zu Ihrem Büro hinzufügen!",
 		"missingMainNumberMessage": "Fügen Sie Ihrem Account eine Hauptrufnummer hinzu.",
@@ -1165,7 +1167,7 @@
 			"international": "Internationale Rufnummern",
 			"noNumber": "Keine Nummer verfügbar"
 		},
-		"__comment": "UI-1220: Wenn jemand SmartPBX das erste Mal lädt und keinen Anrufbeantworter besitzt, wird automatisch ein zentraler Anrufbeantworter hinzugefügt",
+		"__comment": "UI-1220: Wenn jemand SimplePBX das erste Mal lädt und keinen Anrufbeantworter besitzt, wird automatisch ein zentraler Anrufbeantworter hinzugefügt",
 		"__version": "3.19",
 		"mainVMBoxName": "Haupt-Anrufbeantworter",
 		"__comment": "UI-1210: Haupt-Faxnummer wird im Dashboard angezeigt",
@@ -1179,8 +1181,8 @@
 		"__version": "3.23",
 		"walkthrough": {
 			"steps": {
-				"1": "Willkommen bei SmartPBX, der einfachen Methode, Ihr Bürotelefonsystem einzurichten! Dies ist das Haupt-Dashboard. Hier haben Sie einen Überblick über alle Benutzer, Geräte und Rufnummern!",
-				"2": "Mit SmartPBX ist die Einrichtung von Benutzern ein Kinderspiel. Den Großteil Ihrer Services können Sie über die Registerkarte „Benutzer“ erstellen und verwalten. Erstellen Sie neue Benutzer, weisen Sie Rufnummern zu, fügen Sie Geräte hinzu und verwalten Sie Benutzerfunktionen.",
+				"1": "Willkommen bei SimplePBX, der einfachen Methode, Ihr Bürotelefonsystem einzurichten! Dies ist das Haupt-Dashboard. Hier haben Sie einen Überblick über alle Benutzer, Geräte und Rufnummern!",
+				"2": "Mit SimplePBX ist die Einrichtung von Benutzern ein Kinderspiel. Den Großteil Ihrer Services können Sie über die Registerkarte „Benutzer“ erstellen und verwalten. Erstellen Sie neue Benutzer, weisen Sie Rufnummern zu, fügen Sie Geräte hinzu und verwalten Sie Benutzerfunktionen.",
 				"3": "Sobald Sie genügend Benutzer erstellt haben, können Sie Benutzergruppen erstellen. Das ist außerordentlich nützlich, wenn mehrere Benutzer in derselben Abteilung arbeiten, wie etwa ein Vertriebsteam.",
 				"4": "Hauptrufnummer-Services sind für Ihr Geschäft äußerst wichtig! Mit dem virtuellen Empfang können Sie die Anrufverarbeitung verwalten und Anrufe abhängig von Öffnungszeiten und Feiertagen umleiten."
 			}
@@ -1196,7 +1198,7 @@
 		}
 	},
 
-	"__comment": "UI-299, v3.19_s2: Registerkarte „Funktionscodes“ zu SmartPBX hinzugefügt.",
+	"__comment": "UI-299, v3.19_s2: Registerkarte „Funktionscodes“ zu SimplePBX hinzugefügt.",
 	"featureCodes": {
 		"title": "Verfügbare Funktionscodes",
 		"noFeatureCodeMessage": "Für Ihren Account sind noch keine Funktionscodes aktiviert. Funktionscodes werden automatisch erstellt, wenn Sie die Seite „Hauptrufnummer“ laden.",
@@ -1256,7 +1258,7 @@
 			},
 			"hotdesk[action=login]": {
 				"label": "Hotdesking aktivieren",
-				"tooltip": "(Eingabe von *11 plus der Hotdesk-ID) Die Hotdesk-ID kann in SmartPBX unter „Benutzer“ konfiguriert werden. Alle Anrufe werden an dieses Gerät gesendet."
+				"tooltip": "(Eingabe von *11 plus der Hotdesk-ID) Die Hotdesk-ID kann in SimplePBX unter „Benutzer“ konfiguriert werden. Alle Anrufe werden an dieses Gerät gesendet."
 			},
 			"hotdesk[action=logout]": {
 				"label": "Hotdesking deaktivieren",

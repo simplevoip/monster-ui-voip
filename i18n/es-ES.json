@@ -226,7 +226,7 @@
 					"H261": "H261"
 				}
 			},
-			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
+			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SimplePBX",
 			"__version": "v3.20_s4",
 			"featureKeys": {
 				"menuTitle": "Teclas de funciones",
@@ -525,7 +525,7 @@
 			"pinLabel": "Número personal de la sala de conferencias",
 			"number": "Número(s) de teléfono de conferencia",
 			"help": "Puede crear una llamada de Conferencia proveando un número de teléfono de conferencia y su número de habitación personal a los participantes ",
-			"noConfNumbers": "Usted necesita agregar un número de conferencia principal (en la sección número principal a la izquierda de la SmartPBX) para permitir que los puentes de conferencia Personnals "
+			"noConfNumbers": "Usted necesita agregar un número de conferencia principal (en la sección número principal a la izquierda de la SimplePBX) para permitir que los puentes de conferencia Personnals "
 		},
 		"faxing": {
 			"titles": {
@@ -609,7 +609,7 @@
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {
-			"confirmMigration": "Nos encontramos con un flujo de llamada existente con el número que está intentando agregar, parece que podemos migrar este flujo al SmartPBX. Antes de proceder, queremos que usted entienda que usted no se le permitirá actualizar este flujo en Kazoo-UI o en la aplicación de Monster-UI flujos después de este cambio. ¿Desea continuar?",
+			"confirmMigration": "Nos encontramos con un flujo de llamada existente con el número que está intentando agregar, parece que podemos migrar este flujo al SimplePBX. Antes de proceder, queremos que usted entienda que usted no se le permitirá actualizar este flujo en Kazoo-UI o en la aplicación de Monster-UI flujos después de este cambio. ¿Desea continuar?",
 			"tooManyCallflows": "Parece que los números que usted está tratando de añadir pertenecen a múltiples flujos de llamadas de Kazoo-UI. No hay forma de migrar correctamente estos flujos en Monster-UI, por favor póngase en contacto con el soporte técnico para arreglarlo."
 		},
 		"__commment": "UI-1109: Adding popup for Presence ID change",
@@ -808,7 +808,7 @@
 		"walkthrough": {
 			"first": {
 				"steps": {
-					"1": "Configurar su número de empresa principal dentro de SmartPBX por comprar o portar un número. Esto es diferente a números de teléfono del usuario porque representa el número de teléfono principal de toda la empresa."
+					"1": "Configurar su número de empresa principal dentro de SimplePBX por comprar o portar un número. Esto es diferente a números de teléfono del usuario porque representa el número de teléfono principal de toda la empresa."
 				}
 			},
 			"second": {
@@ -867,7 +867,8 @@
 			"callerID": "Caller ID",
 			"musicOnHold": "Música de espera",
 			"callRecording": "Grabación",
-			"hours": "Horas"
+			"hours": "Horas",
+			"curbside": "Acera"
 		},
 		"musicOnHold": {
 			"title": "Música de espera ",
@@ -896,7 +897,8 @@
 			"emergencyState": "Estado",
 			"emergencyHelp1": "Esta dirección aparecerá como su dirección de identificador al hacer llamada de emergencia saliente a una agencia del gobierno (e.g. 911 in the US).",
 			"emergencyHelp2": "Nota: puede poner este rasgo en los números de los usuarios también si no comparten la misma ubicación que el anterior.",
-			"mandatoryE911Alert": "Se debe especificar información de e911 para su número de identificación de llamadas de empresa."
+			"mandatoryE911Alert": "Se debe especificar información de e911 para su número de identificación de llamadas de empresa.",
+			"invalidCNAMAlert": "El nombre del identificador de llamadas no debe tener más de 15 caracteres y solo puede incluir letras, números y espacios."
 		},
 		"missingMainNumberForCallerId": "Tienes que añadir un número principal a su oficina antes de configurar el identificador de llamadas!",
 		"missingE911Message": "Por favor, configure su identificador de empresa y e911 en un número de principal.",
@@ -920,7 +922,7 @@
 			"international": "Números internacionales",
 			"noNumber": "No hay ningún número disponible"
 		},
-		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SimplePBX if they don't have one",
 		"__version": "3.19",
 		"mainVMBoxName": "Buzón de voz principal",
 
@@ -936,7 +938,7 @@
 		}
 	},
 
-	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SimplePBX.",
 	"featureCodes": {
 		"title": "Códigos de función disponible",
 		"noFeatureCodeMessage": "No hay códigos de función activado en su cuenta. Códigos de función se crean automáticamente cuando se carga la página principal.",
