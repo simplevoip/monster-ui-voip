@@ -38,7 +38,7 @@ $ mkdir ~/tmp/simplevoip-{version}
 
 # 3) copy required files for the RPM build (source files, license, and spec)
 #---------------------------------------------
-$ cp /opt/monster-ui/{dev|prod}/src/apps/simplevoip ~/tmp/simplevoip-{version}/
+$ cp -a /opt/monster-ui/{dev|prod}/src/apps/simplevoip/. ~/tmp/simplevoip-{version}/
 $ cp /opt/monster-ui/{dev|prod}/src/apps/simplevoip/LICENSE ~/tmp/simplevoip-{version}/
 $ cp /opt/monster-ui/{dev|prod}/src/apps/simplevoip/simplevoip.spec ~/rpmbuild/SPECS/
 
