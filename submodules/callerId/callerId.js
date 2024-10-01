@@ -9,7 +9,7 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.callerId.renderPopup': 'callerIdEdit'
+			'simplevoip.callerId.renderPopup': 'callerIdEdit'
 		},
 
 		/**
@@ -38,7 +38,7 @@ define(function(require) {
 				argsCommon.accountId = args.accountId;
 			}
 
-			monster.pub('voip.numbers.editFeatures', argsCommon);
+			monster.pub('simplevoip.numbers.editFeatures', argsCommon);
 		},
 
 		/**

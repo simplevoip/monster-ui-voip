@@ -4,7 +4,8 @@ define(function(require) {
 		monster = require('monster'),
 		sv_config = require('./config.js'),
 		env = sv_config.env,
-		sv_api = sv_config.api;
+		sv_api = sv_config.api,
+		sv_featureSets = sv_config.featureSets;
 
 	var app = {
 		name: 'simplevoip',
@@ -286,7 +287,7 @@ define(function(require) {
 			self.loadGlobalData(function() {
 				/* On first Load, load my office */
 				template.find('.category#myOffice').addClass('active');
-				monster.pub('voip.myOffice.render', { parent: template.find('.right-content') });
+				monster.pub('simplevoip.myOffice.render', { parent: template.find('.right-content') });
 			});
 
 			self.bindEvents(template);
@@ -301,7 +302,7 @@ define(function(require) {
 		},
 
 		isExtensionDisplayable: function(number) {
-			var isAlphanumericExtensionsEnabled = monster.util.isFeatureAvailable('smartpbx.users.settings.utfExtensions.show'),
+			var isAlphanumericExtensionsEnabled = false,
 				regex = /\D/,
 				isAlphanumericExtension = regex.test(number);
 
@@ -365,7 +366,7 @@ define(function(require) {
 
 				// Empty the main container and then render the submodule content
 				container.empty();
-				monster.pub('voip.' + id + '.render', args);
+				monster.pub('simplevoip.' + id + '.render', args);
 			});
 		},
 
@@ -636,6 +637,10 @@ define(function(require) {
 				},
 			});
 		},
+
+		isFeatureAvailable: function(featurePath) {
+			return _.get(sv_featureSets, featurePath, true);
+		}
 	};
 
 	return app;

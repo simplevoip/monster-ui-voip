@@ -21,7 +21,7 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.myOffice.render': 'myOfficeRender',
+			'simplevoip.myOffice.render': 'myOfficeRender',
 			'auth.continueTrial': 'myOfficeWalkthroughRender',
 			'myaccount.closed': 'myOfficeAfterMyaccountClosed'
 		},
@@ -588,19 +588,19 @@ define(function(require) {
 				switch (category) {
 					case 'users':
 						$('.category#users').addClass('active');
-						monster.pub('voip.users.render', { parent: parent });
+						monster.pub('simplevoip.users.render', { parent: parent });
 						break;
 					case 'devices':
 						$('.category#devices').addClass('active');
-						monster.pub('voip.devices.render', { parent: parent });
+						monster.pub('simplevoip.devices.render', { parent: parent });
 						break;
 					case 'numbers':
 						$('.category#numbers').addClass('active');
-						monster.pub('voip.numbers.render', { parent: parent });
+						monster.pub('simplevoip.numbers.render', { parent: parent });
 						break;
 					case 'strategy':
 						$('.category#strategy').addClass('active');
-						monster.pub('voip.strategy.render', {
+						monster.pub('simplevoip.strategy.render', {
 							parent: parent,
 							openElement: subcategory
 						});

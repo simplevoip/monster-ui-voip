@@ -10,10 +10,10 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
-			'voip.strategy.render': 'strategyRender',
+			'simplevoip.strategy.addOfficeHours': 'strategyAddOfficeHoursPopup',
+			'simplevoip.strategy.render': 'strategyRender',
 			'auth.currentAccountUpdated': '_strategyOnCurrentAccountUpdated',
-			'voip.strategy.addEditOfficeHolidays': 'strategyAddEditOfficeHolidaysPopup'
+			'simplevoip.strategy.addEditOfficeHolidays': 'strategyAddEditOfficeHolidaysPopup'
 		},
 
 		weekdays: [
@@ -776,7 +776,7 @@ define(function(require) {
 
 					break;
 				case 'hours':
-					monster.pub('voip.strategyHours.render', {
+					monster.pub('simplevoip.strategyHours.render', {
 						container: $container,
 						strategyData: strategyData,
 						callback: callback
@@ -784,7 +784,7 @@ define(function(require) {
 
 					break;
 				case 'holidays':
-					monster.pub('voip.strategyHolidays.render', {
+					monster.pub('simplevoip.strategyHolidays.render', {
 						container: $container,
 						strategyData: strategyData,
 						callback: callback
@@ -874,7 +874,7 @@ define(function(require) {
 							}
 						};
 
-					monster.pub('voip.numberFeaturesMenu.render', args);
+					monster.pub('simplevoip.numberFeaturesMenu.render', args);
 				});
 
 				monster.ui.tooltips(template);
@@ -1010,7 +1010,7 @@ define(function(require) {
 					return $template;
 				},
 				formatDataToTemplate = _.partial(function(strategyData, callflowName, menuName) {
-					var isVirtualExceptionistEnabled = monster.util.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist'),
+					var isVirtualExceptionistEnabled = self.isFeatureAvailable('simplepbx.mainNumber.incomingCallHandling.virtualReceptionist'),
 						hasAdvancedCallflows = !_.isEmpty(strategyData.callEntities.advancedCallflows),
 						strategies = _.reject([{
 							type: 'menu',
@@ -1222,7 +1222,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('voip.numbers.dialogSpare', args);
+				monster.pub('simplevoip.numbers.dialogSpare', args);
 			});
 
 			container.on('click', '.action-links .buy-link', function(e) {
@@ -1418,7 +1418,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('voip.numbers.dialogSpare', args);
+				monster.pub('simplevoip.numbers.dialogSpare', args);
 			});
 
 			container.on('click', '.action-links .greeting-link', _.bind(self.strategyConfGreetingRender, self, strategyData));
@@ -1673,7 +1673,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('voip.numbers.dialogSpare', args);
+				monster.pub('simplevoip.numbers.dialogSpare', args);
 			});
 
 			container.on('click', '.action-links .edit-email', function(e) {
@@ -2886,7 +2886,7 @@ define(function(require) {
 					});
 				},
 				function maybeDisableVirtualReceptionist(callflows, callback) {
-					if (monster.util.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist')) {
+					if (self.isFeatureAvailable('simplepbx.mainNumber.incomingCallHandling.virtualReceptionist')) {
 						return callback(null, callflows);
 					}
 					var updateCallflowModuleToVmBoxFactory = function(voicemailBoxId, subCallflowLabel) {
@@ -3035,9 +3035,9 @@ define(function(require) {
 					paginate: 'false',
 					has_key: 'featurecode'
 				}, createdByApp ? {
-					'filter_ui_metadata.origin': 'voip'
+					'filter_ui_metadata.origin': 'simplevoip'
 				} : {
-					'filter_not_ui_metadata.origin': 'voip'
+					'filter_not_ui_metadata.origin': 'simplevoip'
 				}),
 				success: function(listFeatureCodes) {
 					callback && callback(listFeatureCodes);
@@ -3854,7 +3854,7 @@ define(function(require) {
 								'group_id'
 							],
 							'filter_ui_metadata.origin': [
-								'voip'
+								'simplevoip'
 							]
 						},
 						success: function(data) {

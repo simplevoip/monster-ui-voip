@@ -10,11 +10,11 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.numbers.dialogSpare': 'numbersDialogSpare',
-			'voip.numbers.render': 'numbersRender',
-			'voip.numbers.editFeatures': 'numbersEditFeatures',
-			'voip.numbers.getListFeatures': 'numbersGetFeatures',
-			'voip.numbers.getCarriersModules': 'numbersGetCarriersModules'
+			'simplevoip.numbers.dialogSpare': 'numbersDialogSpare',
+			'simplevoip.numbers.render': 'numbersRender',
+			'simplevoip.numbers.editFeatures': 'numbersEditFeatures',
+			'simplevoip.numbers.getListFeatures': 'numbersGetFeatures',
+			'simplevoip.numbers.getCarriersModules': 'numbersGetCarriersModules'
 		},
 
 		/* Arguments:
@@ -41,7 +41,7 @@ define(function(require) {
 						}
 					};
 
-				// monster.pub('voip.numberFeaturesMenu.render', args);
+				// monster.pub('simplevoip.numberFeaturesMenu.render', args);
 			});
 		},
 

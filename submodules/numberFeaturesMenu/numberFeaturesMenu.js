@@ -8,7 +8,7 @@ define(function(require) {
 		requests: {},
 
 		subscribe: {
-			'voip.numberFeaturesMenu.render': 'numberFeaturesMenuRender'
+			'simplevoip.numberFeaturesMenu.render': 'numberFeaturesMenuRender'
 		},
 
 		numberFeaturesMenuRender: function(args) {
@@ -41,7 +41,7 @@ define(function(require) {
 			var self = this,
 				featureEvents = {
 					'failover': 'common.failover.renderPopup',
-					'cnam': 'voip.callerId.renderPopup',
+					'cnam': 'simplevoip.callerId.renderPopup',
 					'prepend': 'common.numberPrepend.renderPopup',
 					'rename-carrier': 'common.numberRenameCarrier.renderPopup',
 					'messaging': 'common.numberMessaging.renderPopup'

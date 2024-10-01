@@ -9,7 +9,7 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.featureCodes.render': 'featureCodesRender'
+			'simplevoip.featureCodes.render': 'featureCodesRender'
 		},
 
 		categories: {
@@ -183,7 +183,7 @@ define(function(require) {
 						.addClass('active');
 
 				parent.empty();
-				monster.pub('voip.strategy.render', {
+				monster.pub('simplevoip.strategy.render', {
 					parent: parent
 				});
 			});

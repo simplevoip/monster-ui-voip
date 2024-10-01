@@ -14,7 +14,7 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.callLogs.render': 'callLogsRender'
+			'simplevoip.callLogs.render': 'callLogsRender'
 		},
 
 		callLogsRender: function(args) {

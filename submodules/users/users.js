@@ -22,14 +22,14 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.users.render': 'usersRender'
+			'simplevoip.users.render': 'usersRender'
 		},
 
 		appFlags: {
 			users: {
-				smartPBXCallflowString: ' SimplePBX\'s Callflow',
-				smartPBXConferenceString: ' SimplePBX Conference',
-				smartPBXVMBoxString: '\'s VMBox'
+				simplePBXCallflowString: ' SimplePBX\'s Callflow',
+				simplePBXConferenceString: ' SimplePBX Conference',
+				simplePBXVMBoxString: '\'s VMBox'
 			}
 		},
 
@@ -200,14 +200,14 @@ define(function(require) {
 				getFeatureTitle = function(featureId, defaultKey) {
 					var i18n = self.i18n.active().users[featureId].titles,
 						key = monster.util.getFeatureConfig(
-							['smartpbx', 'users', 'features', featureId, 'i18nLabelPath'],
+							['simplepbx', 'users', 'features', featureId, 'i18nLabelPath'],
 							defaultKey
 						);
 					return i18n[key];
 				},
 				isFeatureAvailable = function(data, id) {
-					var isFeatureAvailable = monster.util.isFeatureAvailable(
-							['smartpbx', 'users', 'features', _.camelCase(id), 'edit']
+					var isFeatureAvailable = self.isFeatureAvailable(
+							['simplepbx', 'users', 'features', _.camelCase(id), 'edit']
 						),
 						availabilityChecker = _.get(data, 'availabilityChecker', _.stubTrue);
 
@@ -239,8 +239,8 @@ define(function(require) {
 					mapFeatures: _.pickBy({
 						caller_id: {
 							availabilityChecker: function() {
-								var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
-										'smartpbx.users.features.callerId.editWhenSetOnAccount'
+								var isEditableWhenSetOnAccount = self.isFeatureAvailable(
+										'simplepbx.users.features.callerId.editWhenSetOnAccount'
 									),
 									isNotSetOnAccount = _
 										.chain(monster.apps.auth.currentAccount)
@@ -692,7 +692,7 @@ define(function(require) {
 						if (type === 'name') {
 							currentUser = data;
 
-							if (monster.util.isFeatureAvailable('smartpbx.users.timezone.edit')) {
+							if (self.isFeatureAvailable('simplepbx.users.timezone.edit')) {
 								monster.ui.chosen(template.find('#user_timezone'));
 							}
 
@@ -981,14 +981,14 @@ define(function(require) {
 											var conferenceIDToChange;
 
 											_.each(conferences, function(conference) {
-												if (!conferenceIDToChange && conference.name.indexOf(self.appFlags.users.smartPBXConferenceString) >= 0) {
+												if (!conferenceIDToChange && conference.name.indexOf(self.appFlags.users.simplePBXConferenceString) >= 0) {
 													conferenceIDToChange = conference.id;
 												}
 											});
 
 											if (conferenceIDToChange) {
 												self.usersGetConference(conferenceIDToChange, function(conference) {
-													conference.name = newName + self.appFlags.users.smartPBXConferenceString;
+													conference.name = newName + self.appFlags.users.simplePBXConferenceString;
 
 													self.usersUpdateConference(conference, function(newConference) {
 														callback && callback(null, newConference);
@@ -1024,7 +1024,7 @@ define(function(require) {
 										}
 
 										if (isUserNameDifferent) {
-											mainCallflow.name = newName + self.appFlags.users.smartPBXCallflowString;
+											mainCallflow.name = newName + self.appFlags.users.simplePBXCallflowString;
 										}
 
 										if (shouldUpdateTimeout && 'flow' in mainCallflow) {
@@ -1259,7 +1259,7 @@ define(function(require) {
 				var $this = $(this),
 					type = $this.data('type');
 
-				monster.pub('voip.devices.renderAdd', {
+				monster.pub('simplevoip.devices.renderAdd', {
 					allowAssign: false,
 					type: type,
 					callback: function(device) {
@@ -1344,7 +1344,7 @@ define(function(require) {
 					userData = _.find(data.users, { id: userId }),
 					deviceData = _.find(userData.extra.devices, { id: id });
 
-				monster.pub('voip.devices.editDevice', {
+				monster.pub('simplevoip.devices.editDevice', {
 					allowAssign: false,
 					data: { id: id, isRegistered: deviceData.registered },
 					callbackSave: function(device) {
@@ -1439,7 +1439,7 @@ define(function(require) {
 									}
 								};
 
-							monster.pub('voip.numberFeaturesMenu.render', args);
+							monster.pub('simplevoip.numberFeaturesMenu.render', args);
 
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
@@ -1452,7 +1452,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('voip.numbers.dialogSpare', args);
+				monster.pub('simplevoip.numbers.dialogSpare', args);
 			});
 
 			template.on('click', '.actions .buy-link', function(e) {
@@ -1480,7 +1480,7 @@ define(function(require) {
 										}
 									};
 
-								monster.pub('voip.numberFeaturesMenu.render', argsFeatures);
+								monster.pub('simplevoip.numberFeaturesMenu.render', argsFeatures);
 
 								monster.ui.tooltips(rowTemplate);
 
@@ -2422,7 +2422,7 @@ define(function(require) {
 				switchTranscription = featureForm.find('#transcribe').parent(),
 				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
 
-			if (!monster.util.isFeatureAvailable('smartpbx.users.features.vmbox.transcription')) {
+			if (!self.isFeatureAvailable('simplepbx.users.features.vmbox.transcription')) {
 				switchTranscription.addClass('disabled');
 			}
 
@@ -3096,9 +3096,9 @@ define(function(require) {
 					monster.pub('common.ringingDurationControl.getEndpoints', {
 						container: featureForm,
 						callback: function(endpoints) {
-							currentUser.smartpbx = currentUser.smartpbx || {};
-							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
-							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
+							currentUser.simplepbx = currentUser.simplepbx || {};
+							currentUser.simplepbx.find_me_follow_me = currentUser.simplepbx.find_me_follow_me || {};
+							currentUser.simplepbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
 							var callflowNode = {};
 
@@ -3318,9 +3318,9 @@ define(function(require) {
 			var self = this,
 				isEnabled = template.find('.switch-state').prop('checked');
 
-			user.smartpbx = user.smartpbx || {};
-			user.smartpbx.call_recording = user.smartpbx.call_recording || {};
-			user.smartpbx.call_recording.enabled = isEnabled;
+			user.simplepbx = user.simplepbx || {};
+			user.simplepbx.call_recording = user.simplepbx.call_recording || {};
+			user.simplepbx.call_recording.enabled = isEnabled;
 
 			if (isEnabled) {
 				user.call_recording = $.extend(true, {}, user.call_recording, {
@@ -3973,7 +3973,7 @@ define(function(require) {
 								}
 							};
 
-						monster.pub('voip.numberFeaturesMenu.render', argsFeatures);
+						monster.pub('simplevoip.numberFeaturesMenu.render', argsFeatures);
 					});
 
 					callback && callback(template, results);
@@ -4218,7 +4218,7 @@ define(function(require) {
 							},
 							module: 'user'
 						},
-						name: fullName + self.appFlags.users.smartPBXCallflowString,
+						name: fullName + self.appFlags.users.simplePBXCallflowString,
 						numbers: [ (data.callflow || {}).extension ]
 					},
 					extra: data.extra
@@ -4451,7 +4451,7 @@ define(function(require) {
 							},
 							module: 'user'
 						},
-						name: fullName + self.appFlags.users.smartPBXCallflowString,
+						name: fullName + self.appFlags.users.simplePBXCallflowString,
 						numbers: listExtensions,
 						owner_id: user.id,
 						type: 'mainUserCallflow'
@@ -5021,7 +5021,7 @@ define(function(require) {
 		usersIsSmartConference: function(name) {
 			var self = this;
 
-			return _.includes(name, self.appFlags.users.smartPBXConferenceString);
+			return _.includes(name, self.appFlags.users.simplePBXConferenceString);
 		},
 
 		usersGetConferenceFeature: function(userId, globalCallback) {
@@ -5299,7 +5299,7 @@ define(function(require) {
 						data: {
 							userId: userId,
 							data: {
-								smartpbx: {
+								simplepbx: {
 									find_me_follow_me: false
 								}
 							}
@@ -5536,7 +5536,7 @@ define(function(require) {
 			monster.parallel({
 				conference: function(callback) {
 					var baseConference = {
-							name: monster.util.getUserFullName(data.user) + self.appFlags.users.smartPBXConferenceString,
+							name: monster.util.getUserFullName(data.user) + self.appFlags.users.simplePBXConferenceString,
 							owner_id: data.user.id,
 							play_name_on_join: true,
 							member: {
@@ -5546,7 +5546,7 @@ define(function(require) {
 						},
 						formData = monster.ui.getFormData('conferencing_form');
 
-					monster.util.dataFlags.add({ source: 'smartpbx' }, baseConference);
+					monster.util.dataFlags.add({ source: 'simplepbx' }, baseConference);
 
 					if (formData.video) {
 						formData = _.merge(formData, {
@@ -5579,13 +5579,13 @@ define(function(require) {
 					}
 				},
 				user: function(callback) {
-					if (data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
+					if (data.user.simplepbx && data.user.simplepbx.conferencing && data.user.simplepbx.conferencing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.smartpbx = data.user.smartpbx || {};
-						data.user.smartpbx.conferencing = data.user.smartpbx.conferencing || {};
+						data.user.simplepbx = data.user.simplepbx || {};
+						data.user.simplepbx.conferencing = data.user.simplepbx.conferencing || {};
 
-						data.user.smartpbx.conferencing.enabled = true;
+						data.user.simplepbx.conferencing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5619,13 +5619,13 @@ define(function(require) {
 					});
 				},
 				user: function(callback) {
-					if (data.user.smartpbx && data.user.smartpbx.faxing && data.user.smartpbx.faxing.enabled === true) {
+					if (data.user.simplepbx && data.user.simplepbx.faxing && data.user.simplepbx.faxing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.smartpbx = data.user.smartpbx || {};
-						data.user.smartpbx.faxing = data.user.smartpbx.faxing || {};
+						data.user.simplepbx = data.user.simplepbx || {};
+						data.user.simplepbx.faxing = data.user.simplepbx.faxing || {};
 
-						data.user.smartpbx.faxing.enabled = true;
+						data.user.simplepbx.faxing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5749,10 +5749,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.conferencing_enabled = false;
-						user.smartpbx = user.smartpbx || {};
-						user.smartpbx.conferencing = user.smartpbx.conferencing || {};
+						user.simplepbx = user.simplepbx || {};
+						user.simplepbx.conferencing = user.simplepbx.conferencing || {};
 
-						user.smartpbx.conferencing.enabled = false;
+						user.simplepbx.conferencing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
@@ -5814,10 +5814,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.faxing_enabled = false;
-						user.smartpbx = user.smartpbx || {};
-						user.smartpbx.faxing = user.smartpbx.faxing || {};
+						user.simplepbx = user.simplepbx || {};
+						user.simplepbx.faxing = user.simplepbx.faxing || {};
 
-						user.smartpbx.faxing.enabled = false;
+						user.simplepbx.faxing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
@@ -5941,7 +5941,7 @@ define(function(require) {
 					// been created by the voip app, or if does not have
 					// empty children at the root of the flow, which
 					// is the default main user callflow without vmbox
-					if (mainUserCallflow.ui_metadata.origin !== 'voip' || !_.isEmpty(mainUserCallflow.flow.children)) {
+					if (mainUserCallflow.ui_metadata.origin !== 'simplevoip' || mainUserCallflow.ui_metadata.origin !== 'voip' || !_.isEmpty(mainUserCallflow.flow.children)) {
 						waterfallCallback(null);
 						return;
 					}
@@ -6166,7 +6166,7 @@ define(function(require) {
 		usersGetMainVMBoxName: function(userName) {
 			var self = this;
 
-			return userName + self.appFlags.users.smartPBXVMBoxString;
+			return userName + self.appFlags.users.simplePBXVMBoxString;
 		},
 
 		/**
@@ -6275,7 +6275,7 @@ define(function(require) {
 					}
 
 					// VMBox no longer exists, so purge it from main callflow
-					monster.pub('voip.vmboxes.removeCallflowModule', {
+					monster.pub('simplevoip.vmboxes.removeCallflowModule', {
 						callflow: data.callflow,
 						module: 'voicemail',
 						dataId: vmboxIdNotFound,

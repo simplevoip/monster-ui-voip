@@ -9,7 +9,7 @@ define(function(require) {
 
 	return {
 		subscribe: {
-			'voip.strategyHolidays.render': 'strategyHolidaysRender'
+			'simplevoip.strategyHolidays.render': 'strategyHolidaysRender'
 		},
 
 		appFlags: {
@@ -349,7 +349,7 @@ define(function(require) {
 			template.on('click', '.add-holiday', function(event) {
 				event.preventDefault();
 
-				monster.pub('voip.strategy.addEditOfficeHolidays', {
+				monster.pub('simplevoip.strategy.addEditOfficeHolidays', {
 					existingHolidays: _.map(self.appFlags.strategyHolidays.allHolidays, function(holiday) {
 						return {
 							id: _.get(holiday, 'holidayData.id'),
@@ -459,7 +459,7 @@ define(function(require) {
 					allHolidays = self.appFlags.strategyHolidays.allHolidays,
 					holidayRule = allHolidays[key];
 
-				monster.pub('voip.strategy.addEditOfficeHolidays', {
+				monster.pub('simplevoip.strategy.addEditOfficeHolidays', {
 					yearSelected: parseInt(parent.find('#year').val()),
 					existingHolidays: _.map(allHolidays, function(holiday) {
 						return {

@@ -30,9 +30,9 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.devices.render': 'devicesRender',
-			'voip.devices.renderAdd': 'devicesRenderAdd',
-			'voip.devices.editDevice': 'devicesRenderEdit'
+			'simplevoip.devices.render': 'devicesRender',
+			'simplevoip.devices.renderAdd': 'devicesRenderAdd',
+			'simplevoip.devices.editDevice': 'devicesRenderEdit'
 		},
 
 		appFlags: {
@@ -340,8 +340,8 @@ define(function(require) {
 					if (!monster.util.isNumberFeatureEnabled('e911')) {
 						return false;
 					}
-					var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
-							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
+					var isEditableWhenSetOnAccount = self.isFeatureAvailable(
+							'simplepbx.devices.settings.callerId.editWhenSetOnAccount'
 						),
 						isNotSetOnAccount = _
 							.chain(monster.apps.auth.currentAccount)
@@ -1223,7 +1223,7 @@ define(function(require) {
 				unassignedString = self.i18n.active().devices.unassignedDevice;
 				registeredDevices = _.filter(data.status, (device) => device.registered);
 				registeredDevicesById = _.map(registeredDevices, 'device_id'),
-				filteredAddableDeviceTypes = monster.util.isSuperDuper() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
+				filteredAddableDeviceTypes = monster.util.isReseller() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
 
 			return {
 				countDevices: _.size(data.devices),

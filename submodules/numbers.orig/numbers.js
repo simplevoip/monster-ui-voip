@@ -8,7 +8,7 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.numbers.render': 'numbersRender'
+			'simplevoip.numbers.render': 'numbersRender'
 		},
 
 		numbersRender: function(args) {
@@ -16,7 +16,7 @@ define(function(require) {
 				parent = args.parent || $('#ws_content'),
 				callback = args.callback;
 
-			monster.pub('voip.numbers.render', {
+			monster.pub('simplevoip.numbers.render', {
 				container: parent,
 				viewType: 'pbx',
 				callbackAfterRender: callback
