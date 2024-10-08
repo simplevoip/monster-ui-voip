@@ -346,7 +346,7 @@ define(function(require) {
 			var self = this,
 				container = parent.find('.right-content');
 
-			parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
+			parent.find('.left-menu').on('click', '.category:not(.loading):not(.external-link)', function() {
 				// Get the ID of the submodule to render
 				var $this = $(this),
 					args = {

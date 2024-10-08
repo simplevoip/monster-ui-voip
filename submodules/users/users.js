@@ -4062,7 +4062,7 @@ define(function(require) {
 				emptySpare: _.isEmpty(unassigned),
 				assignedDevices: _.keyBy(assigned, 'id'),
 				unassignedDevices: _.keyBy(unassigned, 'id'),
-				isSuperDuper: monster.util.isSuperDuper()
+				isReseller: monster.util.isReseller()
 			};
 		},
 

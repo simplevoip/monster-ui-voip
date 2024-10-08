@@ -235,7 +235,8 @@
 		"featureCodes": "Feature Codes",
 		"__comment": "UI-1220: Added VMBox module",
 		"__version": "3.19",
-		"vmboxes": "Voicemail Boxes"
+		"vmboxes": "Voicemail Boxes",
+		"analytics": "Analytics"
 	},
 
 	"commonMisc": {

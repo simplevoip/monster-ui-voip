@@ -26,13 +26,31 @@ config.js
 LICENSE
 ```
 
-From the command line:
+##### From your local command line
+
+Navigate to the main app:
 ```
 $ cd /<your-dev-directory>/monster-ui
+```
+
+Build the distributed code:
+```
 $ gulp build-app --app=simplevoip
+```
+
+Navigate to the distributed code directory:
+```
 $ cd dist/apps
+```
+
+Build the TAR file (x.x.x is the version from config.js):
+```
 $ tar -czvf simplevoip-x.x.x.tar.gz simplevoip
-<where x.x.x is the version from `config.js`>
+```
+
+Move the TAR file out of the repo:
+```
+$ mv simplevoip-x.x.x.tar.gz /<your-dev-directory>
 ```
 
 #### To staging
@@ -42,11 +60,16 @@ $ tar -czvf simplevoip-x.x.x.tar.gz simplevoip
 - Upload the `.tar.gz` file to the `monster-ui-simplevoip` S3 bucket
 - Connect to the MonsterUI Staging EC2 instance
 
-From the EC2 command line
+##### From the EC2 command line
+
+Execute the bash script to unzip the TAR file and move the files to the appropriate directories:
 ```
 $ ./monsterui.sh
+```
+
+Enter version number that matches the uploaded TAR file:
+```
 Enter the version number in the format #.#.#
-<enter version number that matches the uploaded TAR file>
 ```
 
 #### To production
