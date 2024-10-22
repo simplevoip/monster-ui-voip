@@ -13,9 +13,15 @@
 			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-music"></i></div>
 			<div class="header-link-title">{{i18n.myOffice.topBarLinks.musicOnHold}}</div>
 		</a>
-		<a href="#" class="header-link caller-id{{#compare mainNumbers.length "===" 0}} disabled{{/compare}}">
-			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-user"></i></div>
-			<div class="header-link-title">{{i18n.myOffice.topBarLinks.callerID}}</div>
+		{{#if isCnamEnabled}}
+			<a href="#" class="header-link caller-id{{#compare mainNumbers.length "===" 0}} disabled{{/compare}}">
+				<div class="header-link-icon"><i class="monster-white fa-lg fa fa-user"></i></div>
+				<div class="header-link-title">{{i18n.myOffice.topBarLinks.callerID}}</div>
+			</a>
+		{{/if}}
+		<a href="#" class="header-link curbside{{#compare mainNumbers.length "===" 0}} disabled{{/compare}}">
+			<div class="header-link-icon"><i class="monster-white fa-lg fa fa-car"></i></div>
+			<div class="header-link-title">{{i18n.myOffice.topBarLinks.curbside}}</div>
 		</a>
 	</div>
 
