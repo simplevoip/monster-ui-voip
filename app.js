@@ -25,14 +25,6 @@ define(function(require) {
 					'X-Auth-Token'
 				]
 			},
-			'sv.numbers.update': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
 			'sv.numbers.create': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
@@ -57,14 +49,6 @@ define(function(require) {
 					'X-Auth-Token'
 				]
 			},
-			'sv.sms.get': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=sms&did={did}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
 			'sv.sms.create': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=sms',
@@ -83,16 +67,8 @@ define(function(require) {
 			},
 			'sv.sms.delete': {
 				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=sms',
+				url: 'monster/api_functions.php?m=sms&accountId={accountId}&userId={userId}',
 				verb: 'DELETE',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.user.list': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=users&accountId={accountId}',
-				verb: 'GET',
 				removeHeaders: [
 					'X-Auth-Token'
 				]
@@ -101,6 +77,14 @@ define(function(require) {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
 				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.sync': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'POST',
 				removeHeaders: [
 					'X-Auth-Token'
 				]
@@ -129,62 +113,6 @@ define(function(require) {
 					'X-Auth-Token'
 				]
 			},
-			'sv.orders.list': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=orders&accountId={accountId}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.order.update': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=order&orderId={orderId}',
-				verb: 'PATCH',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.order.get': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=order&orderId={orderId}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.quote.approve': {
-				apiRoot: sv_api[env],
-				url: 'quote_pdf_s3.php?orderID={orderId}&name={name}',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.quote.update.duedate': {
-				apiRoot: sv_api[env],
-				url: 'ajax_functions.php?fn=quote_update&orderID={orderId}&duedate={dueDate}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.quote.toggle.rental': {
-				apiRoot: sv_api[env],
-				url: 'ajax_functions.php?fn=quote_toggle_rental&orderID={orderId}&toggle={toggle}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.user.sync': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			}
 		},
 		subscribe: {
 			'core.crossSiteMessage.voip': 'crossSiteMessageHandler'
@@ -244,6 +172,8 @@ define(function(require) {
 
 		e911_readonly: true,
 
+		app_version: sv_config.version,
+
 		// method required by MonsterUI
 		load: function(callback) {
 			var self = this;
@@ -270,9 +200,9 @@ define(function(require) {
 				// show_accountManagement = !monster.util.isSuperDuper() && monster.util.isAdmin();
 				template = $(self.getTemplate({
 					name: 'app',
-					// data: {
-					// 	show_accountManagement: show_accountManagement,
-					// },
+					data: {
+						app_version: self.app_version,
+					},
 				}));
 
 			self.registerHandlebarHelpers();

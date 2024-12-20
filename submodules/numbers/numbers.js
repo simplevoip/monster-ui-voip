@@ -20,7 +20,7 @@ define(function(require) {
 		/* Arguments:
 		** container: jQuery Div
 		** callbackAfterRender: callback executed once we rendered the number control
-		** viewType: default to 'pbx', can be set to 'pbx', basically changes the view from Number Manager to SimplePBX the if set to 'pbx'
+		** viewType: default to 'pbx', can be set to 'pbx', basically changes the view from Number Manager to SmartPBX the if set to 'pbx'
 		*/
 
 		numbersDisplayFeaturesMenu: function(arrayNumbers, parent) {
@@ -41,7 +41,7 @@ define(function(require) {
 						}
 					};
 
-				// monster.pub('simplevoip.numberFeaturesMenu.render', args);
+				// monster.pub('common.numberFeaturesMenu.render', args);
 			});
 		},
 

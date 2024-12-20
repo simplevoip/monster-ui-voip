@@ -16,7 +16,7 @@ define(function(require) {
 				parent = args.parent || $('#ws_content'),
 				callback = args.callback;
 
-			monster.pub('simplevoip.numbers.render', {
+			monster.pub('common.numbers.render', {
 				container: parent,
 				viewType: 'pbx',
 				callbackAfterRender: callback

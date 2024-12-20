@@ -126,7 +126,7 @@ define(function(require) {
 			return {
 				groups: _
 					.chain(mapGroups)
-					// Only list groups created with SimplePBX (e.g. with an associated baseGroup callflow)
+					// Only list groups created with SmartPBX (e.g. with an associated baseGroup callflow)
 					.reject(function(group) {
 						return !_.has(group, 'extra.baseCallflowId');
 					})

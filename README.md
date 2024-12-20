@@ -8,6 +8,7 @@ _***See the `monster-ui` README for local build instructions***_
 
 (For testing on a staging server, use `voip` instead of `simplevoip`)
 
+- Make sure that the `env` value in `config.js` matches one of the `api` values (e.g., `local`, `staging`, `production`)
 - Update the `version` value in `config.js` (e.g., `1.0.2`)
 
 Copy the following directories/files to the `monster-ui/src/apps/simplevoip` directory in the monster-ui repo directory:

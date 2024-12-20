@@ -471,14 +471,14 @@
 					"label": "Notify when unregistered",
 					"help": "Do you want to notify the administrator each time this device unregisters?"
 				},
-				"__comment": "UI-1917: Add button to unlock device on SimplePBX app",
+				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
 				"__version": "3.22",
 				"unlock": {
 					"label": "Allow Reprovision",
 					"button": "Unlock",
 					"success": "This device is unlocked for the next 24 hours"
 				},
-				"__comment": "UI-1917: Add button to unlock device on SimplePBX app",
+				"__comment": "UI-1917: Add button to unlock device on SmartPBX app",
 				"__version": "3.22",
 				"mediaWebrtc": {
 					"help": "If checked, forces a WebRTC compatible SDP on the INVITE.",
@@ -515,7 +515,7 @@
 					"H261": "H261"
 				}
 			},
-			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SimplePBX",
+			"__comment": "UI-1351: Add ability to configure feature keys for SIP devices in SmartPBX",
 			"__version": "v3.20_s4",
 			"keys": {
 				"alert": {
@@ -891,7 +891,7 @@
 			"pinLabel": "Personal Conference Room number",
 			"number": "Conferencing Phone Number(s)",
 			"help": "You can create a conference call by providing a conferencing phone number and your personal room number to the participants",
-			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SimplePBX) in order to enable the Personnals Conference Bridges",
+			"noConfNumbers": "You need to add a Main Conference Number (in the Main number section on the left of the SmartPBX) in order to enable the Personnals Conference Bridges",
 			"enableVideoConferencing": "Enable Video Conferencing"
 		},
 		"do_not_disturb": {
@@ -1028,7 +1028,7 @@
 		"__comment": "UI-1129: Migration tool from Kazoo-UI to Monster-UI",
 		"__version": "3.19",
 		"migration": {
-			"confirmMigration": "We found an existing callflow with the number you're trying to add, it appears we can migrate this callflow to the SimplePBX. Before we proceed, we want to make sure you understand that you won't be allowed to update this Callflow in Kazoo-UI or in the Monster-UI Callflows app after this change. Do you want to continue?",
+			"confirmMigration": "We found an existing callflow with the number you're trying to add, it appears we can migrate this callflow to the SmartPBX. Before we proceed, we want to make sure you understand that you won't be allowed to update this Callflow in Kazoo-UI or in the Monster-UI Callflows app after this change. Do you want to continue?",
 			"tooManyCallflows": "It appears the numbers you're trying to add belong to multiple Kazoo-UI Callflows. There is no way to properly migrate these callflows in Monster-UI please contact your support to fix it."
 		},
 		"__commment": "UI-1109: Adding popup for Presence ID change",
@@ -1374,7 +1374,7 @@
 		"walkthrough": {
 			"first": {
 				"steps": {
-					"1": "Setup your main company number within SimplePBX by purchasing or porting a number. This is different than User Phone Numbers because it represents the main phone number for the entire company."
+					"1": "Setup your main company number within SmartPBX by purchasing or porting a number. This is different than User Phone Numbers because it represents the main phone number for the entire company."
 				}
 			},
 			"second": {
@@ -1605,7 +1605,7 @@
 			"international": "International Numbers",
 			"noNumber": "No number available"
 		},
-		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SimplePBX if they don't have one",
+		"__comment": "UI-1220: Adding a Main VMBox automatically when they first load the SmartPBX if they don't have one",
 		"__version": "3.19",
 		"mainVMBoxName": "Main Voicemail Box",
 		"__comment": "UI-1210: Display the Main Faxbox number on the dashboard",
@@ -1619,8 +1619,8 @@
 		"__version": "3.23",
 		"walkthrough": {
 			"steps": {
-				"1": "Welcome to SimplePBX, the easiest way to set up your office phone system! This is the main dashboard. From here you can see your users, devices, numbers all in one place!",
-				"2": "Setting up Users is a breeze in SimplePBX. Create and manage most of your services in the Users tab. Create new users, assign numbers, add devices, and manage User Features.",
+				"1": "Welcome to SmartPBX, the easiest way to set up your office phone system! This is the main dashboard. From here you can see your users, devices, numbers all in one place!",
+				"2": "Setting up Users is a breeze in SmartPBX. Create and manage most of your services in the Users tab. Create new users, assign numbers, add devices, and manage User Features.",
 				"3": "Once you have created enough users, create user groups. This is extremely useful if you have users that work in the same department, such as a sales team.",
 				"4": "Main Number services are highly important for your business! Manage call handling with Virtual Receptionist, and route calls depending on Office Hours and Holidays."
 			}
@@ -1636,7 +1636,7 @@
 		}
 	},
 
-	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SimplePBX.",
+	"__comment": "UI-299, v3.19_s2: Added the Feature Codes tab to SmartPBX.",
 	"featureCodes": {
 		"title": "Available Feature Codes",
 		"noFeatureCodeMessage": "There are no feature codes enabled on your account yet. Feature codes are automatically created when you load the Main Number page.",
@@ -1696,7 +1696,7 @@
 			},
 			"hotdesk[action=login]": {
 				"label": "Enable Hot Desking",
-				"tooltip": "(Dial *11 + Hotdesk ID) Hotdesk ID can be configured in SimplePBX under User. All calls will be sent to this device."
+				"tooltip": "(Dial *11 + Hotdesk ID) Hotdesk ID can be configured in SmartPBX under User. All calls will be sent to this device."
 			},
 			"hotdesk[action=logout]": {
 				"label": "Disable Hot Desking",

@@ -1272,8 +1272,8 @@ define(function(require) {
 									function(callback) {
 										strategyData.callflows.MainCallflow.numbers.splice(indexToRemove, 1);
 
-										// We don't want the '0' to stay in the routing system if they're no longer using SimplePBX.
-										// If they remove their last main number, we consider they don't use SimplePBX, so we reset the "0" to be the "undefinedMainNumber"
+										// We don't want the '0' to stay in the routing system if they're no longer using SmartPBX.
+										// If they remove their last main number, we consider they don't use SmartPBX, so we reset the "0" to be the "undefinedMainNumber"
 										if (strategyData.callflows.MainCallflow.numbers.length === 1 && strategyData.callflows.MainCallflow.numbers[0] === '0') {
 											strategyData.callflows.MainCallflow.numbers[0] = 'undefinedMainNumber';
 										}
@@ -2209,7 +2209,7 @@ define(function(require) {
 										$disabled_template.find('select').prop('disabled', true);
 										$disabled_template.find('.remove-btn').addClass('hidden');
 										
-										$('<div class="text-error">This call flow cannot be modified within SimplePBX, and must be edited within the Callflows app.</div>').insertBefore('#strategy_menu_popup .action-block .save-button');
+										$('<div class="text-error">This call flow cannot be modified within SmartPBX, and must be edited within the Callflows app.</div>').insertBefore('#strategy_menu_popup .action-block .save-button');
 										$('#strategy_menu_popup .save-button').prop('disabled', true);
 									menuLineContainer
 										.append($disabled_template);

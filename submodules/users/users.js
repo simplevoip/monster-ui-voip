@@ -27,8 +27,8 @@ define(function(require) {
 
 		appFlags: {
 			users: {
-				simplePBXCallflowString: ' SimplePBX\'s Callflow',
-				simplePBXConferenceString: ' SimplePBX Conference',
+				simplePBXCallflowString: ' SmartPBX\'s Callflow',
+				simplePBXConferenceString: ' SmartPBX Conference',
 				simplePBXVMBoxString: '\'s VMBox'
 			}
 		},
@@ -392,7 +392,7 @@ define(function(require) {
 			});
 
 			var softphones = dataUser.extra.devices.filter(function(item) {
-				return item.type === 'softphone';
+				return dataUser.mobile_app.softphone_id === item.id;
 			});
 			if (softphones.length) {
 				softphones[0].name = softphones[0].name.substring(0, softphones[0].name.indexOf(' (softphone)'));
@@ -2900,8 +2900,11 @@ define(function(require) {
 					var formData = monster.ui.getFormData('sms_form'),
 						smsToSave = $.extend(true, {}, featureUser.sms, formData);
 
-					self.usersUpdateSms(smsToSave, function(data) {
+					self.usersUpdateSms(featureUser, smsToSave, function(data) {
 						if (data) {
+							if (data.message !== null && data.message !== '' && data.message !== undefined) {
+								monster.ui.alert('info', data.message);
+							}
 							popup.dialog('close').remove();
 							self.usersRender({
 								userId: featureUser.id,
@@ -3334,7 +3337,7 @@ define(function(require) {
 					}
 				});
 
-				// First we made the decision that SimplePBX would set these 3 fields globally, so we remove individual settings first
+				// First we made the decision that SmartPBX would set these 3 fields globally, so we remove individual settings first
 				_.each(user.call_recording, function(category) {
 					_.each(category, function(direction) {
 						delete direction.time_limit;
@@ -4594,7 +4597,7 @@ define(function(require) {
 				self.usersUpdateCallflow(existingCallflow, function() {
 					// Now that the numbers have been changed, we can create the new Monster UI Callflow
 					self.usersCreateCallflow(callflowToCreate, function(newCallflow) {
-						// Once all this is done, continue normally to the SimplePBX normal update
+						// Once all this is done, continue normally to the SmartPBX normal update
 						callback && callback(newCallflow);
 					});
 				});
@@ -4704,7 +4707,7 @@ define(function(require) {
 				var indexMain = -1;
 
 				_.each(listDirectories, function(directory, index) {
-					if (directory.name === 'SimplePBX Directory') {
+					if (directory.name === 'SmartPBX Directory') {
 						indexMain = index;
 
 						return false;
@@ -4744,7 +4747,7 @@ define(function(require) {
 					confirm_match: false,
 					max_dtmf: 0,
 					min_dtmf: 3,
-					name: 'SimplePBX Directory',
+					name: 'SmartPBX Directory',
 					sort_by: 'last_name'
 				};
 
@@ -4945,7 +4948,7 @@ define(function(require) {
 			});
 		},
 
-		usersUpdateSms: function(sms, callback) {
+		usersUpdateSms: function(userData, sms, callback) {
 			var self = this,
 				enabled = sms.enabled,
 				resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
@@ -4954,6 +4957,7 @@ define(function(require) {
 				resource: resource,
 				data: {
 					accountId: self.accountId,
+					userId: userData.id,
 					data: sms
 				},
 				success: function(data) {

@@ -303,7 +303,7 @@ define(function(require) {
 						},
 						success: function(data, status) {
 							var mainDirectory = _.find(data.data, function(val) {
-								return val.name === 'SimplePBX Directory';
+								return val.name === 'SmartPBX Directory';
 							});
 							if (mainDirectory) {
 								self.callApi({
@@ -914,6 +914,9 @@ define(function(require) {
 					delete dataToSave.curbside_settings.confirm_password;
 
 					self.myOfficeSaveCurbside(data, dataToSave, function(data) {
+						if (data.message !== null && data.message !== '' && data.message !== undefined) {
+							monster.ui.alert('info', data.message);
+						}
 						popup.dialog('close').remove();
 					});
 
@@ -1278,7 +1281,7 @@ define(function(require) {
 					data: curbsideData
 				},
 				success: function(data) {
-					callbackSuccess && callbackSuccess(data.data);
+					callbackSuccess && callbackSuccess(data);
 				},
 				error: function(data) {
 					callbackError && callbackError(data);
