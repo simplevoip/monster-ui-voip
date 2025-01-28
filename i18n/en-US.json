@@ -97,6 +97,7 @@
 			"headline": "Group Ringback Settings",
 			"dropdownLabel": "Ringback media:",
 			"silence": "Silence",
+			"default": "Default",
 			"defaultRingback": "Default Ringback",
 			"emptyUploadAlert": "Please select a file to upload",
 			"fileTooBigAlert": "You can not upload a file with a size exceeding 5MB",
@@ -232,7 +233,8 @@
 				"__version": "3.19",
 				"ignoreCompletedElsewhere": {
 					"label": "Ignore Completed Elsewhere",
-					"help": "When checked supporting phones will show a call missed if it was part of a ring group answered elsewhere."
+					"help": "When turned on, supporting phones will show a call missed if it was part of a ring group answered elsewhere.",
+					"systemDefault": "System Default"
 				},
 				"__comment": "UI-377: Adding Restart device feature",
 				"__version": "3.21",
@@ -432,6 +434,12 @@
 			"new": "New Softphone",
 			"deviceName": "Device Name"
 		},
+		"teammate": {
+			"addTitle": "Adding a MS Teams Device",
+			"editTitle": "Editing MS Teams Device: {{name}}",
+			"new": "New MS Teams Device",
+			"deviceName": "Device Name"
+		},
 		"ata": {
 			"addTitle": "Adding an ATA",
 			"editTitle": "Editing ATA: {{name}}",
@@ -459,6 +467,7 @@
 			"smartphone": "Smartphone",
 			"mobile": "Business Mobile",
 			"softphone": "Soft Phone",
+			"teammate": "MS Teams",
 			"landline": "Landline",
 			"fax": "Fax",
 			"ata": "ATA",
@@ -472,6 +481,7 @@
 		"add": "Add User",
 		"addExtension": "Add an extension to this user",
 		"addNewExtension": "Extension number: ",
+		"extensionAlreadyExist": "Already exists",
 		"addFromSpare": "Add from Spare Numbers",
 		"addFromSpareDevices": "Add from Spare Devices",
 		"buy": "Buy Numbers",
@@ -613,9 +623,6 @@
 			"headline": "User Call Forwarding Settings",
 			"keepCallerId": "Keep Original Caller-ID",
 			"label": "Forward all calls to" ,
-			"mobile": "A Mobile Phone",
-			"deskphone": "A Desk Phone",
-			"number": "This number",
 			"placeholder": "+14157283992",
 			"requireKeyPress": "Leave voicemails on forwarded numbers",
 			"title": "Call Forwarding",
@@ -672,7 +679,10 @@
 		},
 		"faxing": {
 			"trialError": "You're currently using a trial version of the UI. Please upgrade your account to have access to the Faxing feature!",
-			"title": "Faxbox",
+			"titles": {
+				"faxbox": "Faxbox",
+				"fax": "Fax"
+			},
 			"headline": "Faxbox",
 			"defaultSettings": {
 				"nameExtension": "'s Faxbox",
@@ -712,13 +722,16 @@
 			}
 		},
 		"vmbox": {
+			"missingExtension": "You need to add an extension in order to enable the Voicemail Box",
 			"deleteAfterNotify": "Delete messages from database after sending the notification.",
 			"headline": "User Voicemail Box",
 			"text": "A voicemail box will be available for this user.",
 			"label": "Voicemail to e-mail:",
-			"title": "Voicemail Box",
+			"titles": {
+				"voicemailBox": "Voicemail Box",
+				"voicemail": "Voicemail"
+			},
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
-			"announceOnly": "Announce Only",
 			"transcribe": "Transcribe",
 			"attachVoicemail": "Attach voicemail message to email."
 		},
@@ -821,8 +834,38 @@
 				"openHours": "Open Hours"
 			},
 			"errors": {
-				"noDaysSelected": "No days have been selected.",
-				"overlappingHours": "Selected hours overlap existing hours."
+				"noDaysSelected": "No days have been selected."
+			}
+		},
+		"addEditOfficeHolidays": {
+			"title": {
+				"add": "Add Holiday",
+				"edit": "Edit Holiday"
+			},
+			"labels": {
+				"addHoliday": "Add Holiday",
+				"updateHoliday": "Update Holiday",
+				"name": "Holiday Name",
+				"dateType": "Date Type",
+				"date": "Date",
+				"recurringAnnually": "Recurring Annually",
+				"allDay": "All Day",
+				"year": "Year",
+				"time": "Time"
+			},
+			"dateType": {
+				"singleDate": "Single Date",
+				"dateRange": "Date Range",
+				"advancedDate": "Advanced Date"
+			},
+			"placeholders": {
+				"name": "Holiday Name"
+			},
+			"errors": {
+				"noName": "Please enter a name for this holiday",
+				"minimum": "Holiday name must be 4 characters or greater",
+				"maximum": "Holiday name must be limited to 60 characters",
+				"nameExists": "Holiday name already exists. Please specificy a unique name"
 			}
 		},
 		"noNumberHelp": "Note: Please add a Main Office Number to your account first. Once you add a main number, you will be able to set up Office Hours, Holidays and Incoming Call Handling (Call-Flow) for your office.",
@@ -893,13 +936,84 @@
 		},
 		"holidays": {
 			"enableTitle": "Are you closed for holidays?",
-			"addLink": "Add Holiday",
-			"singleLink": "Single Day",
-			"rangeLink": "Date Range",
-			"advancedLink": "Advanced",
-			"__comment": "UI-1250: Adding help boxes",
-			"__version": "3.20_s2",
-			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab."
+			"title": "Holidays",
+			"holidaySchedule": "Holiday Schedule",
+			"buttons": {
+				"addHoliday": "Add Holiday",
+				"importHolidays": "Import Holidays",
+				"includeNationalHolidays": "Include National Holidays"
+			},
+			"listing": {
+				"headers": {
+					"name": "Name",
+					"date": "Date",
+					"actions": "Actions"
+				},
+				"search": "Search...",
+				"dateWithYear": "{{dateText}}, {{year}}"
+			},
+			"days": {
+				"monday": "Mon",
+				"tuesday": "Tue",
+				"wednesday": "Wed",
+				"thursday": "Thu",
+				"friday": "Fri",
+				"saturday": "Sat",
+				"sunday": "Sun"
+			},
+			"ordinals": {
+				"first": "First",
+				"second": "Second",
+				"third": "Third",
+				"fourth": "Fourth",
+				"fifth": "Fifth",
+				"last": "Last"
+			},
+			"months": {
+				"january": "Jan",
+				"february": "Feb",
+				"march": "Mar",
+				"april": "Apr",
+				"may": "May",
+				"june": "Jun",
+				"july": "Jul",
+				"august": "Aug",
+				"september": "Sep",
+				"october": "Oct",
+				"november": "Nov",
+				"december": "Dec"
+			},
+			"to": "to",
+			"empty": {
+				"title": "Your Office Holidays Are Empty",
+				"description": "Please use the Add holiday or Import Holidays buttons to enter holidays."
+			},
+			"importOfficeHolidays": {
+				"title": "Import Holidays"
+			},
+			"importNationalOfficeHolidays": {
+				"title": "Select National Holidays",
+				"labels": {
+					"selectYourCountry": "Select Your Country",
+					"description": "Select holidays when your office will be closed",
+					"includeObservedDates": "Include Observed Dates",
+					"selectHolidays": "Select Holidays",
+					"holiday": "holiday"
+				}
+			},
+			"dialogs": {
+				"delete": {
+					"title": "Delete Holiday?",
+					"deleteAll": "Delete all recurring instances",
+					"message": "Delete holiday \"{{variable}}\"? Deleting a holiday will permanently remove it.",
+					"buttons": {
+						"yes": "Yes, Delete Holiday",
+						"no": "No, Keep Holiday"
+					}
+				}
+			},
+			"helpHolidays": "Do not forget to set the call routing for when your office is closed for the holidays! To set it up, go in the \"Incoming Call Handling\" section of this page, and select the \"Holidays\" tab.",
+			"expiredHolidays": "Expired holidays"
 		},
 		"calls": {
 			"openHoursTitle": "Open Hours",
@@ -933,7 +1047,7 @@
 			"recordGreetingInfo": "Record the greeting message yourself over the phone, by following the steps below:",
 			"recordGreetingLines": {
 				"line1": "Pick up a phone registered in this account.",
-				"line2": "Dial your office main number.",
+				"line2": "Dial into the appropriate menu.",
 				"line3": "Enter this PIN when prompted:",
 				"line4": "Record your greetings / menu."
 			},
@@ -951,37 +1065,6 @@
 		},
 		"open": "Open",
 		"closed": "Closed",
-		"weekdays": {
-			"monday": "Monday",
-			"tuesday": "Tuesday",
-			"wednesday": "Wednesday",
-			"thursday": "Thursday",
-			"friday": "Friday",
-			"saturday": "Saturday",
-			"sunday": "Sunday"
-		},
-		"ordinals": {
-			"first": "First",
-			"second": "Second",
-			"third": "Third",
-			"fourth": "Fourth",
-			"fifth": "Fifth",
-			"last": "Last"
-		},
-		"monthsShort": {
-			"january": "Jan",
-			"february": "Feb",
-			"march": "Mar",
-			"april": "Apr",
-			"may": "May",
-			"june": "Jun",
-			"july": "Jul",
-			"august": "Aug",
-			"september": "Sep",
-			"october": "Oct",
-			"november": "Nov",
-			"december": "Dec"
-		},
 		"callEntities": {
 			"qubicle": "Call Queues",
 			"user": "Users",
@@ -1159,9 +1242,27 @@
 		"__version": "v4.0",
 		"loading": "Loading additional information...",
 		"actions": {
-			"report": "Report Call",
+			"report": "Copy details",
 			"details": "Technical Details"
 		},
+		"diagnosticCallData": {
+			"accountId": "Account ID: {{variable}}",
+			"fromName": "From (Name): {{variable}}",
+			"fromNumber": "From (Number): {{variable}}",
+			"toName": "To (Name): {{variable}}",
+			"toNumber": "To (Number): {{variable}}",
+			"date": "Date: {{variable}}",
+			"duration": "Duration: {{variable}}",
+			"hangUpCause": "Hangup Cause: {{variable}}",
+			"callId": "Call ID: {{variable}}",
+			"otherLegCallId": "Other Leg Call ID: {{variable}}",
+			"otherLegs": "Other Legs: {{variable}}",
+			"handlingServer": "Handling Server: {{variable}}",
+			"timestamp": "Timestamp: {{variable}}",
+			"base64Encoded": "Base64 Encoded: {{variable}}"
+		},
+		"copyCallDiagInfo": "Diagnostic data copied to clipboard, please email this to your support representative for assistance",
+		"copyCallDiagError": "An error occurred while copying diagnostic data to clipboard",
 		"downloadTooltip": "In \"Custom\" Mode, you'll need to click on \"Filter\" before clicking on download."
 	},
 
@@ -1198,10 +1299,17 @@
 			"emergencyCity": "City",
 			"emergencyState": "State",
 			"emergencyEmail": "Email Address(es)",
+			"emergencyCountry": "Country",
 			"emergencyEmailError": "Invalid space separated address(es)",
 			"emergencyHelp1": "This information will appear as your Caller ID information when you make outbound emergency call to a government agency (e.g. 911 in the US).",
 			"emergencyHelp2": "Note: You can set this feature on users' numbers too if they do not share the same location as above.",
-			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number."
+			"mandatoryE911Alert": "You must specify e911 information for your company caller ID number.",
+			"countries": {
+				"us": {
+					"value": "US",
+					"option": "United States"
+				}
+			}
 		},
 		"others": "Others",
 		"missingMainNumberForCallerId": "You need to add a main number to your office before configuring the Caller-ID!",

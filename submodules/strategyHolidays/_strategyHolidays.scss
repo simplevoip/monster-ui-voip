@@ -1,0 +1,193 @@
+.holidays-toggler {
+	padding: 32px 0 20px 20px;
+
+	span {
+		color: $woodsmoke;
+		font-weight: 600;
+	}
+}
+
+.monster-button {
+	color: $woodsmoke;
+	border-radius: 2px;
+}
+
+.save-button {
+	background: #2ed022;
+	border-color: #209218;
+	margin-left: 3px;
+}
+
+.holidays-div {
+	color: $woodsmoke;
+	padding: 20px;
+	display: none;
+
+	.title {
+		font-size: 18px;
+		margin-bottom: 1rem;
+	}
+
+	.help-div {
+		background-color: $french-pass;
+		display: flex;
+		padding: 16px;
+
+		.help-icon {
+			margin-right: 12px;
+			position: relative;
+			bottom: 2px;
+		}
+	}
+
+	.year-config {
+		margin: 16px 0;
+
+		select {
+			height: 36px;
+			width: 140px;
+		}
+	}
+
+	.actions-wrapper {
+		position: absolute;
+		z-index: 1;
+
+		button {
+			font-size: 14px;
+			padding: 8px 7px;
+			border: 1px solid $french-gray2;
+			background: linear-gradient(-180deg, $white 0%, $athens-gray 100%);
+			margin-right: 8px;
+			min-width: 96px;
+
+			span {
+				margin-left: .5rem
+			}
+
+			.svg-icon {
+				color: $midgray2;
+			}
+		}
+
+		.add-holiday {
+			background: $dodger-blue;
+			border: 1px solid #006bca;
+
+			.svg-icon {
+				color: $woodsmoke;
+			}
+		}
+	}
+
+	#holidays_list_table {
+		color: $shark2;
+
+		.footable-filtering {
+			.input-group {
+				width: 256px;
+
+				.form-control {
+					width: 192px;
+				}
+
+				input[type="text"] {
+					height: 22px;
+				}
+
+				.input-group-btn {
+					.btn-primary {
+						background-color: $white !important;
+						color: $manatee;
+						border-left: unset;
+						height: 36px;
+
+						.fooicon {
+							font-size: 16px;
+						}
+					}
+				}
+			}
+		}
+
+		.footable-header {
+			background-color: #dbdbde;
+
+			th {
+				font-size: 12px;
+				font-weight: 600;
+				color: $shark2;
+				border-color: $french-gray2;
+			}
+		}
+
+		tbody {
+			tr {
+				height: 44px;
+				border: 1px $french-gray2;
+
+				svg {
+					color: $midgray2;
+					padding: 0 10px;
+					cursor: pointer;
+				}
+
+				&.footable-empty {
+					display: none;
+				}
+			}
+
+			tr:nth-child(even) {
+				background: rgba($athens-gray, 0.48);
+			}
+		}
+
+		td:first-child, .footable-header th:first-child {
+			border-left: 1px solid $french-gray2;
+		}
+
+		td:last-child, .footable-header th:last-child {
+			border-right: 1px solid $french-gray2;
+		}
+	}
+
+	.custom-footable-empty {
+		color: $woodsmoke;
+		display: none;
+		border-radius: 2px;
+		border: 1px solid $mischka;
+		border-top: none;
+		text-align: center;
+
+		&.show {
+			display: block;
+		}
+
+		svg {
+			color: $manatee;
+			height: 1.5rem;
+			width: 1.5rem;
+			cursor: default;
+			margin-right: 12px;
+		}
+
+		.title-row {
+			padding: 44px 0;
+			display: inline-flex;
+			align-items: center;
+
+			span {
+				font-size: 16px;
+				font-weight: 600;
+			}
+		}
+
+		.description-row {
+			margin-bottom: 40px;
+
+			.description {
+				font-size: 14px;
+			}
+		}
+	}
+}

@@ -7,6 +7,12 @@ define(function(require) {
 		return _.every([dest, src], _.isArray) ? src : undefined;
 	};
 
+	var showTeammateDevice = _
+		.chain(monster.config)
+		.get('allowedExtraDeviceTypes', [])
+		.includes('teammate')
+		.value();
+
 	var app = {
 
 		requests: {
@@ -32,23 +38,25 @@ define(function(require) {
 		appFlags: {
 			devices: {
 				iconClassesByDeviceTypes: {
-					application: 'icon-telicon-apps',
-					ata: 'icon-telicon-ata',
-					cellphone: 'fa fa-phone',
-					fax: 'icon-telicon-fax',
-					landline: 'icon-telicon-home',
-					mobile: 'icon-telicon-sprint-phone',
-					sip_device: 'icon-telicon-voip-phone',
-					sip_uri: 'icon-telicon-voip-phone',
-					smartphone: 'icon-telicon-mobile-phone',
-					softphone: 'icon-telicon-soft-phone'
+					application: 'apps',
+					ata: 'device-ata',
+					cellphone: 'phone',
+					fax: 'device-fax',
+					landline: 'home',
+					mobile: 'device-sprint-phone',
+					sip_device: 'device-voip-phone',
+					sip_uri: 'device-voip-phone',
+					smartphone: 'device-mobile',
+					softphone: 'device-soft-phone',
+					teammate: 'device-mst',
+					meta: 'apps'
 				},
 				/**
 				 * Lists device types allowed to be added by devicesRenderAdd.
 				 * The order is important and controls the list rendered in DOM.
 				 * @type {Array}
 				 */
-				addableDeviceTypes: [
+				addableDeviceTypes: _.flatten([[
 					'sip_device',
 					'cellphone',
 					'smartphone',
@@ -57,12 +65,14 @@ define(function(require) {
 					'fax',
 					'ata',
 					'sip_uri'
-				],
+				], showTeammateDevice ? [
+					'teammate'
+				] : []]),
 				/**
 				 * Lists device types allowed to be edited by devicesRenderEdit.
 				 * @type {Array}
 				 */
-				editableDeviceTypes: [
+				editableDeviceTypes: _.flatten([[
 					'ata',
 					'cellphone',
 					'fax',
@@ -73,6 +83,9 @@ define(function(require) {
 					'smartphone',
 					'softphone'
 				],
+				showTeammateDevice ? [
+					'teammate'
+				] : []]),
 				provisionerConfigFlags: monster.config.whitelabel.provisioner
 			}
 		},
@@ -206,10 +219,8 @@ define(function(require) {
 						}
 					});
 				} else if (action === 'delete') {
-					monster.ui.confirm(self.i18n.active().devices.confirmDeleteDevice, function() {
-						self.devicesHelperDeleteDevice(dataDevice.id, function() {
-							self.devicesRender();
-						});
+					self.devicesHelperDeleteDevice(dataDevice.id, function() {
+						self.devicesRender();
 					});
 				}
 			});
@@ -325,6 +336,21 @@ define(function(require) {
 		 */
 		devicesRenderDevice: function(args) {
 			var self = this,
+				isCallerIdConfigurable = function() {
+					if (!monster.util.isNumberFeatureEnabled('e911')) {
+						return false;
+					}
+					var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
+							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
+						),
+						isNotSetOnAccount = _
+							.chain(monster.apps.auth.currentAccount)
+							.get('caller_id.external.number')
+							.isUndefined()
+							.value();
+
+					return isEditableWhenSetOnAccount || isNotSetOnAccount;
+				},
 				data = _.get(args, 'data'),
 				isAssignAllowed = !!_.get(args, 'allowAssign', true),
 				callbackSave = _.get(args, 'callbackSave'),
@@ -343,7 +369,7 @@ define(function(require) {
 					name: 'devices-' + type,
 					data: $.extend(true, {}, data, {
 						isProvisionerConfigured: monster.config.api.hasOwnProperty('provisioner'),
-						showEmergencyCallerId: monster.util.isNumberFeatureEnabled('e911')
+						showEmergencyCallerId: isCallerIdConfigurable()
 					}),
 					submodule: 'devices'
 				})),
@@ -379,96 +405,15 @@ define(function(require) {
 				});
 
 				templateDevice.find('.keys').each(function() {
-					var $this = $(this),
-						itemUpdated = false,
-						$itemUnder,
-						$itemBefore,
-						$itemAfter,
-						$siblings;
+					var $this = $(this);
 
 					$this.sortable({
+						axis: 'y',
 						items: '.control-group',
 						placeholder: 'control-group placeholder',
 						update: function(e, ui) {
 							ui.item.addClass('moved');
-
-							itemUpdated = true;
-						},
-						start: function(e, ui) {
-							$itemBefore = ui.item.prevAll('.control-group:not(.placeholder):first');
-							$itemAfter = ui.item.nextAll('.control-group:not(.placeholder):first');
-							$siblings = ui.item.siblings('.control-group');
-						},
-						stop: function(e, ui) {
-							// Swap
-							if (!_.isEmpty($itemUnder) && !$itemUnder.hasClass('placeholder')) {
-								$itemUnder.addClass('moved');
-
-								if (itemUpdated) {
-									// The dragged item was updated, so we only need to swap the other item
-									if (!_.isEmpty($itemBefore) && !$itemUnder.is($itemBefore)) {
-										$itemUnder.remove().insertAfter($itemBefore);
-									} else if (!_.isEmpty($itemAfter) && !$itemUnder.is($itemAfter)) {
-										$itemUnder.remove().insertBefore($itemAfter);
-									}
-								} else {
-									// Special case: the dragged item is over a sibling next to it,
-									// but it did not triggered an update event, because the
-									// placeholder was still at the same original position of the item
-									ui.item.addClass('moved');
-									if (!$itemUnder.is($itemBefore)) {
-										$itemUnder.insertBefore(ui.item);
-									} else if (!$itemUnder.is($itemAfter)) {
-										$itemUnder.insertAfter(ui.item);
-									}
-								}
-							}
-
-							// Update items
-							$this
-								.find('.feature-key-index')
-									.each(function(idx, el) {
-										$(el).text(idx + 1);
-									});
-
-							if ($this.data('section') === 'comboKeys') {
-								$this
-									.find('.control-group')
-										.first()
-											.addClass('warning')
-										.siblings('.control-group.warning')
-											.removeClass('warning');
-							}
-
-							// Cleanup
-							if (!_.isEmpty($itemUnder)) {
-								$itemUnder.removeClass('selected');
-								$itemUnder = null;
-							}
-							itemUpdated = false;
-						},
-						sort: _.debounce(function(e, ui) {
-							var $newItemUnder = $siblings.filter(function(idx, elem) {
-								var itemPosition = ui.position,
-									$elem = $(elem),
-									elemPosition = $elem.position();
-								return itemPosition.left >= elemPosition.left
-									&& itemPosition.left <= elemPosition.left + $elem.width()
-									&& itemPosition.top >= elemPosition.top
-									&& itemPosition.top <= elemPosition.top + $elem.height();
-							});
-
-							if ($newItemUnder.is($itemUnder)) {
-								return;
-							}
-
-							if (!_.isEmpty($itemUnder)) {
-								$itemUnder.removeClass('selected');
-							}
-
-							$newItemUnder.addClass('selected');
-							$itemUnder = $newItemUnder;
-						}, 50)
+						}
 					});
 				});
 
@@ -733,6 +678,13 @@ define(function(require) {
 				});
 			});
 
+			templateDevice.find('.btn-group-wrapper button.monster-button-ignore').on('click', function(e) {
+				e.preventDefault();
+				var $this = $(this);
+				$this.siblings().removeClass('selected monster-button-primary');
+				$this.addClass('selected monster-button-primary');
+			});
+
 			var popup = monster.ui.dialog(templateDevice, {
 				title: popupTitle,
 				dialogClass: 'voip-edit-device-popup'
@@ -784,20 +736,31 @@ define(function(require) {
 						.value();
 				};
 
+			template.find('.ignore-completed-elsewhere').each(function() {
+				var $this = $(this),
+					hasValue = $this.find('button.selected').length,
+					value = hasValue ? $this.find('button.selected').data('value') : 'default';
+
+				// If value is set to something else than account default then we set the enabled boolean
+				if (value && value !== 'default') {
+					formData.ignore_completed_elsewhere = value === 'on';
+					return;
+				}
+
+				delete formData.ignore_completed_elsewhere;
+				delete originalData.ignore_completed_elsewhere;
+			});
+
 			if ('mac_address' in formData) {
 				formData.mac_address = monster.util.formatMacAddress(formData.mac_address);
 			}
 
 			if (hasCallForward) {
-				formData.call_forward = $.extend(true, {
+				formData.call_forward = _.merge({
 					enabled: true,
 					require_keypress: true,
 					keep_caller_id: true
 				}, formData.call_forward);
-
-				if (originalData.device_type === 'smartphone') {
-					formData.call_forward.failover = true;
-				}
 
 				if (formData.hasOwnProperty('extra') && formData.extra.allowVMCellphone) {
 					formData.call_forward.require_keypress = !formData.extra.allowVMCellphone;
@@ -1100,14 +1063,33 @@ define(function(require) {
 						audio: [],
 						video: []
 					},
+					sip: {
+						realm: monster.apps.auth.currentAccount.realm
+					},
 					users: _.sortBy(data.users, function(user) {
 						return _
 							.chain(user)
 							.thru(monster.util.getUserFullName)
 							.toLower()
 							.value();
-					})
-				}
+					}),
+					faxOptions: {
+						selected: _.get(data.device, 'media.fax_option', 'auto'),
+						options: [{
+							labelKey: 'auto',
+							value: 'auto'
+						}, {
+							labelKey: 'force',
+							value: true
+						}, {
+							labelKey: 'disabled',
+							value: false
+						}]
+					}
+				},
+				system_ignore_completed_elsewhere: _.get(data, 'configs.ignore_completed_elsewhere', true)
+					? self.i18n.active().on
+					: self.i18n.active().off
 			}, deviceData);
 		},
 
@@ -1118,28 +1100,26 @@ define(function(require) {
 		 * @return {Object}
 		 */
 		devicesApplyDefaults: function(device) {
-			var self = this;
+			var self = this,
+				isNew = !_.has(device, 'id'),
+				type = _.get(device, 'device_type');
 
 			return _.mergeWith(
-				self.devicesGetDefaults(device),
+				isNew ? self.devicesGetDefaults(type) : {},
 				device,
 				overrideDestArray
 			);
 		},
 
 		/**
-		 * @param  {Object} device
-		 * @param  {String} device.device_type
-		 * @param  {String} [device.id]
+		 * @param  {String} type
 		 * @return {Object}
 		 */
-		devicesGetDefaults: function(device) {
-			var self = this,
-				isNew = !_.has(device, 'id'),
-				type = _.get(device, 'device_type');
+		devicesGetDefaults: function(type) {
+			var self = this;
 
 			return _.mergeWith(
-				isNew ? self.devicesGetBaseDefaults() : {},
+				self.devicesGetBaseDefaults(),
 				self.devicesGetDefaultsForType(type),
 				overrideDestArray
 			);
@@ -1178,7 +1158,6 @@ define(function(require) {
 				sipSettings = {
 					sip: {
 						password: monster.util.randomString(12),
-						realm: monster.apps.auth.currentAccount.realm,
 						username: 'user_' + monster.util.randomString(10)
 					}
 				},
@@ -1187,7 +1166,7 @@ define(function(require) {
 					cellphone: _.merge({}, callForwardSettings),
 					fax: _.merge({
 						media: {
-							fax_option: 'false'
+							fax_option: false
 						},
 						outbound_flags: [
 							'fax'
@@ -1207,7 +1186,25 @@ define(function(require) {
 						]))
 					},
 					smartphone: _.merge({}, sipSettings, callForwardSettings),
-					softphone: _.merge({}, sipSettings)
+					softphone: _.merge({}, sipSettings),
+					teammate: _.merge({
+						caller_id_options: {
+							outbound_privacy: 'none'
+						},
+						sip: _.merge({
+							ignore_completed_elsewhere: false
+						}, _.pick(sipSettings.sip, ['password', 'username'])),
+						media: {
+							webrtc: false,
+							encryption: {
+								enforce_security: true,
+								methods: ['srtp']
+							},
+							audio: {
+								codecs: ['PCMU', 'PCMA']
+							}
+						}
+					}, sipSettings)
 				};
 
 			return _.get(defaultsPerType, type, {});
@@ -1236,7 +1233,9 @@ define(function(require) {
 					.map(function(device) {
 						var staticStatusClasses = ['unregistered', 'registered'],
 							deviceType = device.device_type,
-							isRegistered = device.registrable ? device.registered : true,
+							// TODO: this validation should be removed once the backend returns the actual meta device status.
+							isRegistered = device.device_type === 'meta' ? true :
+							  device.registrable ? device.registered : true,
 							isEnabled = _.get(device, 'enabled', false),
 							userName = _
 								.chain(usersById)
@@ -1441,7 +1440,19 @@ define(function(require) {
 									callback(null, users);
 								}
 							});
-						}
+						},
+						configs: function(callback) {
+							self.callApi({
+								resource: 'configs.get',
+								data: {
+									accountId: self.accountId,
+									endpoint: 'kazoo_endpoint'
+								},
+								success: function(data, status) {
+									callback(null, data.data);
+								}
+							});
+						},
 					}, function(error, results) {
 						waterfallCb(null, results);
 					});
@@ -1504,6 +1515,8 @@ define(function(require) {
 					self.updateMobileCallflowAssignment(userId, userMainCallflowId, device, callback);
 				},
 				saveDevice = function saveDevice(device, callback) {
+					delete device.system_ignore_completed_elsewhere;
+
 					var method = _.has(device, 'id') ? 'devicesUpdateDevice' : 'devicesCreateDevice';
 
 					self[method](device, _.partial(callback, null), callback);

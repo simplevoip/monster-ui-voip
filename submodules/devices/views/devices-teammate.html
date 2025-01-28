@@ -2,13 +2,13 @@
 	<div class="title-bar clearfix">
 		<div class="device-title pull-left">
 			<div class="device-icon">
-				<i class="icon-telicon-soft-phone"></i>
+				{{telicon "device-mst"}}
 			</div>
 
 			{{#if id}}
 				<div class="device-model">{{name}}</div>
 			{{else}}
-				<div class="device-model">{{i18n.devices.softphone.new}}</div>
+				<div class="device-model">{{i18n.devices.teammate.new}}</div>
 			{{/if}}
 		</div>
 
@@ -24,20 +24,6 @@
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu pull-right">
-				{{#isFeatureAvailable "smartpbx.devices.settings.codecs.manage"}}
-					<li>
-						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
-							<i class="fa fa-music"></i>
-							{{ i18n.devices.popupSettings.audio.menuTitle }}
-						</a>
-					</li>
-					<li>
-						<a class="tabs-selector change-section" data-section="video" href="javascript:void(0)">
-							<i class="fa fa-video-camera"></i>
-							{{ i18n.devices.popupSettings.video.menuTitle }}
-						</a>
-					</li>
-				{{/isFeatureAvailable}}
 					<li>
 						<a class="tabs-selector change-section" data-section="restrictions" href="javascript:void(0)">
 							<i class="fa fa-ban"></i>
@@ -67,7 +53,7 @@
 		<form id="form_device" class="form-horizontal">
 			<div class="tabs-section active" data-section="basic">
 				<div class="control-group">
-					<label class="control-label" for="name">{{ i18n.devices.softphone.deviceName }}</label>
+					<label class="control-label" for="name">{{ i18n.devices.teammate.deviceName }}</label>
 					<div class="controls">
 						<input {{#isFeatureAvailable "smartpbx.devices.settings.name.edit" }}{{else}}disabled{{/isFeatureAvailable}} type="text"
 							id="name" name="name" value="{{name}}">
@@ -95,34 +81,7 @@
 						<span class="displayed-realm">{{ extra.sip.realm }}</span>
 					</div>
 				</div>
-				{{/isFeatureAvailable}}
-			</div>
-
-			<div class="tabs-section clearfix" data-section="audio">
-				<div class="title">
-					{{ i18n.devices.popupSettings.audio.sectionTitle }}
-				</div>
-
-				<div class="helper">
-					<i class="fa fa-info-circle"></i>
-					{{ i18n.devices.popupSettings.dragAndDrop }}
-				</div>
-
-				<div class="items-selector codec-selector clearfix" id="audio_codec_selector">
-				</div>
-			</div>
-
-			<div class="tabs-section clearfix" data-section="video">
-				<div class="title">
-					{{ i18n.devices.popupSettings.video.sectionTitle }}
-				</div>
-				<div class="helper">
-					<i class="fa fa-info-circle"></i>
-					{{ i18n.devices.popupSettings.dragAndDrop }}
-				</div>
-
-				<div class="items-selector codec-selector" id="video_codec_selector">
-				</div>
+			{{/isFeatureAvailable}}
 			</div>
 
 			<div class="tabs-section clearfix" data-section="restrictions">
@@ -202,64 +161,7 @@
 						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.unregisterNotifications.help}}" data-placement="top" data-toggle="tooltip"></i>
 					</label>
 				</div>
-
-				<div class="control-group ignore-completed-elsewhere-group">
-					<label class="control-label">{{ i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.label }}</label>
-					<div class="btn-group-wrapper">
-						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.help}}" data-placement="top" data-toggle="tooltip"></i>
-						<div class="btn-group btn-group-controls ignore-completed-elsewhere">
-							<button data-value="off" class="monster-button monster-button-ignore{{#compare ignore_completed_elsewhere "===" false}} monster-button-primary selected{{/compare}}">{{ i18n.off }}</button>
-							<button data-value="default" class="monster-button monster-button-ignore{{#compare ignore_completed_elsewhere "===" undefined}} monster-button-primary selected{{/compare}}">{{ i18n.devices.popupSettings.miscellaneous.ignoreCompletedElsewhere.systemDefault }} ({{ system_ignore_completed_elsewhere }})</button>
-							<button data-value="on" class="monster-button monster-button-ignore{{#compare ignore_completed_elsewhere "===" true}} monster-button-primary selected{{/compare}}">{{ i18n.on }}</button>
-						</div>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<label for="outbound_privacy" class="control-label checkbox">
-						{{i18n.commonMisc.outboundPrivacy.label}}
-						<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" title="{{i18n.commonMisc.outboundPrivacy.tooltip}}"></i>
-					</label>
-					<div class="controls">
-						<select name="caller_id_options.outbound_privacy" id="outbound_privacy" class="input-medium">
-						{{#select caller_id_options.outbound_privacy}}
-							{{#each extra.outboundPrivacy}}
-								<option value="{{key}}">
-									{{value}}
-								</option>
-							{{/each}}
-						{{/select}}
-						</select>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<label class="control-label checkbox">
-						{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.mediaWebrtc.label }}
-							<input type="checkbox" name="media.webrtc" id="media_webrtc" {{#if media.webrtc}}checked{{/if}} />
-						{{/monsterCheckbox}}
-						<i class="help-popover fa fa-question-circle fa-lg" data-original-title="{{i18n.devices.popupSettings.miscellaneous.mediaWebrtc.help}}" data-placement="top" data-toggle="tooltip"></i>
-					</label>
-				</div>
-
-				<div class="rtp-line">
-					<div class="control-group">
-						<label class="control-label checkbox">
-							{{#monsterCheckbox i18n.devices.popupSettings.miscellaneous.rtp.enable }}
-								<input type="checkbox" id="secure_rtp" name="media.encryption.enforce_security"{{#if media.encryption.enforce_security}} checked="checked"{{/if}}></input>
-							{{/monsterCheckbox}}
-						</label>
-					</div>
-
-					<div id="rtp_method">
-						<span>{{ i18n.devices.popupSettings.miscellaneous.rtp.type }}</span>
-
-						<select class="input-small" name="extra.rtpMethod">
-							<option value="srtp"{{#compare extra.rtpMethod "===" "srtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.srtp }}</option>
-							<option value="zrtp"{{#compare extra.rtpMethod "===" "zrtp"}} selected{{/compare}}>{{ i18n.devices.popupSettings.miscellaneous.rtp.zrtp }}</option>
-						</select>
-					</div>
-				</div>
+	
 			</div>
 		</form>
 	</div>
