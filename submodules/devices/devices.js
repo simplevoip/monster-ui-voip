@@ -58,13 +58,13 @@ define(function(require) {
 				 */
 				addableDeviceTypes: _.flatten([[
 					'sip_device',
-					'cellphone',
 					'smartphone',
 					'softphone',
 					'landline',
 					'fax',
 					'ata',
-					'sip_uri'
+					'sip_uri',
+					'cellphone'
 				], showTeammateDevice ? [
 					'teammate'
 				] : []]),
@@ -74,14 +74,14 @@ define(function(require) {
 				 */
 				editableDeviceTypes: _.flatten([[
 					'ata',
-					'cellphone',
 					'fax',
 					'landline',
 					'mobile',
 					'sip_device',
 					'sip_uri',
 					'smartphone',
-					'softphone'
+					'softphone',
+					'cellphone'
 				],
 				showTeammateDevice ? [
 					'teammate'
@@ -341,7 +341,7 @@ define(function(require) {
 						return false;
 					}
 					var isEditableWhenSetOnAccount = self.isFeatureAvailable(
-							'simplepbx.devices.settings.callerId.editWhenSetOnAccount'
+							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
 						),
 						isNotSetOnAccount = _
 							.chain(monster.apps.auth.currentAccount)
@@ -1223,7 +1223,7 @@ define(function(require) {
 				unassignedString = self.i18n.active().devices.unassignedDevice;
 				registeredDevices = _.filter(data.status, (device) => device.registered);
 				registeredDevicesById = _.map(registeredDevices, 'device_id'),
-				filteredAddableDeviceTypes = monster.util.isReseller() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
+				filteredAddableDeviceTypes = self.canCreateDevices() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
 
 			return {
 				countDevices: _.size(data.devices),

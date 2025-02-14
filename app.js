@@ -4,8 +4,7 @@ define(function(require) {
 		monster = require('monster'),
 		sv_config = require('./config.js'),
 		env = sv_config.env,
-		sv_api = sv_config.api,
-		sv_featureSets = sv_config.featureSets;
+		sv_api = sv_config.api;
 
 	var app = {
 		name: 'simplevoip',
@@ -563,8 +562,16 @@ define(function(require) {
 			});
 		},
 
+		canCreateDevices: function(pAccount) {
+			var account = pAccount || _.get(monster, 'apps.auth.originalAccount', {});
+			if (account.sv_custom) {
+				return _.get(account.sv_custom, 'can_create_devices', false);
+			}
+			return false;
+		},
+
 		isFeatureAvailable: function(featurePath) {
-			return _.get(sv_featureSets, featurePath, true);
+			return _.get(monster.apps.auth.appFlags.featureSet, featurePath, true);
 		}
 	};
 

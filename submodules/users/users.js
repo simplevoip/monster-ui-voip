@@ -200,14 +200,14 @@ define(function(require) {
 				getFeatureTitle = function(featureId, defaultKey) {
 					var i18n = self.i18n.active().users[featureId].titles,
 						key = monster.util.getFeatureConfig(
-							['simplepbx', 'users', 'features', featureId, 'i18nLabelPath'],
+							['smartpbx', 'users', 'features', featureId, 'i18nLabelPath'],
 							defaultKey
 						);
 					return i18n[key];
 				},
 				isFeatureAvailable = function(data, id) {
 					var isFeatureAvailable = self.isFeatureAvailable(
-							['simplepbx', 'users', 'features', _.camelCase(id), 'edit']
+							['smartpbx', 'users', 'features', _.camelCase(id), 'edit']
 						),
 						availabilityChecker = _.get(data, 'availabilityChecker', _.stubTrue);
 
@@ -240,7 +240,7 @@ define(function(require) {
 						caller_id: {
 							availabilityChecker: function() {
 								var isEditableWhenSetOnAccount = self.isFeatureAvailable(
-										'simplepbx.users.features.callerId.editWhenSetOnAccount'
+										'smartpbx.users.features.callerId.editWhenSetOnAccount'
 									),
 									isNotSetOnAccount = _
 										.chain(monster.apps.auth.currentAccount)
@@ -692,7 +692,7 @@ define(function(require) {
 						if (type === 'name') {
 							currentUser = data;
 
-							if (self.isFeatureAvailable('simplepbx.users.timezone.edit')) {
+							if (self.isFeatureAvailable('smartpbx.users.timezone.edit')) {
 								monster.ui.chosen(template.find('#user_timezone'));
 							}
 
@@ -2422,7 +2422,7 @@ define(function(require) {
 				switchTranscription = featureForm.find('#transcribe').parent(),
 				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
 
-			if (!self.isFeatureAvailable('simplepbx.users.features.vmbox.transcription')) {
+			if (!self.isFeatureAvailable('smartpbx.users.features.vmbox.transcription')) {
 				switchTranscription.addClass('disabled');
 			}
 
@@ -2460,6 +2460,8 @@ define(function(require) {
 							self.usersAddMainVMBoxToUser({
 								user: currentUser,
 								deleteAfterNotify: deleteAfterNotify,
+								transcribe: transcribe,
+								includeMessageOnNotify: include_message_on_notify,
 								callback: callback
 							});
 							return;
@@ -2946,7 +2948,7 @@ define(function(require) {
 				deviceData = {
 					device_name: `${featureUser.first_name} ${featureUser.last_name} - Mobile App`,
 					device_type: 'softphone',
-					user_name: `${featureUser.presence_id}_softphone`,
+					user_name: `${featureUser.presence_id}_softphone`, // TODO: create method to generate username, should search device listing for existing usernames and make sure not to duplicate
 					user_id: `${featureUser.id}`
 				};
 
@@ -3099,9 +3101,9 @@ define(function(require) {
 					monster.pub('common.ringingDurationControl.getEndpoints', {
 						container: featureForm,
 						callback: function(endpoints) {
-							currentUser.simplepbx = currentUser.simplepbx || {};
-							currentUser.simplepbx.find_me_follow_me = currentUser.simplepbx.find_me_follow_me || {};
-							currentUser.simplepbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
+							currentUser.smartpbx = currentUser.smartpbx || {};
+							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
+							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
 							var callflowNode = {};
 
@@ -3321,9 +3323,9 @@ define(function(require) {
 			var self = this,
 				isEnabled = template.find('.switch-state').prop('checked');
 
-			user.simplepbx = user.simplepbx || {};
-			user.simplepbx.call_recording = user.simplepbx.call_recording || {};
-			user.simplepbx.call_recording.enabled = isEnabled;
+			user.smartpbx = user.smartpbx || {};
+			user.smartpbx.call_recording = user.smartpbx.call_recording || {};
+			user.smartpbx.call_recording.enabled = isEnabled;
 
 			if (isEnabled) {
 				user.call_recording = $.extend(true, {}, user.call_recording, {
@@ -4057,7 +4059,8 @@ define(function(require) {
 				unassigned = _.flatten([
 					_.filter(devices, { owner_id: '' }),
 					_.reject(devices, _.partial(_.has, _, 'owner_id'))
-				]);
+				]),
+				can_create_devices = self.canCreateDevices();
 
 			return {
 				countSpare: _.size(unassigned),
@@ -4065,7 +4068,7 @@ define(function(require) {
 				emptySpare: _.isEmpty(unassigned),
 				assignedDevices: _.keyBy(assigned, 'id'),
 				unassignedDevices: _.keyBy(unassigned, 'id'),
-				isReseller: monster.util.isReseller()
+				canCreateDevices: can_create_devices
 			};
 		},
 
@@ -5303,7 +5306,7 @@ define(function(require) {
 						data: {
 							userId: userId,
 							data: {
-								simplepbx: {
+								smartpbx: {
 									find_me_follow_me: false
 								}
 							}
@@ -5550,7 +5553,7 @@ define(function(require) {
 						},
 						formData = monster.ui.getFormData('conferencing_form');
 
-					monster.util.dataFlags.add({ source: 'simplepbx' }, baseConference);
+					monster.util.dataFlags.add({ source: 'smartpbx' }, baseConference);
 
 					if (formData.video) {
 						formData = _.merge(formData, {
@@ -5583,13 +5586,13 @@ define(function(require) {
 					}
 				},
 				user: function(callback) {
-					if (data.user.simplepbx && data.user.simplepbx.conferencing && data.user.simplepbx.conferencing.enabled === true) {
+					if (data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.simplepbx = data.user.simplepbx || {};
-						data.user.simplepbx.conferencing = data.user.simplepbx.conferencing || {};
+						data.user.smartpbx = data.user.smartpbx || {};
+						data.user.smartpbx.conferencing = data.user.smartpbx.conferencing || {};
 
-						data.user.simplepbx.conferencing.enabled = true;
+						data.user.smartpbx.conferencing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5623,13 +5626,13 @@ define(function(require) {
 					});
 				},
 				user: function(callback) {
-					if (data.user.simplepbx && data.user.simplepbx.faxing && data.user.simplepbx.faxing.enabled === true) {
+					if (data.user.smartpbx && data.user.smartpbx.faxing && data.user.smartpbx.faxing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.simplepbx = data.user.simplepbx || {};
-						data.user.simplepbx.faxing = data.user.simplepbx.faxing || {};
+						data.user.smartpbx = data.user.smartpbx || {};
+						data.user.smartpbx.faxing = data.user.smartpbx.faxing || {};
 
-						data.user.simplepbx.faxing.enabled = true;
+						data.user.smartpbx.faxing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5753,10 +5756,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.conferencing_enabled = false;
-						user.simplepbx = user.simplepbx || {};
-						user.simplepbx.conferencing = user.simplepbx.conferencing || {};
+						user.smartpbx = user.smartpbx || {};
+						user.smartpbx.conferencing = user.smartpbx.conferencing || {};
 
-						user.simplepbx.conferencing.enabled = false;
+						user.smartpbx.conferencing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
@@ -5818,10 +5821,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.faxing_enabled = false;
-						user.simplepbx = user.simplepbx || {};
-						user.simplepbx.faxing = user.simplepbx.faxing || {};
+						user.smartpbx = user.smartpbx || {};
+						user.smartpbx.faxing = user.smartpbx.faxing || {};
 
-						user.simplepbx.faxing.enabled = false;
+						user.smartpbx.faxing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
@@ -5931,7 +5934,14 @@ define(function(require) {
 
 					self.usersCreateVMBox({
 						data: {
-							data: self.usersNewMainVMBox(mailbox, userFullName, userId, args.deleteAfterNotify)
+							data: self.usersNewMainVMBox(
+								mailbox,
+								userFullName,
+								userId,
+								args.deleteAfterNotify,
+								args.transcribe,
+								args.includeMessageOnNotify
+							)
 						},
 						success: function(userVMBox) {
 							waterfallCallback(null, userData, userVMBox);
@@ -5941,11 +5951,12 @@ define(function(require) {
 				function(userData, userVMBox, waterfallCallback) {
 					var mainUserCallflow = userData.callflow;
 
-					// Do not update main callflow if it does not has
+					// Do not update main callflow if it has not
 					// been created by the voip app, or if does not have
 					// empty children at the root of the flow, which
 					// is the default main user callflow without vmbox
 					if (mainUserCallflow.ui_metadata.origin !== 'simplevoip' || mainUserCallflow.ui_metadata.origin !== 'voip' || !_.isEmpty(mainUserCallflow.flow.children)) {
+						monster.ui.alert('warning', self.i18n.active().users.vmbox.createdButCallflowNotUpdated);
 						waterfallCallback(null);
 						return;
 					}
@@ -6151,14 +6162,16 @@ define(function(require) {
 		 * @param    {Boolean} [deleteAfterNotify]  Delete voicemail message after notify user
 		 * @returns  {Object}  Voicemail Box object
 		 */
-		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify) {
+		usersNewMainVMBox: function(mailbox, userName, userId, deleteAfterNotify, transcribe, includeMessageOnNotify) {
 			var self = this;
 
 			return {
 				owner_id: userId,
 				mailbox: mailbox.toString(),	// Force to string
 				name: self.usersGetMainVMBoxName(userName),
-				delete_after_notify: deleteAfterNotify
+				delete_after_notify: deleteAfterNotify,
+				transcribe: transcribe,
+				include_message_on_notify: includeMessageOnNotify
 			};
 		},
 
