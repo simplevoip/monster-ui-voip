@@ -1010,7 +1010,7 @@ define(function(require) {
 					return $template;
 				},
 				formatDataToTemplate = _.partial(function(strategyData, callflowName, menuName) {
-					var isVirtualExceptionistEnabled = self.isFeatureAvailable('simplepbx.mainNumber.incomingCallHandling.virtualReceptionist'),
+					var isVirtualExceptionistEnabled = self.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist'),
 						hasAdvancedCallflows = !_.isEmpty(strategyData.callEntities.advancedCallflows),
 						strategies = _.reject([{
 							type: 'menu',
@@ -2886,7 +2886,7 @@ define(function(require) {
 					});
 				},
 				function maybeDisableVirtualReceptionist(callflows, callback) {
-					if (self.isFeatureAvailable('simplepbx.mainNumber.incomingCallHandling.virtualReceptionist')) {
+					if (self.isFeatureAvailable('smartpbx.mainNumber.incomingCallHandling.virtualReceptionist')) {
 						return callback(null, callflows);
 					}
 					var updateCallflowModuleToVmBoxFactory = function(voicemailBoxId, subCallflowLabel) {

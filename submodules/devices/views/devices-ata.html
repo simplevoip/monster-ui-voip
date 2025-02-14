@@ -24,7 +24,7 @@
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu pull-right">
-				{{#isFeatureAvailable "simplepbx.devices.settings.codecs.manage"}}
+				{{#isFeatureAvailable "smartpbx.devices.settings.codecs.manage"}}
 					<li>
 						<a class="tabs-selector change-section" data-section="audio" href="javascript:void(0)">
 							<i class="fa fa-music"></i>
@@ -57,11 +57,11 @@
 				<div class="control-group">
 					<label class="control-label" for="name">{{ i18n.devices.ata.deviceName }}</label>
 					<div class="controls">
-						<input {{#isFeatureAvailable "simplepbx.devices.settings.name.edit"}}{{else}}disabled{{/isFeatureAvailable}} type="text" id="name" name="name" value="{{name}}">
+						<input {{#isFeatureAvailable "smartpbx.devices.settings.name.edit"}}{{else}}disabled{{/isFeatureAvailable}} type="text" id="name" name="name" value="{{name}}">
 					</div>
 				</div>
 
-			{{#isFeatureAvailable "simplepbx.devices.settings.sip.manage"}}
+			{{#isFeatureAvailable "smartpbx.devices.settings.sip.manage"}}
 				<div class="control-group">
 					<label class="control-label" for="sip_username">{{ i18n.devices.sip.username }}</label>
 					<div class="controls">

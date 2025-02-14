@@ -7,7 +7,7 @@
 			{{#each assignedDevices}}
 				<div class="item-row assigned" data-id="{{this.id}}">
 					<div class="device">
-					{{#isFeatureAvailable "simplepbx.users.devices.edit"}}
+					{{#isFeatureAvailable "smartpbx.users.devices.edit"}}
 						<button type="button" class="monster-button monster-button-danger remove-device">{{ @root.i18n.unassign }}</button>
 					{{/isFeatureAvailable}}
 						<a href="javascript:void(0);" class="edit-device-link monster-link">{{ this.name }}</a>
@@ -19,13 +19,13 @@
 		</div>
 	</div>
 
-{{#isFeatureAvailable "simplepbx.users.devices.edit"}}
+{{#isFeatureAvailable "smartpbx.users.devices.edit"}}
 	<div class="actions">
 		<a class="spare-devices monster-link pull-left" href="javascript:void(0);"><i class="fa fa-list monster-green"></i>{{ i18n.users.devices.spareDevice }}</a>
 		<div class="dropdown pull-left">
 			<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus monster-green"></i>{{ i18n.users.devices.newDevice }}</a>
 			<ul class="dropdown-menu">
-				{{#if isReseller}}
+				{{#if canCreateDevices}}
 					<li><a class="create-device" data-type="sip_device"><i class="icon-telicon-voip-phone"></i>{{ i18n.devices.types.sip_device }}</a></li>
 					<li><a class="create-device" data-type="cellphone"><i class="fa fa-phone"></i>{{ i18n.devices.types.cellphone }}</a></li>
 					<li><a class="create-device" data-type="smartphone"><i class="icon-telicon-mobile-phone"></i>{{ i18n.devices.types.smartphone }}</a></li>

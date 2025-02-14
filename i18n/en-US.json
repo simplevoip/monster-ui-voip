@@ -955,8 +955,9 @@
 			},
 			"vmToEmailHelp": "An e-mail will be sent to {{variable}} for every new voicemail. If you want to change where email notifications go to, please edit the user's email address in the User Administration section.",
 			"transcribe": "Transcribe",
-			"attachVoicemail": "Attach voicemail message to email."
-		},
+			"attachVoicemail": "Attach voicemail message to email.",
+			"createdButCallflowNotUpdated": "A voicemail box was created, but was not attached to the users's main callflow because the callflow was created someplace other than this app. To fully enable voicemail for this user, go to callflows and manually add voicemail to the user's main callflow."
+ 		},
 		"find_me_follow_me": {
 			"title": "Find me, Follow me",
 			"headline": "Find me, Follow me Settings",

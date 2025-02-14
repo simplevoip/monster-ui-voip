@@ -341,7 +341,7 @@ define(function(require) {
 						return false;
 					}
 					var isEditableWhenSetOnAccount = self.isFeatureAvailable(
-							'simplepbx.devices.settings.callerId.editWhenSetOnAccount'
+							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
 						),
 						isNotSetOnAccount = _
 							.chain(monster.apps.auth.currentAccount)
@@ -1223,7 +1223,7 @@ define(function(require) {
 				unassignedString = self.i18n.active().devices.unassignedDevice;
 				registeredDevices = _.filter(data.status, (device) => device.registered);
 				registeredDevicesById = _.map(registeredDevices, 'device_id'),
-				filteredAddableDeviceTypes = monster.util.isReseller() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
+				filteredAddableDeviceTypes = self.canCreateDevices() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
 
 			return {
 				countDevices: _.size(data.devices),

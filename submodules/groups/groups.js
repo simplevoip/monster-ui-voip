@@ -172,7 +172,7 @@ define(function(require) {
 
 			_.each(result.mapFeatures, function(val, key) {
 				if (('features' in group && group.features.indexOf(key) >= 0) // If data from view
-				|| ('simplepbx' in group && key in group.simplepbx && group.simplepbx[key].enabled)) { // If data from document
+				|| ('smartpbx' in group && key in group.smartpbx && group.smartpbx[key].enabled)) { // If data from document
 					val.active = true;
 					result.hasFeatures = true;
 				}
@@ -590,15 +590,15 @@ define(function(require) {
 					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.prop('checked');
 
-					if (!('simplepbx' in data.group)) { data.group.simplepbx = {}; }
-					if (!('call_recording' in data.group.simplepbx)) {
-						data.group.simplepbx.call_recording = {
+					if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+					if (!('call_recording' in data.group.smartpbx)) {
+						data.group.smartpbx.call_recording = {
 							enabled: false
 						};
 					}
 
-					if (data.group.simplepbx.call_recording.enabled || enabled) {
-						data.group.simplepbx.call_recording.enabled = enabled;
+					if (data.group.smartpbx.call_recording.enabled || enabled) {
+						data.group.smartpbx.call_recording.enabled = enabled;
 						var newCallflow = $.extend(true, {}, data.callflow),
 							currentNode = monster.util.findCallflowNode(newCallflow, 'record_call') || monster.util.findCallflowNode(newCallflow, 'callflow');
 						if (enabled) {
@@ -759,16 +759,16 @@ define(function(require) {
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
 						enabled = switchFeature.prop('checked');
 
-					if (!('simplepbx' in data.group)) {
-						data.group.simplepbx = {};
+					if (!('smartpbx' in data.group)) {
+						data.group.smartpbx = {};
 					}
 
 					if (enabled) {
 						ringGroupNode.data.ringback = selectedMedia;
-						if ('ringback' in data.group.simplepbx) {
-							data.group.simplepbx.ringback.enabled = true;
+						if ('ringback' in data.group.smartpbx) {
+							data.group.smartpbx.ringback.enabled = true;
 						} else {
-							data.group.simplepbx.ringback = {
+							data.group.smartpbx.ringback = {
 								enabled: true
 							};
 						}
@@ -782,10 +782,10 @@ define(function(require) {
 								self.groupsRender({ groupId: data.group.id });
 							});
 						});
-					} else if (ringGroupNode.data.ringback || (data.group.simplepbx.ringback && data.group.simplepbx.ringback.enabled)) {
+					} else if (ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
 						delete ringGroupNode.data.ringback;
-						if ('ringback' in data.group.simplepbx) {
-							data.group.simplepbx.ringback.enabled = false;
+						if ('ringback' in data.group.smartpbx) {
+							data.group.smartpbx.ringback.enabled = false;
 						}
 
 						self.groupsUpdateCallflow(data.baseCallflow, function() {
@@ -828,15 +828,15 @@ define(function(require) {
 				var selectedOption = featureTemplate.find('.next-action-select option:selected'),
 					enabled = switchFeature.prop('checked');
 
-				if (!('simplepbx' in data.group)) { data.group.simplepbx = {}; }
-				if (!('next_action' in data.group.simplepbx)) {
-					data.group.simplepbx.next_action = {
+				if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if (!('next_action' in data.group.smartpbx)) {
+					data.group.smartpbx.next_action = {
 						enabled: false
 					};
 				}
 
-				if (data.group.simplepbx.next_action.enabled || enabled) {
-					data.group.simplepbx.next_action.enabled = enabled;
+				if (data.group.smartpbx.next_action.enabled || enabled) {
+					data.group.smartpbx.next_action.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow),
 						callflowNode = monster.util.findCallflowNode(newCallflow, 'callflow');
 
@@ -984,9 +984,9 @@ define(function(require) {
 				var enabled = switchFeature.prop('checked'),
 					ignore_forward = !enabled;
 
-				data.group.simplepbx = data.group.simplepbx || {};
-				data.group.simplepbx.forward = data.group.simplepbx.forward || {};
-				data.group.simplepbx.forward.enabled = enabled;
+				data.group.smartpbx = data.group.smartpbx || {};
+				data.group.smartpbx.forward = data.group.smartpbx.forward || {};
+				data.group.smartpbx.forward.enabled = enabled;
 				data.group.ignore_forward = ignore_forward;
 				data.baseCallflow.flow.data.ignore_forward = ignore_forward;
 
@@ -1043,15 +1043,15 @@ define(function(require) {
 				var enabled = switchFeature.prop('checked'),
 					prependData = $.extend(true, { action: 'prepend' }, monster.ui.getFormData('prepend_form'));
 
-				if (!('simplepbx' in data.group)) { data.group.simplepbx = {}; }
-				if (!('prepend' in data.group.simplepbx)) {
-					data.group.simplepbx.prepend = {
+				if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
+				if (!('prepend' in data.group.smartpbx)) {
+					data.group.smartpbx.prepend = {
 						enabled: false
 					};
 				}
 
-				if (data.group.simplepbx.prepend.enabled || enabled) {
-					data.group.simplepbx.prepend.enabled = enabled;
+				if (data.group.smartpbx.prepend.enabled || enabled) {
+					data.group.smartpbx.prepend.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow);
 					if (enabled) {
 						if (newCallflow.flow.module !== 'prepend_cid') {

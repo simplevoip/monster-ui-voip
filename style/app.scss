@@ -40,3 +40,14 @@
 	background-color: #000;
 	opacity: .3;
 }
+
+.category.external-link {
+    padding: 0 !important;
+    height: 60px !important;
+
+	a {
+		display: block;
+		width: 100%;
+		padding: 15px 5px;
+	}
+}
