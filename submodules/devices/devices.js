@@ -58,13 +58,13 @@ define(function(require) {
 				 */
 				addableDeviceTypes: _.flatten([[
 					'sip_device',
-					'cellphone',
 					'smartphone',
 					'softphone',
 					'landline',
 					'fax',
 					'ata',
-					'sip_uri'
+					'sip_uri',
+					'cellphone'
 				], showTeammateDevice ? [
 					'teammate'
 				] : []]),
@@ -74,14 +74,14 @@ define(function(require) {
 				 */
 				editableDeviceTypes: _.flatten([[
 					'ata',
-					'cellphone',
 					'fax',
 					'landline',
 					'mobile',
 					'sip_device',
 					'sip_uri',
 					'smartphone',
-					'softphone'
+					'softphone',
+					'cellphone'
 				],
 				showTeammateDevice ? [
 					'teammate'

@@ -4059,7 +4059,8 @@ define(function(require) {
 				unassigned = _.flatten([
 					_.filter(devices, { owner_id: '' }),
 					_.reject(devices, _.partial(_.has, _, 'owner_id'))
-				]);
+				]),
+				can_create_devices = self.canCreateDevices();
 
 			return {
 				countSpare: _.size(unassigned),
@@ -4067,7 +4068,7 @@ define(function(require) {
 				emptySpare: _.isEmpty(unassigned),
 				assignedDevices: _.keyBy(assigned, 'id'),
 				unassignedDevices: _.keyBy(unassigned, 'id'),
-				canCreateDevices: self.canCreateDevices(),
+				canCreateDevices: can_create_devices
 			};
 		},
 
