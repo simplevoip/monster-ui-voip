@@ -341,7 +341,7 @@ define(function(require) {
 						return false;
 					}
 					var isEditableWhenSetOnAccount = self.isFeatureAvailable(
-							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
+							'simplevoip.devices.settings.callerId.editWhenSetOnAccount'
 						),
 						isNotSetOnAccount = _
 							.chain(monster.apps.auth.currentAccount)
@@ -1522,7 +1522,7 @@ define(function(require) {
 			/**
 			 * We perform both operations in parallel because, although app#updateMobileCallflowAssignment
 			 * requires an existing device to run, since it is not possible to create mobile devices
-			 * from smartpbx, that ID will always be present.
+			 * from simplevoip, that ID will always be present.
 			 */
 			monster.parallel({
 				_: _.partial(maybeUpdateMobileCallflowAssignment, shouldUpdateMobileCallflow, deviceData),

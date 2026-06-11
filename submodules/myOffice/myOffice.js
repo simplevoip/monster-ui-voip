@@ -451,8 +451,8 @@ define(function(require) {
 						}
 						: undefined;
 				}(specialNumbers.mainNumbers, data.account, data.numbers));
-				registeredDevices = _.filter(data.devicesStatus, (device) => device.registered),
-				registeredDevicesById = _.map(registeredDevices, 'device_id');
+				registeredDevices = _.filter(data.devices, (device) => device.registered),
+				registeredDevicesById = _.map(registeredDevices, 'id');
 
 			return _.merge({
 				assignedNumbersData: _
