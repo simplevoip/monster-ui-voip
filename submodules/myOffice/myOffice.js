@@ -541,7 +541,7 @@ define(function(require) {
 					.chain(data.devices)
 					.filter(function(device) {
 						var type = _.get(device, 'device_type'),
-							isDeviceRegistered = _.includes(registeredDevicesById, device.id),
+							isDeviceRegistered = device.registrable ? _.includes(registeredDevicesById, device.id) : true,
 							isDeviceTypeKnown = _.includes(knownDeviceTypes, type),
 							isDeviceDisabled = !_.get(device, 'enabled', false),
 							isDeviceOffline = isDeviceDisabled || !isDeviceRegistered;
