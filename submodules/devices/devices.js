@@ -30,9 +30,9 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.devices.render': 'devicesRender',
-			'voip.devices.renderAdd': 'devicesRenderAdd',
-			'voip.devices.editDevice': 'devicesRenderEdit'
+			'simplevoip.devices.render': 'devicesRender',
+			'simplevoip.devices.renderAdd': 'devicesRenderAdd',
+			'simplevoip.devices.editDevice': 'devicesRenderEdit'
 		},
 
 		appFlags: {
@@ -58,13 +58,13 @@ define(function(require) {
 				 */
 				addableDeviceTypes: _.flatten([[
 					'sip_device',
-					'cellphone',
 					'smartphone',
 					'softphone',
 					'landline',
 					'fax',
 					'ata',
-					'sip_uri'
+					'sip_uri',
+					'cellphone'
 				], showTeammateDevice ? [
 					'teammate'
 				] : []]),
@@ -74,14 +74,14 @@ define(function(require) {
 				 */
 				editableDeviceTypes: _.flatten([[
 					'ata',
-					'cellphone',
 					'fax',
 					'landline',
 					'mobile',
 					'sip_device',
 					'sip_uri',
 					'smartphone',
-					'softphone'
+					'softphone',
+					'cellphone'
 				],
 				showTeammateDevice ? [
 					'teammate'
@@ -340,8 +340,8 @@ define(function(require) {
 					if (!monster.util.isNumberFeatureEnabled('e911')) {
 						return false;
 					}
-					var isEditableWhenSetOnAccount = monster.util.isFeatureAvailable(
-							'smartpbx.devices.settings.callerId.editWhenSetOnAccount'
+					var isEditableWhenSetOnAccount = self.isFeatureAvailable(
+							'simplevoip.devices.settings.callerId.editWhenSetOnAccount'
 						),
 						isNotSetOnAccount = _
 							.chain(monster.apps.auth.currentAccount)
@@ -461,7 +461,7 @@ define(function(require) {
 						required: true
 					},
 					'mac_address': {
-						required: true,
+						required: false,
 						mac: true
 					},
 					'mobile.mdn': {
@@ -1225,6 +1225,9 @@ define(function(require) {
 				},
 				usersById = _.keyBy(data.users, 'id'),
 				unassignedString = self.i18n.active().devices.unassignedDevice;
+				registeredDevices = _.filter(data.status, (device) => device.registered);
+				registeredDevicesById = _.map(registeredDevices, 'device_id'),
+				filteredAddableDeviceTypes = self.canCreateDevices() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
 
 			return {
 				countDevices: _.size(data.devices),
@@ -1293,7 +1296,7 @@ define(function(require) {
 						}
 					})
 					.value(),
-				deviceTypesToAdd: _.map(self.appFlags.devices.addableDeviceTypes, function(type) {
+				deviceTypesToAdd: _.map(filteredAddableDeviceTypes, function(type) {
 					return {
 						type: type,
 						icon: _.get(self.appFlags.devices.iconClassesByDeviceTypes, type)
@@ -1525,7 +1528,7 @@ define(function(require) {
 			/**
 			 * We perform both operations in parallel because, although app#updateMobileCallflowAssignment
 			 * requires an existing device to run, since it is not possible to create mobile devices
-			 * from smartpbx, that ID will always be present.
+			 * from simplevoip, that ID will always be present.
 			 */
 			monster.parallel({
 				_: _.partial(maybeUpdateMobileCallflowAssignment, shouldUpdateMobileCallflow, deviceData),

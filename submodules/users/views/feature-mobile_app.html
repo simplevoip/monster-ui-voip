@@ -1,0 +1,73 @@
+<div class="monster-feature-popup-container" data-feature="mobile_app">
+    <div class="content-wrapper">
+        <div class="feature-popup-title">
+            <div class="popup-title">
+                <div class="feature-fa-wrapper">
+                    <i class="{{extra.mapFeatures.mobile_app.icon}}"></i>
+                </div>
+                <div class="feature-title">
+                    {{ i18n.users.mobile_app.headline }} {{extra.softphone.name}}
+                </div>
+            </div>
+            <div class="switch">
+            {{#monsterSwitch}}
+                <input class="switch-state" type="checkbox" name="enabled" data-on="{{i18n.enabled}}" data-off="{{i18n.disabled}}" {{#if extra.softphone.enabled}} checked{{/if}}></input>
+            {{/monsterSwitch}}
+            </div>
+        </div>
+
+        <div class="content number-feature{{#unless extra.softphone.enabled}} disabled{{/unless}}" data-feature="mobile_app">
+
+            <div class="control-group">
+                <div class="title">
+                    {{ i18n.users.mobile_app.mobileLabel }}
+                </div>
+
+                <div class="mobile-app-mobile">
+                    <div>
+                        <img src="{{mobile_app.credentials.qr_code}}">
+                    </div>
+                    <div class="mobile-app-badges">
+                        <div>
+                            <a target="_blank" href="http://url5041.simplevoip.us/ls/click?upn=WNcaSA27BIavr2QTpZ729p8z6WZ4z25U466VG5RUHv7nirdAhIE1wH-2FVU3qvLMpZm7J29eUFkmCg4KieKOZY8MBjs-2F6ZVmjawvmoihVPc2I-3DEOAU_LpsdMmOcx5wSUBG0N3RMhA4IVDuLd-2FuduCtRmufGVvCLfHgLhRG3-2FPHLW6jH6-2BzDNuwdGLRrt-2Bopj0r35N558Ugk3XMKnZNh-2BTtFTgJZEw23fbbTIwjXXnycv91s27OoP7qUimQpu1q6fcZUdL6SvY5fCXutntvOhwY98Unl2yt2rI-2BBjDpnYZTXI9DCA5vFur77K6Ae02m-2FvV1vfG40k-2FxpyViiDHdOGITiofe3lak-3D"><img src="https://monster-ui-cdn.s3.amazonaws.com/badge-download-apple.png"></a>
+                        </div>
+                        <div>
+                            <a target="_blank" href="http://url5041.simplevoip.us/ls/click?upn=WNcaSA27BIavr2QTpZ729ocoFZ0GdgszslCdiVZxT-2BzinlXKRhBEfaofPDrO21RjpDvV-2BvJCN3vhJQXpZF6CeKEyQonVNSetOA9rUiN3DlppuwYvrRQljNIKC-2BZGBBDBIw8D_LpsdMmOcx5wSUBG0N3RMhA4IVDuLd-2FuduCtRmufGVvCLfHgLhRG3-2FPHLW6jH6-2BzD46AaQNLdxrHqTb1YG7QeapK8cU-2FRnBsaWdp7BpJupmaiwgVNfv2vJvtEjwLdks2dFn1I1mjzSTiMLIz-2BKVueYBHl56P9-2FuRz0ZM4S9OSiIUE2L60O-2FTbwUZX4l67H3qZdebmzofnmzhKt4QAuUX-2FNstl8M1eWiO2-2BSHC7UdZLYc-3D"><img src="https://monster-ui-cdn.s3.amazonaws.com/badge-download-google.png"></a>
+                        </div>
+                        <label>{{ i18n.users.mobile_app.qrCodeHelp }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="title">
+                    {{ i18n.users.mobile_app.desktopLabel }}
+                </div>
+
+                <div>
+                    {{ i18n.users.mobile_app.usernameLabel }}
+                    <pre class="well">{{mobile_app.credentials.username}}</pre>
+                </div>
+
+                <div>
+                    {{ i18n.users.mobile_app.passwordLabel}}
+                    <pre class="well">{{mobile_app.credentials.password}}</pre>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div><a target="_blank" href="https://support.simplevoip.com/hc/en-us/articles/360045786114-SimpleVoIP-Mobile-Softphone-App-User-Guide">{{ i18n.users.mobile_app.wikiMobileHelp }}</a></div>
+                <div><a target="_blank" href="https://support.simplevoip.com/hc/en-us/articles/4419735318807-How-to-Install-and-Use-SimpleVoIP-Desktop-for-MAC-and-Windows">{{ i18n.users.mobile_app.wikiDesktopHelp }}</a></div>
+                <div>{{ i18n.users.mobile_app.sendEmailHelpLabel }} {{email}} <button type="button" class="monster-button monster-button-success send-email">{{ i18n.users.mobile_app.sendEmailLabel }}</button></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="actions clearfix">
+        <div class="pull-right">
+            <a class="cancel-link monster-link blue" href="javascript:void(0);">{{ i18n.close }}</a>
+            <button type="button" class="monster-button monster-button-success save">{{ i18n.saveChanges }}</button>
+        </div>
+    </div>
+</div>

@@ -9,7 +9,7 @@ define(function(require) {
 		},
 
 		subscribe: {
-			'voip.groups.render': 'groupsRender'
+			'simplevoip.groups.render': 'groupsRender'
 		},
 
 		/* Users */
@@ -172,7 +172,7 @@ define(function(require) {
 
 			_.each(result.mapFeatures, function(val, key) {
 				if (('features' in group && group.features.indexOf(key) >= 0) // If data from view
-				|| ('smartpbx' in group && key in group.smartpbx && group.smartpbx[key].enabled)) { // If data from document
+				|| ('simplevoip' in group && key in group.simplevoip && group.simplevoip[key].enabled)) { // If data from document
 					val.active = true;
 					result.hasFeatures = true;
 				}
@@ -479,7 +479,7 @@ define(function(require) {
 								}
 							};
 
-						monster.pub('common.numberFeaturesMenu.render', argsFeatures);
+						monster.pub('simplevoip.numberFeaturesMenu.render', argsFeatures);
 					});
 
 					self.groupsBindNumbers(template, data);
@@ -590,15 +590,15 @@ define(function(require) {
 					var formData = monster.ui.getFormData('call_recording_form'),
 						enabled = switchFeature.prop('checked');
 
-					if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
-					if (!('call_recording' in data.group.smartpbx)) {
-						data.group.smartpbx.call_recording = {
+					if (!('simplevoip' in data.group)) { data.group.simplevoip = {}; }
+					if (!('call_recording' in data.group.simplevoip)) {
+						data.group.simplevoip.call_recording = {
 							enabled: false
 						};
 					}
 
-					if (data.group.smartpbx.call_recording.enabled || enabled) {
-						data.group.smartpbx.call_recording.enabled = enabled;
+					if (data.group.simplevoip.call_recording.enabled || enabled) {
+						data.group.simplevoip.call_recording.enabled = enabled;
 						var newCallflow = $.extend(true, {}, data.callflow),
 							currentNode = monster.util.findCallflowNode(newCallflow, 'record_call') || monster.util.findCallflowNode(newCallflow, 'callflow');
 						if (enabled) {
@@ -759,16 +759,16 @@ define(function(require) {
 					var selectedMedia = featureTemplate.find('.media-dropdown option:selected').val(),
 						enabled = switchFeature.prop('checked');
 
-					if (!('smartpbx' in data.group)) {
-						data.group.smartpbx = {};
+					if (!('simplevoip' in data.group)) {
+						data.group.simplevoip = {};
 					}
 
 					if (enabled) {
 						ringGroupNode.data.ringback = selectedMedia;
-						if ('ringback' in data.group.smartpbx) {
-							data.group.smartpbx.ringback.enabled = true;
+						if ('ringback' in data.group.simplevoip) {
+							data.group.simplevoip.ringback.enabled = true;
 						} else {
-							data.group.smartpbx.ringback = {
+							data.group.simplevoip.ringback = {
 								enabled: true
 							};
 						}
@@ -782,10 +782,10 @@ define(function(require) {
 								self.groupsRender({ groupId: data.group.id });
 							});
 						});
-					} else if (ringGroupNode.data.ringback || (data.group.smartpbx.ringback && data.group.smartpbx.ringback.enabled)) {
+					} else if (ringGroupNode.data.ringback || (data.group.simplevoip.ringback && data.group.simplevoip.ringback.enabled)) {
 						delete ringGroupNode.data.ringback;
-						if ('ringback' in data.group.smartpbx) {
-							data.group.smartpbx.ringback.enabled = false;
+						if ('ringback' in data.group.simplevoip) {
+							data.group.simplevoip.ringback.enabled = false;
 						}
 
 						self.groupsUpdateCallflow(data.baseCallflow, function() {
@@ -828,15 +828,15 @@ define(function(require) {
 				var selectedOption = featureTemplate.find('.next-action-select option:selected'),
 					enabled = switchFeature.prop('checked');
 
-				if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
-				if (!('next_action' in data.group.smartpbx)) {
-					data.group.smartpbx.next_action = {
+				if (!('simplevoip' in data.group)) { data.group.simplevoip = {}; }
+				if (!('next_action' in data.group.simplevoip)) {
+					data.group.simplevoip.next_action = {
 						enabled: false
 					};
 				}
 
-				if (data.group.smartpbx.next_action.enabled || enabled) {
-					data.group.smartpbx.next_action.enabled = enabled;
+				if (data.group.simplevoip.next_action.enabled || enabled) {
+					data.group.simplevoip.next_action.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow),
 						callflowNode = monster.util.findCallflowNode(newCallflow, 'callflow');
 
@@ -984,9 +984,9 @@ define(function(require) {
 				var enabled = switchFeature.prop('checked'),
 					ignore_forward = !enabled;
 
-				data.group.smartpbx = data.group.smartpbx || {};
-				data.group.smartpbx.forward = data.group.smartpbx.forward || {};
-				data.group.smartpbx.forward.enabled = enabled;
+				data.group.simplevoip = data.group.simplevoip || {};
+				data.group.simplevoip.forward = data.group.simplevoip.forward || {};
+				data.group.simplevoip.forward.enabled = enabled;
 				data.group.ignore_forward = ignore_forward;
 				data.baseCallflow.flow.data.ignore_forward = ignore_forward;
 
@@ -1043,15 +1043,15 @@ define(function(require) {
 				var enabled = switchFeature.prop('checked'),
 					prependData = $.extend(true, { action: 'prepend' }, monster.ui.getFormData('prepend_form'));
 
-				if (!('smartpbx' in data.group)) { data.group.smartpbx = {}; }
-				if (!('prepend' in data.group.smartpbx)) {
-					data.group.smartpbx.prepend = {
+				if (!('simplevoip' in data.group)) { data.group.simplevoip = {}; }
+				if (!('prepend' in data.group.simplevoip)) {
+					data.group.simplevoip.prepend = {
 						enabled: false
 					};
 				}
 
-				if (data.group.smartpbx.prepend.enabled || enabled) {
-					data.group.smartpbx.prepend.enabled = enabled;
+				if (data.group.simplevoip.prepend.enabled || enabled) {
+					data.group.simplevoip.prepend.enabled = enabled;
 					var newCallflow = $.extend(true, {}, data.callflow);
 					if (enabled) {
 						if (newCallflow.flow.module !== 'prepend_cid') {
@@ -1260,7 +1260,7 @@ define(function(require) {
 									}
 								};
 
-							monster.pub('common.numberFeaturesMenu.render', args);
+							monster.pub('simplevoip.numberFeaturesMenu.render', args);
 
 							extraSpareNumbers = _.without(extraSpareNumbers, val.phoneNumber);
 						});
@@ -1273,7 +1273,7 @@ define(function(require) {
 					}
 				};
 
-				monster.pub('common.numbers.dialogSpare', args);
+				monster.pub('simplevoip.numbers.dialogSpare', args);
 			});
 
 			template.on('click', '.actions .buy-link', function(e) {
@@ -1301,7 +1301,7 @@ define(function(require) {
 										}
 									};
 
-								monster.pub('common.numberFeaturesMenu.render', argsFeatures);
+								monster.pub('simplevoip.numberFeaturesMenu.render', argsFeatures);
 
 								monster.ui.tooltips(rowTemplate);
 

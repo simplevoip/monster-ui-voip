@@ -122,8 +122,16 @@
 	background-color: #eee;
 	cursor: pointer;
 }
-#call_logs_container .grid-row-group .extra-legs {
+#call_logs_container .grid-row-group .extra-legs,
+#call_logs_container .grid-row-group .recording-row {
 	display: none;
+}
+
+#call_logs_container .grid-row-group .recording-row {
+	text-align: center;
+	background-color: #ccc;
+	padding: 0.5em 0 0;
+	border-bottom: solid 2px #000;
 }
 
 #call_logs_container .grid-row-group .extra-legs .loading-container {

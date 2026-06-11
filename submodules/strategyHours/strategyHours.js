@@ -26,8 +26,8 @@ define(function(require) {
 
 	return {
 		subscribe: {
-			'voip.strategyHours.render': 'strategyHoursRender',
-			'voip.strategyHours.listing.onUpdate': 'strategyHoursListingOnUpdate'
+			'simplevoip.strategyHours.render': 'strategyHoursRender',
+			'simplevoip.strategyHours.listing.onUpdate': 'strategyHoursListingOnUpdate'
 		},
 
 		appFlags: {
@@ -160,7 +160,7 @@ define(function(require) {
 					.empty()
 					.append(initTemplate(templateData));
 
-			monster.pub('voip.strategyHours.listing.onUpdate', $container);
+			monster.pub('simplevoip.strategyHours.listing.onUpdate', $container);
 		},
 
 		strategyHoursBindEvents: function(parent, template, strategyData) {
@@ -196,7 +196,7 @@ define(function(require) {
 			template.on('click', '.add-hours', function(event) {
 				event.preventDefault();
 
-				monster.pub('voip.strategy.addOfficeHours', {
+				monster.pub('simplevoip.strategy.addOfficeHours', {
 					callback: function(err, selected) {
 						var existing = self.strategyHoursGetDaysIntervalsFromTemplate(parent),
 							merged = _.zipWith(existing, selected, _.concat),
@@ -492,7 +492,7 @@ define(function(require) {
 				$interval.slideUp(200, function() {
 					$interval.remove();
 
-					monster.pub('voip.strategyHours.listing.onUpdate', parent);
+					monster.pub('simplevoip.strategyHours.listing.onUpdate', parent);
 
 					if ($intervals.is(':empty')) {
 						$dayContainer.slideUp(200, function() {

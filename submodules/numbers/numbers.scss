@@ -1,0 +1,478 @@
+@import "../../../../css/partials/base";
+
+#numbers_container {
+	display: block;
+	max-width: 902px;
+}
+
+#numbers_container .top-box {
+	display: flex;
+
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+
+	background: #f9f9f9;
+	border-left: 4px solid #E2E2E2;
+	border-right: 4px solid #E2E2E2;
+	border-bottom: 4px solid #E2E2E2;
+	border-radius: 4px;
+	font-size: 16px;
+	width: 100%;
+
+	height: 80px;
+}
+
+#numbers_container .top-box > .half-box {
+	flex-grow: 1;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+
+	border-top: 4px solid #ddd;
+	color: #333;
+	cursor: pointer;
+	font-size: 20px;
+	height: 80px;
+	line-height: 65px;
+	padding: 5px 0px 5px 25px;
+}
+
+#numbers_container .top-box > .half-box:hover {
+	background: rgb(240,240,240); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(240,240,240,1) 0%, rgba(249,249,249,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(240,240,240,1)), color-stop(100%,rgba(249,249,249,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(240,240,240,1) 0%,rgba(249,249,249,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(240,240,240,1) 0%,rgba(249,249,249,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(240,240,240,1) 0%,rgba(249,249,249,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgba(240,240,240,1) 0%,rgba(249,249,249,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f0f0', endColorstr='#f9f9f9',GradientType=0 ); /* IE6-9 */
+}
+
+#numbers_container .top-box > .half-box.selected  {
+	background: #fefefe;
+	border-top: 4px solid $primary-color;
+	box-shadow: inset 0 0 5px #cccccc;
+	color: $primary-color;
+	font-weight: 600;
+}
+
+#numbers_container .top-box > .half-box .count {
+	color: #999;
+	margin-left: 10px;
+}
+
+
+#numbers_container .top-box > .half-box .help-popover {
+	background: none repeat scroll 0 0 #FAFAFA;
+	border-radius: 15px 15px 15px 15px;
+	box-shadow: 0 1px 1px #999999;
+	color: #999999;
+	font-size: 17px;
+	height: 20px;
+	line-height: 20px;
+	margin-right: 15px;
+	margin-top: 20px;
+	text-align: center;
+	width: 20px;
+
+	float: right;
+}
+
+#numbers_container .actions-wrapper .dropdown-move {
+	display: inline-block;
+	list-style: none;
+}
+
+#numbers_container .actions-wrapper .dropdown-move .accounts-dropdown {
+	padding: 0;
+}
+
+#numbers_container .account-section .numbers-wrapper {
+	display: none;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box {
+	position: relative;
+	border: 1px solid #ccc;
+	border-bottom-width: 0px;
+	margin-top: -1px;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .number-options {
+	position: absolute;
+	right: 0;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .features {
+	margin-right: 44px;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .number-options .dropdown {
+	margin-top: 4px;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .phone-number/*,
+.dialog-spare-container .numbers .number-box .phone-number*/ {
+	display: inline-block;
+	width: 150px;
+
+	& > i:not(:first-child) {
+		margin-left: 10px;
+	}
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .locality/*,
+.dialog-spare-container .numbers .number-box .locality*/ {
+	width: 250px;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .used-by i {
+	margin-right: 5px;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .locality,
+#numbers_container .account-section .numbers-wrapper .number-box .used-by/*,
+.dialog-spare-container .numbers .number-box .locality*/ {
+	margin-left: 30px;
+	display: inline-block;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box .locality .flag/*,
+.dialog-spare-container .numbers .number-box .locality .flag*/ {
+	margin-right: 10px;
+}
+
+#numbers_container .account-section .numbers-wrapper .number-box.no-data:hover {
+	background: #f9f9f9;
+}
+
+#numbers_container .account-section input[type="checkbox"] {
+	margin: -2px 20px 0 4px;
+}
+
+#numbers_container .account-section .account-header {
+	background: #F2F2F2;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+	border-top: 1px solid #CCCCCC;
+	font-size: 18px;
+	height: 70px;
+	line-height: 70px;
+	padding-left: 10px;
+}
+
+#numbers_container .account-section .account-header:hover {
+	background: #F0F0F0;
+}
+
+#numbers_container .account-section .account-header .count {
+	margin-left: 10px;
+}
+
+#numbers_container .account-section .account-header .left-part {
+	width: 30px;
+	float: left;
+}
+
+#numbers_container .account-section .account-header .expandable {
+	margin: 0 150px 0 40px;
+	cursor: pointer;
+}
+
+#numbers_container .account-section .account-header .right-links {
+	height: 100%;
+}
+
+#numbers_container .account-section .account-header .right-links .buy-numbers-dropdown {
+	margin-bottom: 0;
+	display: inline-block;
+}
+
+#numbers_container .account-section.open .account-header .right-links a > *{
+	color: #ffffff;
+}
+
+#numbers_container .account-section .account-header .right-links a > *{
+	color: $primary-color;
+}
+
+#numbers_container .account-section .account-header .right-links i{
+	margin-right: 6px;
+	text-decoration: none !important;
+}
+
+#numbers_container .account-section .account-header .right-links a {
+	font-size: 14px;
+	white-space: nowrap;
+}
+
+#numbers_container .account-section .account-header .right-links > * {
+	margin-right: 10px;
+}
+
+#numbers_container .account-section .account-header .account-actions {
+	margin: 8px;
+	cursor: pointer !important;
+}
+
+#numbers_container .dropdown-toggle {
+	background: transparent !important;
+}
+
+#numbers_container .dropdown-toggle > i:hover {
+	color: #000;
+}
+
+#numbers_container .account-section .account-header input[type="checkbox"], #numbers_container .account-section .account-header .count {
+	display: none;
+}
+
+#numbers_container .account-section.open .account-header input[type="checkbox"], #numbers_container .account-section.open .account-header .count {
+	display: inline-block;
+}
+
+#numbers_container .account-section.open .account-header {
+	background-color:$primary-color;
+	color: #ffffff;
+
+	border-bottom-right-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+}
+
+#numbers_container .account-section.open .numbers-wrapper {
+	display: block;
+}
+
+#numbers_container .account-section:nth-of-type(1) .account-header {
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+}
+
+#numbers_container .account-section:nth-last-of-type(1) .account-header {
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	border-bottom: 1px solid #CCCCCC;
+}
+
+#numbers_container .account-section:nth-last-of-type(1) .numbers-wrapper .number-box:nth-last-of-type(1) {
+	border-bottom-width: 1px;
+}
+
+#numbers_container .actions-wrapper {
+	height: 40px;
+	line-height: 40px;
+	margin: 20px 0 10px 0;
+}
+
+#numbers_container .actions-wrapper #trigger_links {
+	display: none;
+
+	&.active {
+		display: inline;
+	}
+}
+
+#numbers_container .buy-numbers-dropdown {
+	display: inline-block;
+}
+
+#numbers_container .actions-wrapper label{
+	font-size: 16px;
+	font-weight: 600;
+	margin-right: 20px;
+}
+
+#numbers_container .actions-wrapper a.action-number {
+	margin-right: 20px;
+	color: #666666;
+	white-space: nowrap;
+	text-decoration: none !important;
+}
+
+#numbers_container .actions-wrapper a.action-number:hover .action-text {
+	text-decoration: underline;
+}
+
+#numbers_container .actions-wrapper a i{
+	margin-right: 5px;
+}
+
+/* #numbers_container .features i {
+	display: none;
+} */
+
+#numbers_container .features i.active {
+	display: inline-block;
+}
+
+#numbers_container .search-custom input {
+	padding: 6px;
+}
+
+@media (max-width: 962px) {
+	#numbers_container .account-section .numbers-wrapper .number-box .locality {
+		display: none;
+	}
+}
+
+/* Dialog Spare Numbers */
+/*.dialog-spare-container {
+	padding: 15px;
+}
+
+.dialog-spare-container .grid-numbers .title {
+	border-radius: 4px 4px 0 0;
+	color: #FFFFFF;
+	line-height: 30px;
+	padding: 10px;
+	width: 600px;
+}
+
+.dialog-spare-container .number-box > input[type="checkbox"] {
+	margin-right: 10px;
+}
+
+.dialog-spare-container .grid-numbers {
+	padding-bottom: 10px;
+}
+
+.dialog-spare-container .grid-numbers .numbers {
+	border: 1px solid #DDD;
+	max-height: 372px;
+	overflow: auto;
+}
+
+.dialog-spare-container .grid-numbers .numbers .number-box {
+	border: 1px solid #DDD;
+}
+
+.dialog-spare-container .grid-numbers .numbers .number-box.no-data:hover {
+	cursor: default;
+	background: inherit;
+}
+
+.dialog-spare-container .grid-numbers .empty-search-row {
+	text-align: center;
+	padding: 10px;
+}
+
+.dialog-spare-container .dialog-buttons-wrapper a.cancel-link {
+	margin-right: 30px;
+	vertical-align: middle;
+	color: $primary-color;
+}*/
+
+/* Dialog Confirmation Actions */
+#action_confirmation h4 {
+	margin-bottom: 0;
+	padding: 15px 15px 25px;
+	border-bottom: 1px solid #ddd;
+	text-align: center;
+}
+
+#action_confirmation .table-wrapper {
+	max-height: 420px;
+	overflow-y: auto;
+}
+
+#action_confirmation thead th {
+	color: #000;
+	background-color: #f9f9f9;
+	text-shadow: none;
+}
+
+#action_confirmation th { padding: 15px 8px 15px 20px; }
+#action_confirmation td { padding-left: 60px; padding-right: 15px; }
+#action_confirmation tr { background-color: #f9f9f9; }
+#action_confirmation tr:nth-child(odd) { background-color: #f9f9f9; }
+
+#action_confirmation td i.remove-number {
+	position: relative;
+	top: 7px;
+}
+
+#action_confirmation td i.remove-number:hover { cursor: pointer }
+
+#action_confirmation .actions { padding: 15px; }
+
+#action_confirmation .actions a { text-decoration: none; margin-right: 10px; }
+
+#action_confirmation .actions a:hover { text-decoration: underline; }
+
+/* Delete confirmation popup */
+.delete-confirmation-popup {
+	width: 600px;
+	padding: 15px;
+}
+
+.delete-confirmation-popup .actions {
+	padding-top: 20px;
+	text-align: center;
+}
+
+/* Add External */
+#numbers_add_external {
+	padding: 20px;
+}
+
+#numbers_add_external .list-numbers {
+	height: 200px;
+	width: 508px;
+}
+
+#numbers_add_external .help-text {
+	color: #999;
+	font-size: 12px;
+	font-style: italic;
+}
+
+#numbers_add_external .cancel-link {
+	margin-right: 10px;
+}
+
+#numbers_add_external .force-activate-cb {
+	padding-left: 0;
+	margin-top: 10px;
+}
+
+#numbers_add_external .force-activate-cb .help-popover {
+	margin-left: 10px;
+	margin-top: 2px;
+	vertical-align: top;
+}
+
+#numbers_add_external .customize-number-field {
+	margin-top: 5px;
+}
+
+#numbers_add_external .customize-number-field.disabled {
+	display: none;
+}
+
+#numbers_add_external .customize-number-field label {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+#numbers_add_external .customize-number-field select {
+	margin-bottom: 0
+}
+
+#numbers_add_external .customize-number-field .custom-carrier-block {
+	margin-top: 5px;
+	display: none;
+}
+
+#numbers_add_external .customize-number-field .custom-carrier-block.active {
+	display: block;
+}
+
+#add_numbers_recap_popup {
+	width: 600px;
+	padding: 15px;
+}
+
+#numbers_add_external .customize-number-field {
+	margin-top: 5px;
+}

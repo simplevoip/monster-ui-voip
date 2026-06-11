@@ -1,23 +1,118 @@
 define(function(require) {
 	var $ = require('jquery'),
 		_ = require('lodash'),
-		monster = require('monster');
+		monster = require('monster'),
+		sv_config = require('./config.js'),
+		env = sv_config.env,
+		sv_api = sv_config.api;
 
 	var app = {
-		name: 'voip',
+		name: 'simplevoip',
 
 		css: [ 'app' ],
 
 		i18n: {
-			'de-DE': { customCss: false },
 			'en-US': { customCss: false },
-			'fr-FR': { customCss: false },
-			'ru-RU': { customCss: false },
-			'es-ES': { customCss: false },
-			'fr-CA': { customCss: false }
 		},
 
-		requests: {},
+		requests: {
+			'sv.numbers.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.numbers.create': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.callerid.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=callerid&accountId={accountId}&phoneNumber={phoneNumber}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.curbside.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=curbside&dids={dids}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.create': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.sms.delete': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=sms&accountId={accountId}&userId={userId}',
+				verb: 'DELETE',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.get': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'GET',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.user.sync': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.device.create': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=device&accountId={accountId}',
+				verb: 'PUT',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.device.update': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
+				verb: 'PATCH',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+			'sv.credentials.send': {
+				apiRoot: sv_api[env],
+				url: 'monster/api_functions.php?m=credentials&userId={userId}',
+				verb: 'POST',
+				removeHeaders: [
+					'X-Auth-Token'
+				]
+			},
+		},
 		subscribe: {
 			'core.crossSiteMessage.voip': 'crossSiteMessageHandler'
 		},
@@ -74,19 +169,49 @@ define(function(require) {
 			'vmboxes'
 		],
 
+		e911_readonly: true,
+
+		app_version: sv_config.version,
+
+		// method required by MonsterUI
+		load: function(callback) {
+			var self = this;
+		
+			self.initAuth(function() {
+			  callback && callback(self);
+			});
+		},
+		
+		// method required by MonsterUI
+		initApp: function(callback) {
+			var self = this;
+		
+			monster.pub('auth.initApp', {
+				app: self,
+				callback: callback
+			});
+		},
+
+		// method required by MonsterUI
 		render: function(container) {
 			var self = this,
 				parent = container || $('#monster_content'),
+				// show_accountManagement = !monster.util.isSuperDuper() && monster.util.isAdmin();
 				template = $(self.getTemplate({
-					name: 'app'
+					name: 'app',
+					data: {
+						app_version: self.app_version,
+					},
 				}));
+
+			self.registerHandlebarHelpers();
 
 			self.appFlags.common.hasProvisioner = _.isString(monster.config.api.provisioner);
 
 			self.loadGlobalData(function() {
 				/* On first Load, load my office */
 				template.find('.category#myOffice').addClass('active');
-				monster.pub('voip.myOffice.render', { parent: template.find('.right-content') });
+				monster.pub('simplevoip.myOffice.render', { parent: template.find('.right-content') });
 			});
 
 			self.bindEvents(template);
@@ -101,7 +226,7 @@ define(function(require) {
 		},
 
 		isExtensionDisplayable: function(number) {
-			var isAlphanumericExtensionsEnabled = monster.util.isFeatureAvailable('smartpbx.users.settings.utfExtensions.show'),
+			var isAlphanumericExtensionsEnabled = false,
 				regex = /\D/,
 				isAlphanumericExtension = regex.test(number);
 
@@ -145,7 +270,7 @@ define(function(require) {
 			var self = this,
 				container = parent.find('.right-content');
 
-			parent.find('.left-menu').on('click', '.category:not(.loading)', function() {
+			parent.find('.left-menu').on('click', '.category:not(.loading):not(.external-link)', function() {
 				// Get the ID of the submodule to render
 				var $this = $(this),
 					args = {
@@ -165,7 +290,7 @@ define(function(require) {
 
 				// Empty the main container and then render the submodule content
 				container.empty();
-				monster.pub('voip.' + id + '.render', args);
+				monster.pub('simplevoip.' + id + '.render', args);
 			});
 		},
 
@@ -409,6 +534,44 @@ define(function(require) {
 				maybeGetMainVMBox,
 				maybeCreateMainVMBox
 			], callback);
+		},
+
+		/**
+		 * filter out toll free number ranges from array of numbers
+		 * @param  {Array} numbers
+		 * @return {Array}
+		 */
+		removeTollFreeNumbers: function(numbers) {
+			return numbers.filter(function(number) {
+				var m = /^(?:\+?1)?(?:8(?:00|88|66|77|55|44|33)[2-9]\d{6})$/gm.exec(number);
+				return m === null || !m.length;
+			});
+		},
+
+		registerHandlebarHelpers: function() {
+			Handlebars.registerHelper({
+				foreach: function(arr, options) {
+					if(options.inverse && !arr.length)
+						return options.inverse(this);
+
+					return arr.map(function(item, index) {
+					  	item.$prev = arr[index - 1];
+						return options.fn(item);
+					}).join('');
+				},
+			});
+		},
+
+		canCreateDevices: function(pAccount) {
+			var account = pAccount || _.get(monster, 'apps.auth.originalAccount', {});
+			if (account.sv_custom) {
+				return _.get(account.sv_custom, 'can_create_devices', false);
+			}
+			return false;
+		},
+
+		isFeatureAvailable: function(featurePath) {
+			return _.get(monster.apps.auth.appFlags.featureSet, featurePath, true);
 		}
 	};
 
