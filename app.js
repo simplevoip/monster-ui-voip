@@ -270,9 +270,9 @@ define(function(require) {
 				// show_accountManagement = !monster.util.isSuperDuper() && monster.util.isAdmin();
 				template = $(self.getTemplate({
 					name: 'app',
-					// data: {
-					// 	show_accountManagement: show_accountManagement,
-					// },
+					data: {
+						version: sv_config.version
+					}
 				}));
 
 			self.registerHandlebarHelpers();
