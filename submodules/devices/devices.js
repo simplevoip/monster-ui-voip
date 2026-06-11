@@ -341,7 +341,7 @@ define(function(require) {
 						return false;
 					}
 					var isEditableWhenSetOnAccount = self.isFeatureAvailable(
-							'simplepbx.devices.settings.callerId.editWhenSetOnAccount'
+							'simplevoip.devices.settings.callerId.editWhenSetOnAccount'
 						),
 						isNotSetOnAccount = _
 							.chain(monster.apps.auth.currentAccount)

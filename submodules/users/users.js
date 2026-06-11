@@ -200,14 +200,14 @@ define(function(require) {
 				getFeatureTitle = function(featureId, defaultKey) {
 					var i18n = self.i18n.active().users[featureId].titles,
 						key = monster.util.getFeatureConfig(
-							['simplepbx', 'users', 'features', featureId, 'i18nLabelPath'],
+							['simplevoip', 'users', 'features', featureId, 'i18nLabelPath'],
 							defaultKey
 						);
 					return i18n[key];
 				},
 				isFeatureAvailable = function(data, id) {
 					var isFeatureAvailable = self.isFeatureAvailable(
-							['simplepbx', 'users', 'features', _.camelCase(id), 'edit']
+							['simplevoip', 'users', 'features', _.camelCase(id), 'edit']
 						),
 						availabilityChecker = _.get(data, 'availabilityChecker', _.stubTrue);
 
@@ -240,7 +240,7 @@ define(function(require) {
 						caller_id: {
 							availabilityChecker: function() {
 								var isEditableWhenSetOnAccount = self.isFeatureAvailable(
-										'simplepbx.users.features.callerId.editWhenSetOnAccount'
+										'simplevoip.users.features.callerId.editWhenSetOnAccount'
 									),
 									isNotSetOnAccount = _
 										.chain(monster.apps.auth.currentAccount)
@@ -692,7 +692,7 @@ define(function(require) {
 						if (type === 'name') {
 							currentUser = data;
 
-							if (self.isFeatureAvailable('simplepbx.users.timezone.edit')) {
+							if (self.isFeatureAvailable('simplevoip.users.timezone.edit')) {
 								monster.ui.chosen(template.find('#user_timezone'));
 							}
 
@@ -2422,7 +2422,7 @@ define(function(require) {
 				switchTranscription = featureForm.find('#transcribe').parent(),
 				switchVmToEmail = featureForm.find('#vm_to_email_enabled');
 
-			if (!self.isFeatureAvailable('simplepbx.users.features.vmbox.transcription')) {
+			if (!self.isFeatureAvailable('simplevoip.users.features.vmbox.transcription')) {
 				switchTranscription.addClass('disabled');
 			}
 
@@ -3096,9 +3096,9 @@ define(function(require) {
 					monster.pub('common.ringingDurationControl.getEndpoints', {
 						container: featureForm,
 						callback: function(endpoints) {
-							currentUser.simplepbx = currentUser.simplepbx || {};
-							currentUser.simplepbx.find_me_follow_me = currentUser.simplepbx.find_me_follow_me || {};
-							currentUser.simplepbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
+							currentUser.simplevoip = currentUser.simplevoip || {};
+							currentUser.simplevoip.find_me_follow_me = currentUser.simplevoip.find_me_follow_me || {};
+							currentUser.simplevoip.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
 							var callflowNode = {};
 
@@ -3318,9 +3318,9 @@ define(function(require) {
 			var self = this,
 				isEnabled = template.find('.switch-state').prop('checked');
 
-			user.simplepbx = user.simplepbx || {};
-			user.simplepbx.call_recording = user.simplepbx.call_recording || {};
-			user.simplepbx.call_recording.enabled = isEnabled;
+			user.simplevoip = user.simplevoip || {};
+			user.simplevoip.call_recording = user.simplevoip.call_recording || {};
+			user.simplevoip.call_recording.enabled = isEnabled;
 
 			if (isEnabled) {
 				user.call_recording = $.extend(true, {}, user.call_recording, {
@@ -5299,7 +5299,7 @@ define(function(require) {
 						data: {
 							userId: userId,
 							data: {
-								simplepbx: {
+								simplevoip: {
 									find_me_follow_me: false
 								}
 							}
@@ -5546,7 +5546,7 @@ define(function(require) {
 						},
 						formData = monster.ui.getFormData('conferencing_form');
 
-					monster.util.dataFlags.add({ source: 'simplepbx' }, baseConference);
+					monster.util.dataFlags.add({ source: 'simplevoip' }, baseConference);
 
 					if (formData.video) {
 						formData = _.merge(formData, {
@@ -5579,13 +5579,13 @@ define(function(require) {
 					}
 				},
 				user: function(callback) {
-					if (data.user.simplepbx && data.user.simplepbx.conferencing && data.user.simplepbx.conferencing.enabled === true) {
+					if (data.user.simplevoip && data.user.simplevoip.conferencing && data.user.simplevoip.conferencing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.simplepbx = data.user.simplepbx || {};
-						data.user.simplepbx.conferencing = data.user.simplepbx.conferencing || {};
+						data.user.simplevoip = data.user.simplevoip || {};
+						data.user.simplevoip.conferencing = data.user.simplevoip.conferencing || {};
 
-						data.user.simplepbx.conferencing.enabled = true;
+						data.user.simplevoip.conferencing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5619,13 +5619,13 @@ define(function(require) {
 					});
 				},
 				user: function(callback) {
-					if (data.user.simplepbx && data.user.simplepbx.faxing && data.user.simplepbx.faxing.enabled === true) {
+					if (data.user.simplevoip && data.user.simplevoip.faxing && data.user.simplevoip.faxing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.simplepbx = data.user.simplepbx || {};
-						data.user.simplepbx.faxing = data.user.simplepbx.faxing || {};
+						data.user.simplevoip = data.user.simplevoip || {};
+						data.user.simplevoip.faxing = data.user.simplevoip.faxing || {};
 
-						data.user.simplepbx.faxing.enabled = true;
+						data.user.simplevoip.faxing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5749,10 +5749,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.conferencing_enabled = false;
-						user.simplepbx = user.simplepbx || {};
-						user.simplepbx.conferencing = user.simplepbx.conferencing || {};
+						user.simplevoip = user.simplevoip || {};
+						user.simplevoip.conferencing = user.simplevoip.conferencing || {};
 
-						user.simplepbx.conferencing.enabled = false;
+						user.simplevoip.conferencing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
@@ -5814,10 +5814,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.faxing_enabled = false;
-						user.simplepbx = user.simplepbx || {};
-						user.simplepbx.faxing = user.simplepbx.faxing || {};
+						user.simplevoip = user.simplevoip || {};
+						user.simplevoip.faxing = user.simplevoip.faxing || {};
 
-						user.simplepbx.faxing.enabled = false;
+						user.simplevoip.faxing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
