@@ -208,7 +208,8 @@ define(function(require) {
 				cdrs = params.cdrs,
 				fromDate = params.fromDate,
 				toDate = params.toDate,
-				startKey = params.nextStartKey;
+				startKey = params.nextStartKey,
+				isLoadingMore = false;
 
 			setTimeout(function() {
 				template.find('.search-query').focus();
@@ -251,9 +252,10 @@ define(function(require) {
 			});
 
 			template.find('.search-div input.search-query').on('keyup', function(e) {
+				var searchValue = $(this).val().replace(/\|/g, '').toLowerCase();
+
 				if (template.find('.grid-row-container .grid-row').length > 0) {
-					var searchValue = $(this).val().replace(/\|/g, '').toLowerCase(),
-						matchedResults = false;
+					var matchedResults = false;
 
 					if (searchValue.length <= 0) {
 						template.find('.grid-row-group').show();
@@ -273,11 +275,17 @@ define(function(require) {
 						});
 					}
 
-					if (matchedResults) {
+					// Don't declare "no match" until every page is loaded; a match may still be on an unfetched page.
+					if (matchedResults || startKey) {
 						template.find('.grid-row.no-match').hide();
 					} else {
 						template.find('.grid-row.no-match').show();
 					}
+				}
+
+				// Filtering is client-side, so pull the remaining pages to apply it against every log.
+				if (searchValue.length > 0 && startKey && !isLoadingMore) {
+					loadMoreCdrs({ untilFiltered: true });
 				}
 			});
 
@@ -375,54 +383,69 @@ define(function(require) {
 				e.stopPropagation();
 			});
 
-			function loadMoreCdrs() {
+			function loadMoreCdrs(options) {
+				options = options || {};
+
 				var loaderDiv = template.find('.call-logs-loader'),
+					searchInput = template.find('.search-div input.search-query'),
 					cdrsTemplate;
 
-				if (startKey) {
-					loaderDiv.toggleClass('loading');
-					loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
-					self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
-						newCdrs = self.callLogsFormatCdrs(newCdrs);
-						cdrsTemplate = $(self.getTemplate({
-							name: 'cdrsList',
-							data: {
-								cdrs: newCdrs,
-								showReport: monster.config.whitelabel.callReportEmail ? true : false
-							},
-							submodule: 'callLogs'
-						}));
-
-						startKey = nextStartKey;
-						if (!startKey) {
-							template.find('.call-logs-loader').hide();
-						}
-
-						template.find('.call-logs-grid .grid-row-container').append(cdrsTemplate);
-
-						cdrs = cdrs.concat(newCdrs);
-						var searchInput = template.find('.search-div input.search-query');
-						if (searchInput.val()) {
-							searchInput.keyup();
-						}
-
-						loaderDiv.toggleClass('loading');
-						loaderDiv.find('.loading-message > i').toggleClass('fa-spin');
-					}, startKey);
-				} else {
+				if (!startKey) {
+					isLoadingMore = false;
 					loaderDiv.hide();
+					return;
 				}
+
+				isLoadingMore = true;
+				loaderDiv.addClass('loading');
+				loaderDiv.find('.loading-message > i').addClass('fa-spin');
+
+				self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
+					newCdrs = self.callLogsFormatCdrs(newCdrs);
+					cdrsTemplate = $(self.getTemplate({
+						name: 'cdrsList',
+						data: {
+							cdrs: newCdrs,
+							showReport: monster.config.whitelabel.callReportEmail ? true : false
+						},
+						submodule: 'callLogs'
+					}));
+
+					startKey = nextStartKey;
+
+					template.find('.call-logs-grid .grid-row-container').append(cdrsTemplate);
+
+					cdrs = cdrs.concat(newCdrs);
+					if (searchInput.val()) {
+						searchInput.keyup();
+					}
+
+					// Keep paging (spinner stays up) until the active filter has seen every log.
+					if (options.untilFiltered && startKey && searchInput.val()) {
+						loadMoreCdrs(options);
+						return;
+					}
+
+					isLoadingMore = false;
+					loaderDiv.removeClass('loading');
+					loaderDiv.find('.loading-message > i').removeClass('fa-spin');
+					if (!startKey) {
+						loaderDiv.hide();
+					}
+				}, startKey);
 			}
 
 			template.find('.call-logs-grid').on('scroll', function(e) {
 				var $this = $(this);
-				if ($this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
+				if (!isLoadingMore && $this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
 					loadMoreCdrs();
 				}
 			});
 
 			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
-				loadMoreCdrs();
+				if (!isLoadingMore) {
+					loadMoreCdrs();
+				}
 			});
 
 			monster.ui.clipboard(template.find('.copy-diag-data-target'), function(trigger) {
