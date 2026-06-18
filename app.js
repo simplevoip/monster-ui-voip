@@ -177,7 +177,7 @@ define(function(require) {
 		load: function(callback) {
 			var self = this;
 		
-			self.initAuth(function() {
+			self.initApp(function() {
 			  callback && callback(self);
 			});
 		},
