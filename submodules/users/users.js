@@ -308,7 +308,8 @@ define(function(require) {
 						sms: {
 							icon: 'fa fa-comments',
 							iconColor: 'monster-green',
-							title: self.i18n.active().users.sms.title
+							title: self.i18n.active().users.sms.title,
+							hidden: true
 						},
 						mobile_app: {
 							icon: 'fa fa-mobile',

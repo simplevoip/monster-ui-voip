@@ -60,6 +60,7 @@ define(function(require) {
 						confNumbers: myOfficeData.confNumbers || [],
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
+						showCurbsideManagement: false,
 						topMessage: myOfficeData.topMessage,
 						devicesList: _.orderBy(myOfficeData.devicesData, 'count', 'desc'),
 						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
