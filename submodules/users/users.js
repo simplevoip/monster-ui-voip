@@ -1256,6 +1256,10 @@ define(function(require) {
 
 			/* Events for Devices in Users */
 			template.on('click', '.create-device', function() {
+				if (!self.canCreateDevices()) {
+					return;
+				}
+
 				var $this = $(this),
 					type = $this.data('type');
 
@@ -2147,7 +2151,7 @@ define(function(require) {
 
 			return _.merge({
 				createVmbox: true,
-				hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
+				hasProvisioner: self.canCreateDevices() && self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
 				listExtensions: _
 					.chain(listExtensions)
 					.keyBy('extension')
@@ -2930,6 +2934,11 @@ define(function(require) {
 		usersPromptUserCreateDevice: function(featureUser, success, error) {
 			var self = this;
 
+			if (!self.canCreateDevices()) {
+				error && error();
+				return;
+			}
+
 			monster.ui.confirm(self.i18n.active().users.mobile_app.createADevice,
 				function() {
 					self.usersCreateUserDevice(featureUser, function(device) {
@@ -2942,7 +2951,7 @@ define(function(require) {
 			);
 		},
 
-		usersCreateUserDevice: function(featureUser, callback) {
+		usersCreateUserDevice: function(featureUser, callback, error) {
 			var self = this,
 				accountId = self.accountId,
 				deviceData = {
@@ -2952,6 +2961,11 @@ define(function(require) {
 					user_id: `${featureUser.id}`
 				};
 
+			if (!self.canCreateDevices()) {
+				error && error();
+				return;
+			}
+
 			monster.request({
 				resource: 'sv.device.create',
 				data: {
@@ -2960,6 +2974,9 @@ define(function(require) {
 				},
 				success: function(device) {
 					callback && callback(device.data);
+				},
+				error: function() {
+					error && error();
 				}
 			});
 		},
@@ -4254,7 +4271,7 @@ define(function(require) {
 
 			delete formattedData.user.extra;
 
-			if (_.get(data, 'user.device.brand', 'none') === 'none') {
+			if (!self.canCreateDevices() || _.get(data, 'user.device.brand', 'none') === 'none') {
 				delete formattedData.user.device;
 				return formattedData;
 			}
@@ -4309,7 +4326,7 @@ define(function(require) {
 		usersCreate: function(args) {
 			var self = this,
 				data = args.data,
-				deviceData = _.get(data, 'user.device');
+				deviceData = self.canCreateDevices() ? _.get(data, 'user.device') : null;
 
 			delete data.user.device;
 
@@ -4632,6 +4649,12 @@ define(function(require) {
 		 */
 		usersAddUserDevice: function(args) {
 			var self = this;
+
+			if (!self.canCreateDevices()) {
+				args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
+				return;
+			}
+
 			self.callApi({
 				resource: 'device.create',
 				data: _.merge({

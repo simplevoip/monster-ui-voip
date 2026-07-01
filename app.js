@@ -562,11 +562,7 @@ define(function(require) {
 			});
 		},
 
-		canCreateDevices: function(pAccount) {
-			var account = pAccount || _.get(monster, 'apps.auth.originalAccount', {});
-			if (account.sv_custom) {
-				return _.get(account.sv_custom, 'can_create_devices', false);
-			}
+		canCreateDevices: function() {
 			return false;
 		},
 
