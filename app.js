@@ -114,7 +114,8 @@ define(function(require) {
 			},
 		},
 		subscribe: {
-			'core.crossSiteMessage.voip': 'crossSiteMessageHandler'
+			'core.crossSiteMessage.voip': 'crossSiteMessageHandler',
+			'core.changedAccount': 'onChangedAccount'
 		},
 		appFlags: {
 			common: {
@@ -299,6 +300,35 @@ define(function(require) {
 				container = $('.right-content');
 
 			monster.pub(crossSiteMessageTopic, { parent: container });
+		},
+
+		// Re-render the active section on account switch so it doesn't keep
+		// showing the previous account's data (e.g. Office Holidays).
+		onChangedAccount: function() {
+			var self = this,
+				$container = $('#voip_container');
+
+			// SmartPBX not on screen: it will render fresh when next opened.
+			if ($container.length === 0) {
+				return;
+			}
+
+			// Drop account-scoped data cached on the app instance.
+			if (self.appFlags.strategyHolidays) {
+				self.appFlags.strategyHolidays.allHolidays = [];
+				self.appFlags.strategyHolidays.deletedHolidays = [];
+			}
+
+			var $rightContent = $container.find('.right-content'),
+				activeId = $container.find('.left-menu .category.active').attr('id') || 'myOffice';
+
+			// self.accountId is already the new account here; reload global data, then re-render.
+			self.loadGlobalData(function() {
+				$rightContent.empty();
+				monster.pub('simplevoip.' + activeId + '.render', {
+					parent: $rightContent
+				});
+			});
 		},
 
 		overlayInsert: function() {
