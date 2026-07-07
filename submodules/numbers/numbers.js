@@ -108,6 +108,53 @@ define(function(require) {
 			return value;
 		},
 
+		numbersGetPhoneNumberId: function(number) {
+			return _.find([
+				_.get(number, 'phoneNumber'),
+				_.get(number, 'phone_number'),
+				_.get(number, 'number'),
+				_.get(number, 'e164Number'),
+				_.get(number, 'e164'),
+				_.get(number, 'id'),
+				_.isString(number) ? number : undefined
+			], function(phoneNumber) {
+				return _.isString(phoneNumber) && !_.isEmpty(phoneNumber);
+			});
+		},
+
+		numbersNormalizeNumbers: function(numbers) {
+			var self = this;
+
+			if (!_.isArray(numbers)) {
+				return numbers || {};
+			}
+
+			return _.reduce(numbers, function(normalizedNumbers, number) {
+				var phoneNumber = self.numbersGetPhoneNumberId(number),
+					numberData = _.isObject(number) ? number : {};
+
+				if (phoneNumber) {
+					normalizedNumbers[phoneNumber] = numberData;
+				}
+
+				return normalizedNumbers;
+			}, {});
+		},
+
+		numbersNormalizeListResponse: function(data) {
+			if (_.isArray(data)) {
+				return {
+					numbers: this.numbersNormalizeNumbers(data),
+					quantity: data.length
+				};
+			}
+
+			data = data || {};
+			data.numbers = this.numbersNormalizeNumbers(_.get(data, 'numbers', {}));
+
+			return data;
+		},
+
 		numbersFormatData: function(data) {
 			var self = this,
 				mapAccounts = {},
@@ -138,7 +185,7 @@ define(function(require) {
 			}
 
 			/* assign each number to spare numbers or used numbers for main account */
-			_.each(data.numbers.numbers, function(value, phoneNumber) {
+			_.each(self.numbersNormalizeNumbers(data.numbers.numbers), function(value, phoneNumber) {
 				value.phoneNumber = phoneNumber;
 
 				value = self.numbersFormatNumber(value);
@@ -208,7 +255,7 @@ define(function(require) {
 								listSearchedAccounts.push(accountId);
 							}
 
-							_.each(numbers.numbers, function(value, phoneNumber) {
+							_.each(self.numbersNormalizeNumbers(numbers.numbers), function(value, phoneNumber) {
 								if (phoneNumber !== 'id' && phoneNumber !== 'quantity') {
 									value.phoneNumber = phoneNumber;
 
@@ -1645,7 +1692,7 @@ define(function(require) {
 					formattedData.numbers[id] = number;
 				};
 
-			_.each(data.numbers, function(number, id) {
+			_.each(self.numbersNormalizeNumbers(data.numbers), function(number, id) {
 				if (extraNumbers.indexOf(id) >= 0) {
 					addNumber(id, number);
 				} else if ((!number.hasOwnProperty('used_by') || number.used_by === '') && ignoreNumbers.indexOf(id) === -1) {
@@ -1751,6 +1798,8 @@ define(function(require) {
 			var self = this,
 				mapUsers = {},
 				mapGroups = {};
+
+			data.numbers = self.numbersNormalizeListResponse(data.numbers);
 
 			_.each(data.users, function(user) {
 				mapUsers[user.id] = user;
@@ -1888,7 +1937,7 @@ define(function(require) {
 					filters: { paginate: false }
 				},
 				success: function(_dataNumbers, status) {
-					callback && callback(_dataNumbers.data);
+					callback && callback(self.numbersNormalizeListResponse(_dataNumbers.data));
 				}
 			});
 		},
