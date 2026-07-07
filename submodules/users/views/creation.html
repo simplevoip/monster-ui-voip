@@ -85,47 +85,6 @@
 				</div>
 			</div>
 		</div>
-
-		{{#if hasProvisioner}}
-		<div class="row-fluid separator"></div>
-
-		<div class="row-fluid user-section-title">
-			<h3>{{ i18n.users.dialogCreationUser.addDevice.title }}</h3>
-		</div>
-
-		<div class="row-fluid">
-			<div class="span6 to-left">
-				<label class="control-label" for="device_brand">{{ i18n.users.dialogCreationUser.addDevice.deviceMake.label }}</i></label>
-				<select id="device_brand" name="user.device.brand">
-					<option value="none">
-						{{ i18n.users.dialogCreationUser.addDevice.deviceMake.none }}
-					</option>
-					{{#each listProvisioners}}
-						<option value="{{name}}">{{name}}</option>
-					{{/each}}
-				</select>
-			</div>
-			<div class="span6 device-name to-right">
-				<label for="device-name" class="control-label">{{ i18n.users.dialogCreationUser.addDevice.name }}</label>
-				<input required type="text" id="device-name" name="user.device.name" placeholder="{{ i18n.users.dialogCreationUser.addDevice.name }}">
-			</div>
-		</div>
-
-		<div class="row-fluid">
-			<div class="span6 to-left device-model">
-				<label class="control-label" for="device_model">{{ i18n.users.dialogCreationUser.addDevice.deviceModel.label }}</label>
-				<select id="device_model" name="user.device.model">
-					<option value="none">
-						{{ i18n.users.dialogCreationUser.addDevice.deviceMake.none }}
-					</option>
-				</select>
-			</div>
-			<div class="span6 device-mac to-right">
-				<label for="mac_address" class="control-label">{{ i18n.users.dialogCreationUser.addDevice.macAddress }}</label>
-				<input type="text" id="mac_address" name="user.device.mac_address" placeholder="19:33:1A:B2:12:58">
-			</div>
-		</div>
-		{{/if}}
 	</form>
 	<div>
 		<div class="dialog-buttons-wrapper add-user-actions">

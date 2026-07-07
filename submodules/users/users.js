@@ -1787,7 +1787,6 @@ define(function(require) {
 		usersBindAddUserEvents: function(args) {
 			var self = this,
 				template = args.template,
-				data = args.data,
 				popup = args.popup;
 
 			template.find('.create_user').on('click', function() {
@@ -1797,13 +1796,7 @@ define(function(require) {
 
 				var action = $(this).data('action'),
 					$buttons = template.find('.create_user'),
-					dataForm = _.merge(monster.ui.getFormData('form_user_creation'), {
-						user: {
-							device: {
-								family: template.find('#device_model').find(':selected').data('family')
-							}
-						}
-					}),
+					dataForm = monster.ui.getFormData('form_user_creation'),
 					formattedData = self.usersFormatCreationData(dataForm);
 
 				$buttons.prop('disabled', true);
@@ -1832,46 +1825,6 @@ define(function(require) {
 			template.find('#notification_email').on('change', function() {
 				template.find('.email-group').toggleClass('hidden');
 			});
-
-			template.find('#device_brand').on('change', function() {
-				var brand = $(this).val(),
-					selectedBrand = [],
-					$deviceModel = template.find('.device-model'),
-					$deviceName = template.find('.device-name'),
-					$deviceMac = template.find('.device-mac'),
-					$deviceModelSelect = template.find('#device_model');
-
-				if (brand !== 'none') {
-					self.usersDeviceFormReset(template);
-					$deviceModel.slideDown();
-					$deviceName.slideDown();
-					$deviceMac.slideDown();
-
-					selectedBrand = _.find(data.listProvisioners, function(provisioner) {
-						return provisioner.name === brand;
-					});
-
-					$deviceModelSelect
-						.find('option')
-						.remove()
-						.end();
-
-					selectedBrand.models.map(function(model) {
-						var option = $('<option>', {
-							value: model.name,
-							text: model.name
-						}).attr('data-family', model.family);
-
-						$deviceModelSelect.append(option);
-					});
-
-					$deviceModelSelect.trigger('chosen:updated');
-
-					return;
-				}
-
-				self.usersDeviceFormReset(template);
-			});
 		},
 
 		usersRenderAddModalDialog: function() {
@@ -1887,25 +1840,6 @@ define(function(require) {
 					self.usersListVMBoxes({
 						success: function(vmboxes) {
 							callback(null, vmboxes);
-						}
-					});
-				},
-				provisioners: function(callback) {
-					if (!self.appFlags.common.hasProvisioner) {
-						callback(null);
-						return;
-					}
-
-					monster.request({
-						resource: 'common.chooseModel.getProvisionerData',
-						data: {
-							generateError: false
-						},
-						success: function(provisionerData) {
-							callback(null, provisionerData.data);
-						},
-						error: function() {
-							callback(null, {});
 						}
 					});
 				}
@@ -1928,12 +1862,6 @@ define(function(require) {
 							},
 							'user.password': {
 								minlength: 6
-							},
-							'user.device.name': 'required',
-							'user.device.model': 'required',
-							'user.device.mac_address': {
-								required: false,
-								mac: true
 							}
 						},
 						messages: {
@@ -1944,15 +1872,6 @@ define(function(require) {
 								required: self.i18n.active().validation.required
 							},
 							'callflow.extension': {
-								required: self.i18n.active().validation.required
-							},
-							'user.device.model': {
-								required: self.i18n.active().validation.required
-							},
-							'user.device.name': {
-								required: self.i18n.active().validation.required
-							},
-							'user.device.mac_address': {
 								required: self.i18n.active().validation.required
 							}
 						}
@@ -1969,7 +1888,6 @@ define(function(require) {
 
 				monster.ui.mask(userTemplate.find('#extension'), 'extension');
 				monster.ui.chosen(userTemplate.find('#licensed_role'));
-				monster.ui.mask(userTemplate.find('#mac_address'), 'macAddress');
 				monster.ui.validate(userCreationForm, validationOptions);
 
 				// Force select element validation on change event
@@ -1981,8 +1899,6 @@ define(function(require) {
 				});
 
 				monster.ui.showPasswordStrength(userTemplate.find('#password'));
-				monster.ui.chosen(userTemplate.find('#device_brand'));
-				monster.ui.chosen(userTemplate.find('#device_model'));
 
 				var popup = monster.ui.dialog(userTemplate, {
 					title: self.i18n.active().users.dialogCreationUser.title
@@ -1994,16 +1910,6 @@ define(function(require) {
 					popup: popup
 				});
 			});
-		},
-
-		usersDeviceFormReset: function(template) {
-			var $deviceModel = template.find('.device-model'),
-				$deviceName = template.find('.device-name'),
-				$deviceMac = template.find('.device-mac');
-
-			$deviceModel.slideUp();
-			$deviceName.slideUp();
-			$deviceMac.slideUp();
 		},
 
 		usersGetCallRecordingData: function(userId, globalCallback) {
@@ -2112,7 +2018,6 @@ define(function(require) {
 		/**
 		 * @param  {Object} data
 		 * @param  {Array} data.callflows
-		 * @param  {Array} data.provisioners
 		 * @param  {Array} data.vmboxes
 		 * @return {Object}
 		 */
@@ -2147,29 +2052,10 @@ define(function(require) {
 
 			return _.merge({
 				createVmbox: true,
-				hasProvisioner: self.appFlags.common.hasProvisioner && !_.isEmpty(data.provisioners),
 				listExtensions: _
 					.chain(listExtensions)
 					.keyBy('extension')
 					.mapValues('callflow')
-					.value(),
-				listProvisioners: _
-					.chain(data.provisioners)
-					.map(function(brand) {
-						return _.merge({
-							models: _.flatMap(brand.families, function(family) {
-								return _.map(family.models, function(model) {
-									return _.merge({
-										family: family.name
-									}, model);
-								});
-							})
-						}, _.pick(brand, [
-							'id',
-							'name'
-						]));
-					})
-					.sortBy('name')
 					.value(),
 				listVMBoxes: mapVMBoxes,
 				nextExtension: parseInt(monster.util.getNextExtension(allNumbers)) + '',
@@ -4180,15 +4066,6 @@ define(function(require) {
 			var self = this,
 				fullName = monster.util.getUserFullName(data.user),
 				callerIdName = fullName.substring(0, 15),
-				provisionData = _
-					.chain(data.user.device)
-					.pick([
-						'brand',
-						'family',
-						'model'
-					])
-					.mapValues(_.toLower)
-					.value(),
 				formattedData = {
 					user: $.extend(true, {}, {
 						service: {
@@ -4254,30 +4131,6 @@ define(function(require) {
 
 			delete formattedData.user.extra;
 
-			if (_.get(data, 'user.device.brand', 'none') === 'none') {
-				delete formattedData.user.device;
-				return formattedData;
-			}
-
-			formattedData.user.device = {
-				device_type: 'sip_device',
-				enabled: true,
-				mac_address: data.user.device.mac_address,
-				name: data.user.device.name,
-				provision: {
-					endpoint_brand: provisionData.brand,
-					endpoint_family: provisionData.family,
-					endpoint_model: provisionData.model
-				},
-				sip: {
-					password: monster.util.randomString(12),
-					realm: monster.apps.auth.currentAccount.realm,
-					username: 'user_' + monster.util.randomString(10)
-				},
-				suppress_unregister_notifications: false,
-				family: data.user.device.family
-			};
-
 			return formattedData;
 		},
 
@@ -4308,10 +4161,7 @@ define(function(require) {
 		 */
 		usersCreate: function(args) {
 			var self = this,
-				data = args.data,
-				deviceData = _.get(data, 'user.device');
-
-			delete data.user.device;
+				data = args.data;
 
 			monster.waterfall([
 				function(callback) {
@@ -4376,29 +4226,6 @@ define(function(require) {
 
 					self.usersAddUserToMainDirectory(_dataUser, _dataCF.id, function(dataDirectory) {
 						callback(null, _dataUser);
-					});
-				},
-				function(_dataUser, callback) {
-					if (!deviceData) {
-						callback(null, _dataUser);
-						return;
-					}
-
-					deviceData.owner_id = _dataUser.id;
-					self.usersAddUserDevice({
-						data: {
-							data: deviceData
-						},
-						success: function(_device, _dataUser) {
-							callback(null);
-						},
-						error: function() {
-							callback(true);
-						},
-						onChargesCancelled: function() {
-							// Allow to complete without errors, although the device won't be created
-							callback(null, _dataUser);
-						}
 					});
 				},
 				function(_dataUser, callback) {
@@ -4617,35 +4444,6 @@ define(function(require) {
 				self.usersUpdateUser(dataUser, function(data) {
 					callback && callback(data);
 				});
-			});
-		},
-
-		/**
-		 * Creates a device for a user
-		 * @param  {Object}   args
-		 * @param  {Object}   args.data                  Data to be sent by the SDK to the API
-		 * @param  {Object}   args.data.data             Data provided for the device to be created
-		 * @param  {Function} [args.success]             Success callback
-		 * @param  {Function} [args.error]               Error callback
-		 * @param  {Function} [args.onChargesCancelled]  Callback to be executed when charges are
-		 *                                               not accepted
-		 */
-		usersAddUserDevice: function(args) {
-			var self = this;
-			self.callApi({
-				resource: 'device.create',
-				data: _.merge({
-					accountId: self.accountId
-				}, args.data),
-				success: function(data) {
-					args.hasOwnProperty('success') && args.success(data.data);
-				},
-				error: function(parsedError) {
-					args.hasOwnProperty('error') && args.error(parsedError);
-				},
-				onChargesCancelled: function() {
-					args.hasOwnProperty('onChargesCancelled') && args.onChargesCancelled();
-				}
 			});
 		},
 
