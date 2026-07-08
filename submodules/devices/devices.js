@@ -283,8 +283,13 @@ define(function(require) {
 		 * @param  {Function} args.callback
 		 */
 		devicesRenderAdd: function(args) {
-			var self = this,
-				allowAssign = _.get(args, 'allowAssign'),
+			var self = this;
+
+			if (!self.canCreateDevices()) {
+				return;
+			}
+
+			var allowAssign = _.get(args, 'allowAssign'),
 				type = args.type,
 				callback = args.callback,
 				data = {
@@ -1227,7 +1232,7 @@ define(function(require) {
 				unassignedString = self.i18n.active().devices.unassignedDevice;
 				registeredDevices = _.filter(data.status, (device) => device.registered);
 				registeredDevicesById = _.map(registeredDevices, 'device_id'),
-				filteredAddableDeviceTypes = self.canCreateDevices() ? self.appFlags.devices.addableDeviceTypes : ['cellphone'];
+				filteredAddableDeviceTypes = self.canCreateDevices() ? self.appFlags.devices.addableDeviceTypes : [];
 
 			return {
 				countDevices: _.size(data.devices),
@@ -1548,6 +1553,11 @@ define(function(require) {
 		 */
 		devicesCreateDevice: function(deviceData, callbackSuccess, callbackError) {
 			var self = this;
+
+			if (!self.canCreateDevices()) {
+				callbackError && callbackError();
+				return;
+			}
 
 			self.callApi({
 				resource: 'device.create',

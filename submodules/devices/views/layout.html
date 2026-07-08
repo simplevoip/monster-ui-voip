@@ -5,24 +5,26 @@
 			<span class="count-devices">{{countDevices}}</span>
 		</div>
 
-		<div class="dropdown">
-			<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown">
-				<i class="fa fa-plus-circle"></i>
-				{{i18n.devices.add }}
-			</a>
-			<ul class="dropdown-menu">
-			{{#each deviceTypesToAdd}}
-				<li>
-					<a class="create-device" data-type="{{type}}">
-						<i>
-							{{telicon icon}}
-						</i>
-						{{tryI18n @root.i18n.devices.types type}}
-					</a>
-				</li>
-			{{/each}}
-			</ul>
-		</div>
+		{{#if deviceTypesToAdd}}
+			<div class="dropdown">
+				<a href="#" class="add-device monster-link dropdown-toggle" data-toggle="dropdown">
+					<i class="fa fa-plus-circle"></i>
+					{{i18n.devices.add }}
+				</a>
+				<ul class="dropdown-menu">
+				{{#each deviceTypesToAdd}}
+					<li>
+						<a class="create-device" data-type="{{type}}">
+							<i>
+								{{telicon icon}}
+							</i>
+							{{tryI18n @root.i18n.devices.types type}}
+						</a>
+					</li>
+				{{/each}}
+				</ul>
+			</div>
+		{{/if}}
 
 		<span class="search-box pull-right">
 			<i class="fa fa-search"></i>

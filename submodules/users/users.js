@@ -1257,6 +1257,10 @@ define(function(require) {
 
 			/* Events for Devices in Users */
 			template.on('click', '.create-device', function() {
+				if (!self.canCreateDevices()) {
+					return;
+				}
+
 				var $this = $(this),
 					type = $this.data('type');
 
@@ -2817,6 +2821,11 @@ define(function(require) {
 		usersPromptUserCreateDevice: function(featureUser, success, error) {
 			var self = this;
 
+			if (!self.canCreateDevices()) {
+				error && error();
+				return;
+			}
+
 			monster.ui.confirm(self.i18n.active().users.mobile_app.createADevice,
 				function() {
 					self.usersCreateUserDevice(featureUser, function(device) {
@@ -2829,7 +2838,7 @@ define(function(require) {
 			);
 		},
 
-		usersCreateUserDevice: function(featureUser, callback) {
+		usersCreateUserDevice: function(featureUser, callback, error) {
 			var self = this,
 				accountId = self.accountId,
 				deviceData = {
@@ -2839,6 +2848,11 @@ define(function(require) {
 					user_id: `${featureUser.id}`
 				};
 
+			if (!self.canCreateDevices()) {
+				error && error();
+				return;
+			}
+
 			monster.request({
 				resource: 'sv.device.create',
 				data: {
@@ -2847,6 +2861,9 @@ define(function(require) {
 				},
 				success: function(device) {
 					callback && callback(device.data);
+				},
+				error: function() {
+					error && error();
 				}
 			});
 		},
