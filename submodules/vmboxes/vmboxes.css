@@ -258,6 +258,40 @@
 	padding: 0 20px;
 }
 
+.edit-vmbox .list-entities.emails-list .entity-wrapper:not(.placeholder) {
+	line-height: 20px;
+	overflow: hidden;
+	padding-right: 45px;
+	position: relative;
+}
+
+.edit-vmbox .list-entities.emails-list .entity-wrapper:not(.placeholder) .entity-title {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.edit-vmbox .list-entities.emails-list .entity-wrapper:not(.placeholder) .delete-entity {
+	background-color: #eee;
+	border-left: 1px solid #ccc;
+	bottom: 0;
+	box-sizing: border-box;
+	display: block;
+	float: none;
+	line-height: 40px;
+	padding: 0;
+	position: absolute;
+	right: 0;
+	text-align: center;
+	top: 0;
+	width: 40px;
+}
+
+.edit-vmbox .list-entities.emails-list .entity-wrapper:not(.placeholder) .delete-entity > i {
+	line-height: 40px;
+}
+
 .edit-vmbox .tabs-section[data-section="greeting"] .greeting-container,
 .edit-vmbox .tabs-section[data-section="greeting"] .temporary-greeting-container {
 	padding: 0 90px 25px
