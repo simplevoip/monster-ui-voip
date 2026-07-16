@@ -4,6 +4,9 @@ define(function(require) {
 		monster = require('monster'),
 		moment = require('moment');
 
+	var callLogsPageSize = 50,
+		callLogsSearchPageSize = 500;
+
 	var app = {
 		requests: {},
 
@@ -432,7 +435,7 @@ define(function(require) {
 					if (!startKey) {
 						loaderDiv.hide();
 					}
-				}, startKey);
+				}, startKey, options.untilFiltered ? callLogsSearchPageSize : callLogsPageSize);
 			}
 
 			template.find('.call-logs-grid').on('scroll', function(e) {
@@ -476,14 +479,14 @@ define(function(require) {
 			};
 		},
 
-		callLogsGetCdrs: function(fromDate, toDate, callback, pageStartKey) {
+		callLogsGetCdrs: function(fromDate, toDate, callback, pageStartKey, pageSize) {
 			var self = this,
 				fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
 				toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate),
 				filters = {
 					'created_from': fromDateTimestamp,
 					'created_to': toDateTimestamp,
-					'page_size': 50
+					'page_size': pageSize || callLogsPageSize
 				};
 
 			if (pageStartKey) {
