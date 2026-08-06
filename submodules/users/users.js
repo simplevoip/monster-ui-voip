@@ -3660,6 +3660,18 @@ define(function(require) {
 						if (userData.sms.enabled) {
 							user.extra.mapFeatures.sms.active = true;
 						}
+						// Kazoo's computed `features` array is an unreliable signal for faxing/conferencing:
+						// a user configured through SmartPBX can have a faxbox + faxing callflow yet still be
+						// missing 'faxing' in `features`, so the toggle would read as off right after saving.
+						// SmartPBX persists the authoritative state under `simplevoip.<feature>.enabled` (see
+						// usersUpdateFaxing/usersDeleteFaxing and their conferencing counterparts), so mirror it
+						// here the same way mobile_app/sms are handled above. Additive: never forces active off.
+						if (_.get(userData, 'simplevoip.faxing.enabled') === true && _.has(user, 'extra.mapFeatures.faxing')) {
+							user.extra.mapFeatures.faxing.active = true;
+						}
+						if (_.get(userData, 'simplevoip.conferencing.enabled') === true && _.has(user, 'extra.mapFeatures.conferencing')) {
+							user.extra.mapFeatures.conferencing.active = true;
+						}
 						userData = $.extend(true, userData, user);
 					}
 				});
