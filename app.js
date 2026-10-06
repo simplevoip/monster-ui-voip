@@ -598,6 +598,23 @@ define(function(require) {
 
 		isFeatureAvailable: function(featurePath) {
 			return _.get(monster.apps.auth.appFlags.featureSet, featurePath, true);
+		},
+
+		/**
+		 * Feature state on user/group docs must live under `smartpbx`: Kazoo's users/groups listing
+		 * views build the `features` array from `smartpbx.<feature>.enabled`. For a while this app
+		 * wrote it under `simplevoip` instead, which Kazoo ignores. Fold those legacy entries back
+		 * under `smartpbx` (existing `smartpbx` entries win) so the next save persists a clean doc.
+		 * @param  {Object} doc user or group document
+		 * @return {Object}
+		 */
+		migrateLegacyFeatureState: function(doc) {
+			if (_.isPlainObject(_.get(doc, 'simplevoip'))) {
+				doc.smartpbx = _.assign({}, doc.simplevoip, doc.smartpbx);
+				delete doc.simplevoip;
+			}
+
+			return doc;
 		}
 	};
 
