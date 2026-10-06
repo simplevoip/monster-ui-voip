@@ -3005,9 +3005,9 @@ define(function(require) {
 					monster.pub('common.ringingDurationControl.getEndpoints', {
 						container: featureForm,
 						callback: function(endpoints) {
-							currentUser.simplevoip = currentUser.simplevoip || {};
-							currentUser.simplevoip.find_me_follow_me = currentUser.simplevoip.find_me_follow_me || {};
-							currentUser.simplevoip.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
+							currentUser.smartpbx = currentUser.smartpbx || {};
+							currentUser.smartpbx.find_me_follow_me = currentUser.smartpbx.find_me_follow_me || {};
+							currentUser.smartpbx.find_me_follow_me.enabled = (enabled && endpoints.length > 0);
 
 							var callflowNode = {};
 
@@ -3227,9 +3227,9 @@ define(function(require) {
 			var self = this,
 				isEnabled = template.find('.switch-state').prop('checked');
 
-			user.simplevoip = user.simplevoip || {};
-			user.simplevoip.call_recording = user.simplevoip.call_recording || {};
-			user.simplevoip.call_recording.enabled = isEnabled;
+			user.smartpbx = user.smartpbx || {};
+			user.smartpbx.call_recording = user.smartpbx.call_recording || {};
+			user.smartpbx.call_recording.enabled = isEnabled;
 
 			if (isEnabled) {
 				user.call_recording = $.extend(true, {}, user.call_recording, {
@@ -3660,6 +3660,13 @@ define(function(require) {
 						if (userData.sms.enabled) {
 							user.extra.mapFeatures.sms.active = true;
 						}
+						// The listing's `features` come from Kazoo's view of the stored doc, so state that was only
+						// just migrated from the legacy `simplevoip` key (see migrateLegacyFeatureState) isn't in it yet.
+						_.each(userData.smartpbx, function(feature, key) {
+							if (_.get(feature, 'enabled') === true && _.has(user, ['extra', 'mapFeatures', key])) {
+								user.extra.mapFeatures[key].active = true;
+							}
+						});
 						userData = $.extend(true, userData, user);
 					}
 				});
@@ -4732,7 +4739,7 @@ define(function(require) {
 					userId: userId
 				},
 				success: function(user) {
-					callback && callback(user.data);
+					callback && callback(self.migrateLegacyFeatureState(user.data));
 				}
 			});
 		},
@@ -5122,7 +5129,7 @@ define(function(require) {
 						data: {
 							userId: userId,
 							data: {
-								simplevoip: {
+								smartpbx: {
 									find_me_follow_me: false
 								}
 							}
@@ -5369,7 +5376,7 @@ define(function(require) {
 						},
 						formData = monster.ui.getFormData('conferencing_form');
 
-					monster.util.dataFlags.add({ source: 'simplevoip' }, baseConference);
+					monster.util.dataFlags.add({ source: 'smartpbx' }, baseConference);
 
 					if (formData.video) {
 						formData = _.merge(formData, {
@@ -5402,13 +5409,13 @@ define(function(require) {
 					}
 				},
 				user: function(callback) {
-					if (data.user.simplevoip && data.user.simplevoip.conferencing && data.user.simplevoip.conferencing.enabled === true) {
+					if (data.user.smartpbx && data.user.smartpbx.conferencing && data.user.smartpbx.conferencing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.simplevoip = data.user.simplevoip || {};
-						data.user.simplevoip.conferencing = data.user.simplevoip.conferencing || {};
+						data.user.smartpbx = data.user.smartpbx || {};
+						data.user.smartpbx.conferencing = data.user.smartpbx.conferencing || {};
 
-						data.user.simplevoip.conferencing.enabled = true;
+						data.user.smartpbx.conferencing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5442,13 +5449,13 @@ define(function(require) {
 					});
 				},
 				user: function(callback) {
-					if (data.user.simplevoip && data.user.simplevoip.faxing && data.user.simplevoip.faxing.enabled === true) {
+					if (data.user.smartpbx && data.user.smartpbx.faxing && data.user.smartpbx.faxing.enabled === true) {
 						callback && callback(null, data.user);
 					} else {
-						data.user.simplevoip = data.user.simplevoip || {};
-						data.user.simplevoip.faxing = data.user.simplevoip.faxing || {};
+						data.user.smartpbx = data.user.smartpbx || {};
+						data.user.smartpbx.faxing = data.user.smartpbx.faxing || {};
 
-						data.user.simplevoip.faxing.enabled = true;
+						data.user.smartpbx.faxing.enabled = true;
 
 						self.usersUpdateUser(data.user, function(user) {
 							callback && callback(null, user.data);
@@ -5572,10 +5579,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.conferencing_enabled = false;
-						user.simplevoip = user.simplevoip || {};
-						user.simplevoip.conferencing = user.simplevoip.conferencing || {};
+						user.smartpbx = user.smartpbx || {};
+						user.smartpbx.conferencing = user.smartpbx.conferencing || {};
 
-						user.simplevoip.conferencing.enabled = false;
+						user.smartpbx.conferencing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
@@ -5637,10 +5644,10 @@ define(function(require) {
 				user: function(callback) {
 					self.usersGetUser(userId, function(user) {
 						//user.faxing_enabled = false;
-						user.simplevoip = user.simplevoip || {};
-						user.simplevoip.faxing = user.simplevoip.faxing || {};
+						user.smartpbx = user.smartpbx || {};
+						user.smartpbx.faxing = user.smartpbx.faxing || {};
 
-						user.simplevoip.faxing.enabled = false;
+						user.smartpbx.faxing.enabled = false;
 
 						self.usersUpdateUser(user, function(user) {
 							callback(null, user);
