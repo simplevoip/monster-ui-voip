@@ -358,6 +358,7 @@ define(function(require) {
 
 			if (_mainCallflow) {
 				dataUser.extra.mainCallflowId = _mainCallflow.id;
+				dataUser.extra.mainCallflowName = _mainCallflow.name;
 
 				if ('flow' in _mainCallflow) {
 					var flow = _mainCallflow.flow,
@@ -944,6 +945,9 @@ define(function(require) {
 							newName = monster.util.getUserFullName(userToSave),
 							oldName = monster.util.getUserFullName(currentUser),
 							isUserNameDifferent = newName !== oldName,
+							mainCallflowName = newName + self.appFlags.users.simplePBXCallflowString,
+							// Also fixes callflows left stale by renames made outside SmartPBX (e.g. "User 200")
+							isCallflowNameOutdated = isUserNameDifferent || (_.has(currentUser, 'extra.mainCallflowId') && currentUser.extra.mainCallflowName !== mainCallflowName),
 							hasTimeout = userToSave.extra.ringingTimeout && userToSave.extra.features.indexOf('find_me_follow_me') < 0,
 							shouldUpdateTimeout = hasTimeout ? parseInt(currentUser.extra.ringingTimeout) !== parseInt(userToSave.extra.ringingTimeout) : false;
 
@@ -1007,7 +1011,7 @@ define(function(require) {
 								}
 							},
 							callflow: function(callback) {
-								if (!isUserNameDifferent && !shouldUpdateTimeout) {
+								if (!isCallflowNameOutdated && !shouldUpdateTimeout) {
 									callback(null, null);
 									return;
 								}
@@ -1024,8 +1028,8 @@ define(function(require) {
 											return;
 										}
 
-										if (isUserNameDifferent) {
-											mainCallflow.name = newName + self.appFlags.users.simplePBXCallflowString;
+										if (isCallflowNameOutdated) {
+											mainCallflow.name = mainCallflowName;
 										}
 
 										if (shouldUpdateTimeout && 'flow' in mainCallflow) {
