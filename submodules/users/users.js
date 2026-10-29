@@ -5775,10 +5775,11 @@ define(function(require) {
 					var mainUserCallflow = userData.callflow;
 
 					// Do not update main callflow if it has not
-					// been created by the voip app, or if does not have
-					// empty children at the root of the flow, which
-					// is the default main user callflow without vmbox
-					if (mainUserCallflow.ui_metadata.origin !== 'simplevoip' || mainUserCallflow.ui_metadata.origin !== 'voip' || !_.isEmpty(mainUserCallflow.flow.children)) {
+					// been created by this app or the stock voip app,
+					// or if does not have empty children at the root
+					// of the flow, which is the default main user
+					// callflow without vmbox
+					if (!_.includes(['simplevoip', 'voip'], _.get(mainUserCallflow, 'ui_metadata.origin')) || !_.isEmpty(mainUserCallflow.flow.children)) {
 						monster.ui.alert('warning', self.i18n.active().users.vmbox.createdButCallflowNotUpdated);
 						waterfallCallback(null);
 						return;
