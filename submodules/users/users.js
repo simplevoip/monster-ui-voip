@@ -305,12 +305,6 @@ define(function(require) {
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
 						},
-						sms: {
-							icon: 'fa fa-comments',
-							iconColor: 'monster-green',
-							title: self.i18n.active().users.sms.title,
-							hidden: true
-						},
 						mobile_app: {
 							icon: 'fa fa-mobile',
 							iconColor: 'monster-orange',
@@ -1665,18 +1659,6 @@ define(function(require) {
 				});
 			});
 
-			template.on('click', '.feature[data-feature="sms"]', function() {
-				modifiedUser = _.merge({}, currentUser, {
-					extra: {
-						nonTollFreeNumbers: self.removeTollFreeNumbers(currentUser.extra.listNumbers)
-					},
-					sms: {
-						kazoo_account_id: self.accountId
-					}
-				});
-				self.usersRenderSms(modifiedUser);
-			});
-
 			template.on('click', '.feature[data-feature="mobile_app"]', function() {
 				if (currentUser.mobile_app.is_provisioned) {
 					self.usersRenderMobileApp(currentUser);
@@ -2727,97 +2709,6 @@ define(function(require) {
 			});
 		},
 
-		usersRenderSms: function(featureUser) {
-			var self = this,
-				featureTemplate = $(self.getTemplate({
-					name: 'feature-sms',
-					data: featureUser,
-					submodule: 'users'
-				})),
-				switchFeature = featureTemplate.find('.switch-state'),
-				featureForm = featureTemplate.find('#sms_form');
-
-			jQuery.validator.addMethod("require_from_sms_options", function (value, element, options) {
-				var numberRequired = options[0];
-				var selector = options[1];
-				var fields = $(selector, element.form);
-				var filled_fields = fields.filter(function () {
-					// it's more clear to compare with empty string
-					return $(this).val() != "";
-				});
-				var empty_fields = fields.not(filled_fields);
-				// we will mark only first empty field as invalid
-				if (filled_fields.length < numberRequired && empty_fields[0] == element) {
-					return false;
-				}
-				return true;
-				// {0} below is the 0th item in the options field
-			}, jQuery.validator.format("Please choose at least one delivery option (Softphone, Email, or URL)"));
-
-			monster.ui.validate(featureForm, {
-				rules: {
-					'did': {
-						required: true
-					},
-					'mobile_id': {
-						require_from_sms_options: [1, '.required-by-sms']
-					},
-					'recv_webhook_url': {
-						require_from_sms_options: [1, '.required-by-sms']
-					},
-					'email': {
-						require_from_sms_options: [1, '.required-by-sms']
-					}
-				}
-			});
-
-			switchFeature.on('change', function() {
-				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
-			});
-
-			featureTemplate.find('#send_webhook_url_match_recv').on('click', function (evt) {
-				const target = evt.currentTarget;
-				const checked = $(target).is(':checked');
-				const val = checked ? $('[name="recv_webhook_url"]').val() : '';
-				$('[name="send_webhook_url"]')
-					.val(val)
-					.attr('readonly', checked);
-			});
-
-			featureTemplate.find('.cancel-link').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			featureTemplate.find('.save').on('click', function() {
-				if (monster.ui.valid(featureForm)) {
-					var formData = monster.ui.getFormData('sms_form'),
-						smsToSave = $.extend(true, {}, featureUser.sms, formData);
-
-					self.usersUpdateSms(featureUser, smsToSave, function(data) {
-						if (data) {
-							if (data.message !== null && data.message !== '' && data.message !== undefined) {
-								monster.ui.alert('info', data.message);
-							}
-							popup.dialog('close').remove();
-							self.usersRender({
-								userId: featureUser.id,
-								openedTab: 'features'
-							});
-						}
-					});
-				}
-			});
-
-			var popup = monster.ui.dialog(featureTemplate, {
-				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.sms.title,
-				position: ['center', 20]
-			});
-
-			if (featureUser.sms.recv_webhook_url === featureUser.sms.send_webhook_url) {
-				featureTemplate.find('#send_webhook_url_match_recv').trigger('click');
-			}
-		},
-
 		usersPromptUserCreateDevice: function(featureUser, success, error) {
 			var self = this;
 
@@ -3656,9 +3547,6 @@ define(function(require) {
 					if (user.id === userData.id) {
 						if (userData.mobile_app.is_provisioned) {
 							user.extra.mapFeatures.mobile_app.active = true;
-						}
-						if (userData.sms.enabled) {
-							user.extra.mapFeatures.sms.active = true;
 						}
 						userData = $.extend(true, userData, user);
 					}
@@ -4767,31 +4655,13 @@ define(function(require) {
 			});
 		},
 
-		usersUpdateSms: function(userData, sms, callback) {
-			var self = this,
-				enabled = sms.enabled,
-				resource = enabled ? 'sv.sms.update' : 'sv.sms.delete';
-
-			monster.request({
-				resource: resource,
-				data: {
-					accountId: self.accountId,
-					userId: userData.id,
-					data: sms
-				},
-				success: function(data) {
-					callback && callback(data);
-				},
-				error: function() {
-					console.log('Failed to update SMS settings');
-				}
-			});
-		},
-
 		usersSendMobileAppCredentials: function(userId, callback) {
+			var self = this;
+
 			monster.request({
 				resource: 'sv.credentials.send',
 				data: {
+					accountId: self.accountId,
 					userId: userId
 				},
 				success: function(data) {
