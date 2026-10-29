@@ -4,15 +4,18 @@ define(function(require) {
 		monster = require('monster'),
 		moment = require('moment');
 
+	// The first page stays small so the grid paints quickly; the rest of the range loads in bigger pages behind it.
 	var callLogsPageSize = 50,
-		callLogsSearchPageSize = 500;
+		callLogsBackgroundPageSize = 500;
 
 	var app = {
 		requests: {},
 
 		appFlags: {
 			callLogs: {
-				devices: []
+				devices: [],
+				// Bumped on every render so in-flight page loads for a previous date range stop.
+				loadId: 0
 			}
 		},
 
@@ -24,7 +27,7 @@ define(function(require) {
 			var self = this;
 
 			self.callLogsGetData(function() {
-				self.callLogsRenderContent(args.parent, args.fromDate, args.toDate, args.type, args.callback);
+				self.callLogsRenderContent(args.parent, args.fromDate, args.toDate, args.callback);
 			});
 		},
 
@@ -126,13 +129,15 @@ define(function(require) {
 			});
 		},
 
-		callLogsRenderContent: function(parent, fromDate, toDate, type, callback) {
+		callLogsRenderContent: function(parent, fromDate, toDate, callback) {
 			var self = this,
 				template,
 				defaultDateRange = 1,
 				container = parent || $('.right-content'),
-				maxDateRange = 31;
+				maxDateRange = 31,
+				loadId = ++self.appFlags.callLogs.loadId;
 
+			// Default to today on first load.
 			if (!toDate && !fromDate) {
 				var dates = monster.util.getDefaultRangeDates(defaultDateRange);
 				fromDate = dates.from;
@@ -142,14 +147,18 @@ define(function(require) {
 			var tz = monster.util.getCurrentTimeZone(),
 				dataTemplate = {
 					timezone: 'GMT' + moment().tz(tz).format('Z'),
-					type: type || 'today',
 					fromDate: fromDate,
 					toDate: toDate,
-					showFilteredDates: ['thisMonth', 'thisWeek'].indexOf(type) >= 0,
 					showReport: monster.config.whitelabel.callReportEmail ? true : false
 				};
 
 			self.callLogsGetCdrs(fromDate, toDate, function(cdrs, nextStartKey) {
+				// The user filtered again before this range came back.
+				if (loadId !== self.appFlags.callLogs.loadId) {
+					callback && callback();
+					return;
+				}
+
 				cdrs = self.callLogsFormatCdrs(cdrs);
 
 				dataTemplate.cdrs = cdrs;
@@ -192,6 +201,7 @@ define(function(require) {
 					cdrs: cdrs,
 					fromDate: fromDate,
 					toDate: toDate,
+					loadId: loadId,
 					nextStartKey: nextStartKey
 				});
 
@@ -211,39 +221,96 @@ define(function(require) {
 				cdrs = params.cdrs,
 				fromDate = params.fromDate,
 				toDate = params.toDate,
+				loadId = params.loadId,
 				startKey = params.nextStartKey,
-				isLoadingMore = false;
+				searchInput = template.find('.search-div input.search-query'),
+				loaderDiv = template.find('.call-logs-loader'),
+				rows = indexRows(cdrs, template.find('.call-logs-grid .grid-row-container > .grid-row-group'));
+
+			// Pairs each CDR with its rendered row (cdrsList renders one .grid-row-group per CDR, in order)
+			// so searching never has to query the DOM.
+			function indexRows(pageCdrs, $rowGroups) {
+				return _.map(pageCdrs, function(cdr, index) {
+					return {
+						element: $rowGroups.get(index),
+						searchString: _.toLower([
+							cdr.date,
+							cdr.fromName,
+							cdr.fromNumber,
+							cdr.toName,
+							cdr.toNumber,
+							cdr.hangupCause,
+							cdr.id
+						].join('|'))
+					};
+				});
+			}
+
+			// Searches the logs already loaded for the range; it never goes back to the API.
+			function filterRows() {
+				var searchValue = _.toLower(searchInput.val().replace(/\|/g, '')),
+					hasMatch = false;
+
+				_.each(rows, function(row) {
+					var isMatch = _.includes(row.searchString, searchValue);
+
+					row.element.classList.toggle('search-hidden', !isMatch);
+					hasMatch = hasMatch || isMatch;
+				});
+
+				// A match may still be on a page that hasn't loaded yet.
+				template.find('.grid-row.no-match').toggle(!_.isEmpty(rows) && !hasMatch && !startKey);
+			}
+
+			// Pulls every remaining page for the range so the grid (and search) covers all of it.
+			function loadRemainingCdrs() {
+				if (!startKey) {
+					return;
+				}
+
+				loaderDiv.addClass('loading');
+
+				self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
+					// Stop if the user filtered another range or left Call Logs while this page was loading.
+					if (loadId !== self.appFlags.callLogs.loadId || !$.contains(document.documentElement, template[0])) {
+						return;
+					}
+
+					var formattedCdrs = self.callLogsFormatCdrs(newCdrs),
+						cdrsTemplate = $(self.getTemplate({
+							name: 'cdrsList',
+							data: {
+								cdrs: formattedCdrs,
+								showReport: monster.config.whitelabel.callReportEmail ? true : false
+							},
+							submodule: 'callLogs'
+						}));
+
+					template.find('.call-logs-grid .grid-row-container').append(cdrsTemplate);
+					rows = rows.concat(indexRows(formattedCdrs, cdrsTemplate.filter('.grid-row-group')));
+					startKey = nextStartKey;
+
+					if (!startKey) {
+						loaderDiv.hide();
+					}
+
+					filterRows();
+					loadRemainingCdrs();
+				}, startKey, callLogsBackgroundPageSize, function() {
+					// Leave the rows we have and let the user retry the rest.
+					loaderDiv.removeClass('loading');
+				});
+			}
 
 			setTimeout(function() {
-				template.find('.search-query').focus();
+				searchInput.focus();
 			});
 
 			template.find('.apply-filter').on('click', function(e) {
 				var fromDate = template.find('input.filter-from').datepicker('getDate'),
 					toDate = template.find('input.filter-to').datepicker('getDate');
 
-				self.callLogsRenderContent(template.parents('.right-content'), fromDate, toDate, 'custom');
-			});
-
-			template.find('.fixed-ranges button').on('click', function(e) {
-				var $this = $(this),
-					type = $this.data('type');
-
-				// We don't really need to do that, but it looks better to the user if we still remove/add the classes instantly.
-				template.find('.fixed-ranges button').removeClass('active');
-				$this.addClass('active');
-
-				if (type !== 'custom') {
-					// Without this, it doesn't look like we're refreshing the data.
-					// GOod way to solve it would be to separate the filters from the call logs view, and only refresh the call logs.
-					template.find('.call-logs-content').empty();
-
-					var dates = self.callLogsGetFixedDatesFromType(type);
-					self.callLogsRenderContent(template.parents('.right-content'), dates.from, dates.to, type);
-				} else {
-					template.find('.fixed-ranges-date').hide();
-					template.find('.custom-range').addClass('active');
-				}
+				self.callLogsRenderContent(template.parents('.right-content'), fromDate, toDate);
 			});
 
 			template.find('.download-csv').on('click', function(e) {
@@ -254,43 +321,7 @@ define(function(require) {
 				window.open(url, '_blank');
 			});
 
-			template.find('.search-div input.search-query').on('keyup', function(e) {
-				var searchValue = $(this).val().replace(/\|/g, '').toLowerCase();
-
-				if (template.find('.grid-row-container .grid-row').length > 0) {
-					var matchedResults = false;
-
-					if (searchValue.length <= 0) {
-						template.find('.grid-row-group').show();
-						matchedResults = true;
-					} else {
-						_.each(cdrs, function(cdr) {
-							var searchString = (cdr.date + '|' + cdr.fromName + '|' + cdr.fromNumber + '|' + cdr.toName + '|'
-											+ cdr.toNumber + '|' + cdr.hangupCause + '|' + cdr.id).toLowerCase(),
-								rowGroup = template.find('.grid-row.main-leg[data-id="' + cdr.id + '"]').parents('.grid-row-group');
-
-							if (searchString.indexOf(searchValue) >= 0) {
-								matchedResults = true;
-								rowGroup.show();
-							} else {
-								rowGroup.hide();
-							}
-						});
-					}
-
-					// Don't declare "no match" until every page is loaded; a match may still be on an unfetched page.
-					if (matchedResults || startKey) {
-						template.find('.grid-row.no-match').hide();
-					} else {
-						template.find('.grid-row.no-match').show();
-					}
-				}
-
-				// Filtering is client-side, so pull the remaining pages to apply it against every log.
-				if (searchValue.length > 0 && startKey && !isLoadingMore) {
-					loadMoreCdrs({ untilFiltered: true });
-				}
-			});
+			searchInput.on('input', filterRows);
 
 			template.on('click', '.grid-row.main-leg', function(e) {
 				var $this = $(this),
@@ -386,100 +417,19 @@ define(function(require) {
 				e.stopPropagation();
 			});
 
-			function loadMoreCdrs(options) {
-				options = options || {};
-
-				var loaderDiv = template.find('.call-logs-loader'),
-					searchInput = template.find('.search-div input.search-query'),
-					cdrsTemplate;
-
-				if (!startKey) {
-					isLoadingMore = false;
-					loaderDiv.hide();
-					return;
-				}
-
-				isLoadingMore = true;
-				loaderDiv.addClass('loading');
-				loaderDiv.find('.loading-message > i').addClass('fa-spin');
-
-				self.callLogsGetCdrs(fromDate, toDate, function(newCdrs, nextStartKey) {
-					newCdrs = self.callLogsFormatCdrs(newCdrs);
-					cdrsTemplate = $(self.getTemplate({
-						name: 'cdrsList',
-						data: {
-							cdrs: newCdrs,
-							showReport: monster.config.whitelabel.callReportEmail ? true : false
-						},
-						submodule: 'callLogs'
-					}));
-
-					startKey = nextStartKey;
-
-					template.find('.call-logs-grid .grid-row-container').append(cdrsTemplate);
-
-					cdrs = cdrs.concat(newCdrs);
-					if (searchInput.val()) {
-						searchInput.keyup();
-					}
-
-					// Keep paging (spinner stays up) until the active filter has seen every log.
-					if (options.untilFiltered && startKey && searchInput.val()) {
-						loadMoreCdrs(options);
-						return;
-					}
-
-					isLoadingMore = false;
-					loaderDiv.removeClass('loading');
-					loaderDiv.find('.loading-message > i').removeClass('fa-spin');
-					if (!startKey) {
-						loaderDiv.hide();
-					}
-				}, startKey, options.untilFiltered ? callLogsSearchPageSize : callLogsPageSize);
-			}
-
-			template.find('.call-logs-grid').on('scroll', function(e) {
-				var $this = $(this);
-				if (!isLoadingMore && $this.scrollTop() === $this[0].scrollHeight - $this.innerHeight()) {
-					loadMoreCdrs();
-				}
-			});
-
-			template.find('.call-logs-loader:not(.loading) .loader-message').on('click', function(e) {
-				if (!isLoadingMore) {
-					loadMoreCdrs();
-				}
+			// Only clickable after a page failed to load (it's hidden while loading).
+			loaderDiv.find('.loader-message').on('click', function(e) {
+				loadRemainingCdrs();
 			});
 
 			monster.ui.clipboard(template.find('.copy-diag-data-target'), function(trigger) {
 				return $(trigger).data('callData');
 			}, self.i18n.active().callLogs.copyCallDiagInfo);
+
+			loadRemainingCdrs();
 		},
 
-		// Function built to return JS Dates for the fixed ranges.
-		callLogsGetFixedDatesFromType: function(type) {
-			var self = this,
-				from = new Date(),
-				to = new Date();
-
-			if (type === 'thisWeek') {
-				// First we need to know how many days separate today and monday.
-				// Since Sunday is 0 and Monday is 1, we do this little substraction to get the result.
-				var day = from.getDay(),
-					countDaysFromMonday = (day || 7) - 1;
-
-				from.setDate(from.getDate() - countDaysFromMonday);
-			} else if (type === 'thisMonth') {
-				from.setDate(1);
-			}
-
-			return {
-				from: from,
-				to: to
-			};
-		},
-
-		callLogsGetCdrs: function(fromDate, toDate, callback, pageStartKey, pageSize) {
+		callLogsGetCdrs: function(fromDate, toDate, callback, pageStartKey, pageSize, errorCallback) {
 			var self = this,
 				fromDateTimestamp = monster.util.dateToBeginningOfGregorianDay(fromDate),
 				toDateTimestamp = monster.util.dateToEndOfGregorianDay(toDate),
@@ -501,6 +451,9 @@ define(function(require) {
 				},
 				success: function(data, status) {
 					callback(data.data, data.next_start_key);
+				},
+				error: function() {
+					errorCallback && errorCallback();
 				}
 			});
 		},

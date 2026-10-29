@@ -1083,21 +1083,12 @@
 			"actions": "Aktionen"
 		},
 		"reportCall": "Anruf melden",
-		"loaderMessage": "Scrollen Sie nach unten oder klicken Sie hier, um weitere Anrufprotokolle zu laden.",
 		"loadingMessage": "Weitere Anrufprotokolle werden geladen …",
 		"alertMessages": {
 			"getDetailsError": "Beim Aufrufen der Anrufprotokolldetails ist ein Fehler aufgetreten."
 		},
 		"key": "Taste",
 		"value": "Wert",
-		"__comment": "UI-1071: Neue „Bereich“-Schaltflächen zu Anrufprotokollen hinzugefügt",
-		"__version": "3.20",
-		"thisMonth": "Diesen Monat",
-		"thisWeek": "Diese Woche",
-		"thisDay": "Heute",
-		"custom": "Benutzerdefiniert",
-		"callsFrom": "Anrufe anzeigen von",
-		"callsTo": "bis",
 		"__comment": "UI-",
 		"__version": "v4.0",
 		"loading": "Weitere Informationen werden geladen …",
@@ -1105,7 +1096,7 @@
 			"report": "Anruf melden",
 			"details": "Technische Details"
 		},
-		"downloadTooltip": "Im benutzerdefinierten Modus müssen Sie erst auf „Filter“ klicken, bevor Sie auf „Download“ klicken."
+		"downloadTooltip": "Sie müssen erst auf „Filter“ klicken, bevor Sie auf „Download“ klicken."
 	},
 
 	"myOffice": {
