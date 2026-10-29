@@ -308,15 +308,15 @@ define(function(require) {
 			var self = this,
 				$container = $('#voip_container');
 
-			// SmartPBX not on screen: it will render fresh when next opened.
-			if ($container.length === 0) {
-				return;
-			}
-
 			// Drop account-scoped data cached on the app instance.
 			if (self.appFlags.strategyHolidays) {
 				self.appFlags.strategyHolidays.allHolidays = [];
 				self.appFlags.strategyHolidays.deletedHolidays = [];
+			}
+
+			// SmartPBX not on screen: it will render fresh when next opened.
+			if ($container.length === 0) {
+				return;
 			}
 
 			var $rightContent = $container.find('.right-content'),
