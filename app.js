@@ -19,98 +19,42 @@ define(function(require) {
 			'sv.numbers.get': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'GET'
 			},
 			'sv.numbers.create': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=numbers&accountId={accountId}&phoneNumber={phoneNumber}',
-				verb: 'PUT',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'PUT'
 			},
 			'sv.callerid.update': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=callerid&accountId={accountId}&phoneNumber={phoneNumber}',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.curbside.get': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=curbside&dids={dids}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.sms.create': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=sms',
-				verb: 'PUT',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.sms.update': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=sms',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
-			},
-			'sv.sms.delete': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=sms&accountId={accountId}&userId={userId}',
-				verb: 'DELETE',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'POST'
 			},
 			'sv.user.get': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
-				verb: 'GET',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'GET'
 			},
 			'sv.user.sync': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'POST'
 			},
 			'sv.device.create': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=device&accountId={accountId}',
-				verb: 'PUT',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'PUT'
 			},
 			'sv.device.update': {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
-				verb: 'PATCH',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				verb: 'PATCH'
 			},
 			'sv.credentials.send': {
 				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=credentials&userId={userId}',
-				verb: 'POST',
-				removeHeaders: [
-					'X-Auth-Token'
-				]
+				url: 'monster/api_functions.php?m=credentials&accountId={accountId}&userId={userId}',
+				verb: 'POST'
 			},
 		},
 		subscribe: {
@@ -564,18 +508,6 @@ define(function(require) {
 				maybeGetMainVMBox,
 				maybeCreateMainVMBox
 			], callback);
-		},
-
-		/**
-		 * filter out toll free number ranges from array of numbers
-		 * @param  {Array} numbers
-		 * @return {Array}
-		 */
-		removeTollFreeNumbers: function(numbers) {
-			return numbers.filter(function(number) {
-				var m = /^(?:\+?1)?(?:8(?:00|88|66|77|55|44|33)[2-9]\d{6})$/gm.exec(number);
-				return m === null || !m.length;
-			});
 		},
 
 		registerHandlebarHelpers: function() {
