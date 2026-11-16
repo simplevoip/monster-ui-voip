@@ -4,17 +4,16 @@
 			{{i18n.callLogs.title}}
 		</div>
 
-		<div class="fixed-ranges">
-			<div class="btn-toolbar pull-left">
-				<div class="btn-group">
-					<button data-type="today" class="btn{{#compare type "===" "today"}} active{{/compare}}" type="button">{{ i18n.callLogs.thisDay }}</button>
-					<button data-type="thisWeek" class="btn{{#compare type "===" "thisWeek"}} active{{/compare}}" type="button">{{ i18n.callLogs.thisWeek }}</button>
-					<button data-type="thisMonth" class="btn{{#compare type "===" "thisMonth"}} active{{/compare}}" type="button">{{ i18n.callLogs.thisMonth }}</button>
-					<button data-type="custom" class="btn{{#compare type "===" "custom"}} active{{/compare}}" type="button">{{ i18n.callLogs.custom }}</button>
-				</div>
+		<div class="call-logs-filters">
+			<div class="date-range">
+				<span>{{i18n.startDate}}</span>
+				<input id="startDate" type="text" class="date-filter filter-from">
+				<span>{{i18n.endDate}}</span>
+				<input id="endDate" type="text" class="date-filter filter-to">
+				<button type="button" class="apply-filter monster-button monster-button-primary" title="{{i18n.callLogs.applyFilter}}">{{i18n.filter}}</button>
 			</div>
 
-			<div class="search-div pull-right">
+			<div class="search-div">
 				<span class="search-box">
 					<i class="fa fa-search"></i>
 					<input type="text" class="search-query" placeholder="{{i18n.table.search}}">
@@ -23,20 +22,6 @@
 		</div>
 
 		<div class="sub-ranges">
-			<div class="custom-range{{#compare type "===" "custom"}} active{{/compare}}">
-				<span>{{i18n.startDate}}</span>
-				<input id="startDate" type="text" class="date-filter filter-from">
-				<span>{{i18n.endDate}}</span>
-				<input id="endDate" type="text" class="date-filter filter-to">
-				<button type="button" class="apply-filter monster-button monster-button-primary" title="{{i18n.callLogs.applyFilter}}">{{i18n.filter}}</button>
-			</div>
-
-			{{#if showFilteredDates}}
-				<div class="fixed-ranges-date">
-					{{ i18n.callLogs.callsFrom }} <span class="highlight-date">{{ toFriendlyDate fromDate "date"}}</span> {{ i18n.callLogs.callsTo }} <span class="highlight-date">{{ toFriendlyDate toDate "date" }}</span>
-				</div>
-			{{/if}}
-
 			<a href="#" role="button" class="monster-link download-csv"><i class="fa fa-download monster-green"></i>{{i18n.download}}</a>
 			<i class="help-popover fa fa-question" data-toggle="tooltip" data-placement="top" data-original-title="{{ i18n.callLogs.downloadTooltip }}"></i>
 		</div>
@@ -89,9 +74,9 @@
 			{{/unless}}
 		</div>
 	</div>
-	<div class="call-logs-loader">
-		<div class="loader-message">{{i18n.callLogs.loaderMessage}}</div>
-		<div class="loading-message"><i class="fa fa-spinner fa-lg"></i><span>{{i18n.callLogs.loadingMessage}}</span></div>
+	<div class="call-logs-loader loading">
+		<div class="loader-message">{{i18n.callLogs.loadErrorMessage}}</div>
+		<div class="loading-message"><i class="fa fa-spinner fa-spin fa-lg"></i><span>{{i18n.callLogs.loadingMessage}}</span></div>
 	</div>
 
 	<!-- DOM element to which clipboard click events can be anchored without interfeering with the toggle main-leg logic -->

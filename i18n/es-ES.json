@@ -845,21 +845,12 @@
 			"report2": "Reportar"
 		},
 		"reportCall": "Reportar Llamada",
-		"loaderMessage": "Desplácese hacia abajo o haga clic aquí para cargar registros de llamada adicionales.",
 		"loadingMessage": "Cargar registros de llamada adicionales...",
 		"alertMessages": {
 			"getDetailsError": "Se ha producido un error al recuperar los detalles de registro de llamadas."
 		},
 		"key": "Clave",
-		"value": "Valor",
-		"__comment": "UI-1071: Adding new Range buttons to Call Logs",
-		"__version": "3.20",
-		"thisMonth": "Este Mes",
-		"thisWeek": "Esta Llamada",
-		"thisDay": "Hoy",
-		"custom": "Personalizado",
-		"callsFrom": "Muestra las llamadas de",
-		"callsTo": "A"
+		"value": "Valor"
 	},
 
 	"myOffice": {
