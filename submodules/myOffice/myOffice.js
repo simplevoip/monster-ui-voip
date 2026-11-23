@@ -60,7 +60,6 @@ define(function(require) {
 						confNumbers: myOfficeData.confNumbers || [],
 						faxingNumbers: myOfficeData.faxingNumbers || [],
 						faxNumbers: myOfficeData.faxNumbers || [],
-						showCurbsideManagement: false,
 						topMessage: myOfficeData.topMessage,
 						devicesList: _.orderBy(myOfficeData.devicesData, 'count', 'desc'),
 						usersList: _.orderBy(myOfficeData.usersData, 'count', 'desc'),
@@ -637,17 +636,6 @@ define(function(require) {
 				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCallerId);
 			});
 
-			template.find('.header-link.curbside:not(.disabled)').on('click', function(e) {
-				e.preventDefault();
-				self.myOfficeRenderCurbsideEdit({
-					accountId: self.accountId,
-					myOfficeData: myOfficeData
-				});
-			});
-
-			template.find('.header-link.curbside.disabled').on('click', function(e) {
-				monster.ui.alert(self.i18n.active().myOffice.missingMainNumberForCurbside);
-			});
 
 			monster.ui.tooltips(template);
 		},
@@ -821,192 +809,6 @@ define(function(require) {
 					popup.dialog('close').remove();
 				});
 			});
-		},
-
-		myOfficeRenderCurbsideEdit: function(args) {
-			var self = this,
-				accountId = args.accountId,
-				myOfficeData = args.myOfficeData,
-				mainNumbers = myOfficeData.mainNumbers;
-
-			self.myOfficeGetCurbside(_.map(mainNumbers, 'number'), function(curbsideData) {
-				var filtered_mainNumbers = self.removeTollFreeNumbers(_.map(mainNumbers, 'number'));
-
-				curbsideData = _.merge({}, curbsideData, {
-					mainNumbers: filtered_mainNumbers
-				});
-
-				self.myOfficeRenderCurbsidePopup(curbsideData);
-			});
-		},
-
-		myOfficeRenderCurbsidePopup: function(curbsideData) {
-			var self = this,
-				popupTemplate = $(self.getTemplate({
-					name: 'curbsidePopup',
-					data: curbsideData,
-					submodule: 'myOffice'
-				})),
-				popup = monster.ui.dialog(popupTemplate, {
-					autoScroll: false,
-					title: self.i18n.active().myOffice.curbside.title,
-					position: ['center', 20]
-				});
-
-			self.myOfficeCurbsidePopupBindEvents({
-				popupTemplate: popupTemplate,
-				popup: popup,
-				data: curbsideData
-			});
-		},
-
-		myOfficeCurbsidePopupBindEvents: function(args) {
-			var self = this,
-				popupTemplate = args.popupTemplate,
-				popup = args.popup,
-				data = args.data,
-				curbsideForm = popupTemplate.find('#form_curbside'),
-				loadCurbsideSection = function() {
-					var $curbside = popupTemplate.find('.number-feature[data-feature="curbside"]'),
-						$enabled = popupTemplate.find('[name="curbside_enabled"]'),
-						action = $enabled.is(':checked') ? 'slideDown' : 'slideUp';
-
-					$curbside[action]();
-				};
-				// loadCurbsideSection();
-
-			monster.ui.validate(curbsideForm, {
-				rules: {
-					'did': {
-						required: true
-					},
-					'curbside_settings.curbside_password': {
-						maxlength: 70,
-						required: true
-					},
-					'curbside_settings.confirm_password': {
-						maxlength: 70,
-						equalTo: '#password',
-						required: true
-					}
-				}
-			});
-
-			if (data.curbside_enabled) {
-				$('[name="curbside_settings.curbside_password"]').rules('remove', 'required');
-				$('[name="curbside_settings.confirm_password"]').rules('remove', 'required');
-			}
-
-			popupTemplate.find('[name="curbside_enabled"]').on('click', function(evt) {
-				loadCurbsideSection();
-			});
-
-			popupTemplate.find('.cancel-link').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			popupTemplate.find('.save').on('click', function() {
-				if (monster.ui.valid(curbsideForm)) {
-					var dataToSave = self.myOfficeCurbsideMergeData(data, popupTemplate);
-
-					if (dataToSave.curbside_settings.curbside_password.length === 0) {
-						delete dataToSave.curbside_settings.curbside_password;
-					}
-					delete dataToSave.curbside_settings.confirm_password;
-
-					self.myOfficeSaveCurbside(data, dataToSave, function(data) {
-						if (data.message !== null && data.message !== '' && data.message !== undefined) {
-							monster.ui.alert('info', data.message);
-						}
-						popup.dialog('close').remove();
-					});
-
-					$('[name="curbside_settings.curbside_password"]').rules('remove', 'required');
-					$('[name="curbside_settings.confirm_password"]').rules('remove', 'required');
-				}
-			});
-
-
-			// Replies stuff
-			var addEntity = function(event) {
-				event.preventDefault();
-
-				var inputName = popupTemplate.find('#entity_name'),
-					reply = inputName.val(),
-					templateFlag = $(self.getTemplate({
-						name: 'replyRow',
-						data: {
-							reply: reply
-						},
-						submodule: 'myOffice'
-					}));
-
-				popupTemplate.find('.saved-entities').prepend(templateFlag);
-
-				inputName
-					.val('')
-					.focus();
-			};
-
-			popupTemplate.find('.entity-wrapper.placeholder:not(.active)').on('click', function() {
-				$(this).addClass('active');
-				popupTemplate.find('#entity_name').focus();
-			});
-
-			popupTemplate.find('#cancel_entity').on('click', function(e) {
-				e.stopPropagation();
-
-				$(this).siblings('input').val('');
-
-				popupTemplate.find('.entity-wrapper.placeholder')
-						.removeClass('active');
-			});
-
-			popupTemplate.find('#add_entity').on('click', function(e) {
-				addEntity(e);
-			});
-
-			popupTemplate.find('#entity_name').on('keypress', function(e) {
-				var code = e.keyCode || e.which;
-
-				if (code === 13) {
-					addEntity(e);
-				}
-			});
-
-			popupTemplate.find('.saved-entities').on('click', '.delete-entity', function() {
-				$(this).parents('.entity-wrapper').remove();
-			});
-		},
-
-		myOfficeCurbsideMergeData: function(originalData, template) {
-			var self = this,
-				formData = monster.ui.getFormData('form_curbside'),
-				mergedData = $.extend(true, {}, originalData, formData);
-
-			// Rebuild list of replies from UI
-			mergedData.curbside_settings.replies = [];
-			template.find('.saved-entities .entity-wrapper').each(function() {
-				mergedData.curbside_settings.replies.push($(this).data('reply'));
-			});
-
-			// set Kazoo Account ID
-			mergedData.kazoo_account_id = self.accountId;
-
-			delete mergedData.mainNumbers;
-			delete mergedData.extra;
-
-			return mergedData;
-		},
-
-		myOfficeSaveCurbside: function(origData, curbsideData, callback) {
-			var self = this;
-
-			if (!origData.curbside_enabled) {
-				self.myOfficeCreateCurbside(curbsideData, callback);
-			} else {
-				self.myOfficeUpdateCurbside(curbsideData, callback);
-			}
 		},
 
 		myOfficeRenderCallerIdPopup: function(args) {
@@ -1266,54 +1068,6 @@ define(function(require) {
 				},
 				success: function(data, status) {
 					success && success(data.data);
-				},
-				error: function(data, status) {
-					error && error(data);
-				}
-			});
-		},
-
-		myOfficeUpdateCurbside: function(curbsideData, callbackSuccess, callbackError) {
-			var self = this;
-
-			monster.request({
-				resource: 'sv.sms.update',
-				data: {
-					data: curbsideData
-				},
-				success: function(data) {
-					callbackSuccess && callbackSuccess(data);
-				},
-				error: function(data) {
-					callbackError && callbackError(data);
-				}
-			});
-		},
-
-		myOfficeCreateCurbside: function(curbsideData, callback) {
-			var self = this;
-
-			monster.request({
-				resource: 'sv.sms.create',
-				data: {
-					data: curbsideData
-				},
-				success: function(data) {
-					callback(data.data);
-				}
-			});
-		},
-
-		myOfficeGetCurbside: function(dids, success, error) {
-			var self = this;
-
-			monster.request({
-				resource: 'sv.curbside.get',
-				data: {
-					dids: dids.join(",")
-				},
-				success: function(data, status) {
-					success && success(data);
 				},
 				error: function(data, status) {
 					error && error(data);
