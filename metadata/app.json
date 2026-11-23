@@ -26,7 +26,7 @@
 	"icon": "SmartPBX_app.png",
 	"api_url": "https://kazoo.simplevoip.us:8443/v2",
 	"author": "SimpleVoIP, LLC",
-	"version": "1.0.1",
+	"version": "1.0.3",
 	"license": "-",
 	"price": 0,
 	"screenshots": [
