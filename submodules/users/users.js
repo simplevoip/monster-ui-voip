@@ -304,11 +304,6 @@ define(function(require) {
 							icon: 'fa fa-ban',
 							iconColor: 'monster-red',
 							title: self.i18n.active().users.do_not_disturb.title
-						},
-						mobile_app: {
-							icon: 'fa fa-mobile',
-							iconColor: 'monster-orange',
-							title: self.i18n.active().users.mobile_app.title
 						}
 					}, isFeatureAvailable),
 					outboundPrivacy: _.map(self.appFlags.common.outboundPrivacy, function(item) {
@@ -1663,27 +1658,6 @@ define(function(require) {
 				});
 			});
 
-			template.on('click', '.feature[data-feature="mobile_app"]', function() {
-				if (currentUser.mobile_app.is_provisioned) {
-					self.usersRenderMobileApp(currentUser);
-				} else {
-					// user must have a phone number or an extension (presence_id)
-					if (currentUser.extra.extension !== '' || currentUser.extra.phoneNumber !== '') {
-						self.usersPromptUserCreateDevice(currentUser, function(device) {
-							self.usersRender({
-								userId: currentUser.id,
-								openedTab: 'features'//,
-								// callback: self.usersRenderMobileApp(currentUser)
-							});
-						}, function() {
-							monster.ui.alert('error', self.i18n.active().users.mobile_app.createDeviceError);
-						});
-					} else {
-						monster.ui.alert('warning', self.i18n.active().users.mobile_app.noNumberError);
-					}
-				}
-			});
-
 			template.on('click', '.feature[data-feature="faxing"]', function() {
 				if (!monster.util.isTrial()) {
 					monster.parallel({
@@ -2713,108 +2687,6 @@ define(function(require) {
 			});
 		},
 
-		usersPromptUserCreateDevice: function(featureUser, success, error) {
-			var self = this;
-
-			if (!self.canCreateDevices()) {
-				error && error();
-				return;
-			}
-
-			monster.ui.confirm(self.i18n.active().users.mobile_app.createADevice,
-				function() {
-					self.usersCreateUserDevice(featureUser, function(device) {
-						self.usersSendMobileAppCredentials(featureUser.id, function() {
-							success(device);
-						});
-					}, error);
-				},
-				function() {}
-			);
-		},
-
-		usersCreateUserDevice: function(featureUser, callback, error) {
-			var self = this,
-				accountId = self.accountId,
-				deviceData = {
-					device_name: `${featureUser.first_name} ${featureUser.last_name} - Mobile App`,
-					device_type: 'softphone',
-					user_name: `${featureUser.presence_id}_softphone`, // TODO: create method to generate username, should search device listing for existing usernames and make sure not to duplicate
-					user_id: `${featureUser.id}`
-				};
-
-			if (!self.canCreateDevices()) {
-				error && error();
-				return;
-			}
-
-			monster.request({
-				resource: 'sv.device.create',
-				data: {
-					accountId: accountId,
-					data: deviceData
-				},
-				success: function(device) {
-					callback && callback(device.data);
-				},
-				error: function() {
-					error && error();
-				}
-			});
-		},
-
-		usersRenderMobileApp: function(featureUser) {
-			var self = this,
-				featureTemplate = $(self.getTemplate({
-					name: 'feature-mobile_app',
-					data: featureUser,
-					submodule: 'users'
-				})),
-				switchFeature = featureTemplate.find('.switch-state'),
-				featureForm = featureTemplate.find('#mobile_app_form');
-
-			featureTemplate.find('.send-email').on('click', function() {
-				self.usersSendMobileAppCredentials(featureUser.id, function(message) {
-					monster.ui.alert('info', message);
-				});
-			});
-
-			switchFeature.on('change', function() {
-				$(this).prop('checked') ? featureTemplate.find('.content').slideDown() : featureTemplate.find('.content').slideUp();
-			});
-
-			featureTemplate.find('.cancel-link').on('click', function() {
-				popup.dialog('close').remove();
-			});
-
-			featureTemplate.find('.save').on('click', function() {
-				var userToSave = featureUser;
-				userToSave.extra.softphone.enabled = switchFeature.prop('checked');
-
-				var deviceData = {
-					deviceId: userToSave.extra.softphone.id,
-					patchData: {
-						enabled: userToSave.extra.softphone.enabled
-					}
-				};
-
-				self.usersUpdateMobileApp(deviceData, function(data) {
-					if (data) {
-						popup.dialog('close').remove();
-						self.usersRender({
-							userId: featureUser.id,
-							openedTab: 'features'
-						});
-					}
-				});
-			});
-
-			var popup = monster.ui.dialog(featureTemplate, {
-				title: featureUser && featureUser.extra && featureUser.extra.mapFeatures.mobile_app.title,
-				position: ['center', 20]
-			});
-		},
-
 		usersRenderFindMeFollowMe: function(params) {
 			var self = this;
 
@@ -3549,9 +3421,6 @@ define(function(require) {
 			self.usersGetUser(userId, function(userData) {
 				_.each(listUsers.users, function(user) {
 					if (user.id === userData.id) {
-						if (userData.mobile_app.is_provisioned) {
-							user.extra.mapFeatures.mobile_app.active = true;
-						}
 						// The listing's `features` come from Kazoo's view of the stored doc, so state that was only
 						// just migrated from the legacy `simplevoip` key (see migrateLegacyFeatureState) isn't in it yet.
 						_.each(userData.smartpbx, function(feature, key) {
@@ -4662,43 +4531,6 @@ define(function(require) {
 				},
 				success: function(userData) {
 					callback && callback(userData);
-				}
-			});
-		},
-
-		usersSendMobileAppCredentials: function(userId, callback) {
-			var self = this;
-
-			monster.request({
-				resource: 'sv.credentials.send',
-				data: {
-					accountId: self.accountId,
-					userId: userId
-				},
-				success: function(data) {
-					callback && callback(data.data.message);
-				},
-				error: function() {
-					callback && callback(data.message);
-				}
-			});
-		},
-
-		usersUpdateMobileApp: function(deviceData, callback) {
-			var self = this;
-
-			monster.request({
-				resource: 'sv.device.update',
-				data: {
-					accountId: self.accountId,
-					deviceId: deviceData.deviceId,
-					data: deviceData.patchData
-				},
-				success: function(data) {
-					callback && callback(data);
-				},
-				error: function() {
-					console.log('Failed to update softphone settings');
 				}
 			});
 		},

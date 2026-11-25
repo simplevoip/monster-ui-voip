@@ -40,22 +40,7 @@ define(function(require) {
 				apiRoot: sv_api[env],
 				url: 'monster/api_functions.php?m=user&accountId={accountId}&userId={userId}',
 				verb: 'POST'
-			},
-			'sv.device.create': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=device&accountId={accountId}',
-				verb: 'PUT'
-			},
-			'sv.device.update': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=device&accountId={accountId}&deviceId={deviceId}',
-				verb: 'PATCH'
-			},
-			'sv.credentials.send': {
-				apiRoot: sv_api[env],
-				url: 'monster/api_functions.php?m=credentials&accountId={accountId}&userId={userId}',
-				verb: 'POST'
-			},
+			}
 		},
 		subscribe: {
 			'core.crossSiteMessage.voip': 'crossSiteMessageHandler',
