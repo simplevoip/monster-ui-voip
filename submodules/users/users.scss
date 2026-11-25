@@ -1089,30 +1089,6 @@
     position: relative;
 }
 
-.monster-feature-popup-container[data-feature="mobile_app"] {
-    width: 600px;
-}
-
 .monster-feature-popup-container a {
     color: #2297ff;
-}
-
-.mobile-app-mobile {
-    display: flex;
-    justify-content: center;
-
-    > div {
-        flex: 0 0 40%;
-        text-align: center;
-    }
-}
-
-.mobile-app-badges {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    img {
-        max-width: 150px;
-    }
 }
